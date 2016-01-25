@@ -35,8 +35,7 @@ def insert_data_into_db(db, streamer, viewers, followers, partner):
 
 
 def main():
-    cycle_delay = 10  # seconds
-    streamer_delay = 2  # seconds
+    cycle_delay = 30  # seconds
     database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
     while True:
         json_url_streams = 'https://api.twitch.tv/kraken/search/streams?q=Elite%20Dangerous'
@@ -52,12 +51,12 @@ def main():
             print('[+] Streams online: {}'.format(stream_count))
             print('[+] Determining streamer count')
             current_count = 0
-            while current_count < int(stream_count):
+            while current_count <= int(stream_count) + 10:  # TODO: Remove limit from API, see if I can grab all the streamers at once
                 print('[+] Streamers: {}/{}'.format(current_count, stream_count))
                 # only ping the api again if you are not on the first page
                 if not current_count == 0:
                     next_json_url = data_games['_links']['next']
-                    print('[+] Accessing url: {}'.format(next_json_url))
+                    # print('[+] Accessing url: {}'.format(next_json_url))
                     try:
                         data_games = requests.get(next_json_url).json()
                     except Exception as e:
@@ -85,7 +84,6 @@ def main():
                         insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
                     else:
                         print('[-] {} is currently not playing Elite: Dangerous'.format(streamer_name))
-                    pause(streamer_delay)
                 current_count += 10
         pause(cycle_delay)
 
