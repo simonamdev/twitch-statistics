@@ -21,7 +21,7 @@ def pause(amount=5):
 def create_streamer_table(db, streamer):
     try:
         db.execute_sql('{}'.format(create_statement.format(streamer)))
-        # TODO: add some sort of feedback for if the table already exists
+        # TODO: add some sort of feedback if the table already exists
     except Exception as e:
         print(e)
 
@@ -29,7 +29,7 @@ def create_streamer_table(db, streamer):
 def insert_data_into_db(db, streamer, viewers, followers, partner):
     try:
         db.insert_db_data(streamer, '(NULL, ?, ?, ?, CURRENT_TIMESTAMP)', (viewers, followers, partner))
-        print('[+] Statistics successfully written to the database')
+        # print('[+] Statistics successfully written to the database')
     except Exception as e:
         print(e)
 
@@ -52,7 +52,7 @@ def main():
             print('[+] Determining streamer count')
             current_count = 0
             while current_count <= int(stream_count) + 10:  # TODO: Remove limit from API, see if I can grab all the streamers at once
-                print('[+] Streamers: {}/{}'.format(current_count, stream_count))
+                # print('[+] Streamers: {}/{}'.format(current_count, stream_count))
                 # only ping the api again if you are not on the first page
                 if not current_count == 0:
                     # print('[+] Accessing url: {}'.format(next_json_url))
@@ -77,7 +77,7 @@ def main():
                             partnership = 0
                             if streamer_data['channel']['partner']:
                                 partnership = 1
-                            print('[+] Info for: {}\n\tGame: {}\n\tViewers: {}\n\tFollowers: {}\n\tPartner: {}'.format(
+                            print('[+] {}\n\tGame: {}\n\tViewers: {}\n\tFollowers: {}\n\tPartner: {}'.format(
                                 streamer_name,
                                 streamer_data['game'],
                                 viewer_count,
@@ -87,7 +87,7 @@ def main():
                             # api search isn't perfect despite filtering for E:D only
                             insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
                         else:
-                            print('[-] {} is currently not playing Elite: Dangerous'.format(streamer_name))
+                            print('[-] {} is not playing Elite: Dangerous'.format(streamer_name))
                 current_count += 10
         pause(cycle_delay)
 
