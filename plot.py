@@ -60,7 +60,7 @@ print('Tier One: {} (>80)\nTier Two: {} (80-50)\nTier Three: {} (50-15)\nTier Fo
 for streamer_dict in tier_one_streamers:
     print('Name: {} Peak Viewers: {} Average Viewers: {} Followers: {}'.format(streamer_dict['name'], max(streamer_dict['viewers']), calculate_average(streamer_dict['viewers']), streamer_dict['followers'][-1]))
 
-sleep(600)
+# sleep(600)
 
 """
 # take the first and last times as strings to put in the axis label
