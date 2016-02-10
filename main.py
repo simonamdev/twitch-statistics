@@ -1,8 +1,10 @@
 import requests
 from cfg import SCP_COMMAND
+from datetime import date
 from time import sleep, strftime
 from pysqlite import Pysqlite
 from pprint import pprint
+from os import system as run_command
 
 create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
                    'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
@@ -38,7 +40,23 @@ def insert_data_into_db(db, streamer, viewers, followers, partner):
 def main():
     cycle_delay = 30  # seconds
     database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
+    previous_day_number = date.day
     while True:
+        # check if a day has passed
+        current_day_number = date.day
+        if not current_day_number == previous_day_number or True:
+            # update the previous day number
+            previous_day_number = current_day_number
+            print('[+] Closing the database connection')
+            database.close_connection()
+            print('[+] Backing up the database')
+            try:
+                run_command(SCP_COMMAND)
+            except Exception as e:
+                print('[-] Backing up error: {}'.format(e))
+            pause(3)
+            print('[+] Reponening database connection')
+            database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
         json_url_streams = 'https://api.twitch.tv/kraken/search/streams?q=Elite%20Dangerous'
         # initial api ping to get the first set of streamers
         try:
