@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-version = '0.1'
+version = '0.1.1'
 
 
 class PysqliteError(Exception):
@@ -20,6 +20,9 @@ class Pysqlite:
             self.dbcur = self.dbcon.cursor()
         else:
             raise PysqliteError('{} could not be found or cannot be accessed!'.format(self.dbname))
+
+    def close_connection(self):
+        self.dbcon.close()
 
     def execute_sql(self, execution_string):
         try:
