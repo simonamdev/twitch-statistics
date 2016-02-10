@@ -88,8 +88,10 @@ def main():
                 else:
                     for streamer_data in streamers_data:
                         streamer_name = streamer_data['channel']['name']
-                        # create a table for each streamer. The method avoids duplicates itself
-                        if streamer_data['game'] == 'Elite: Dangerous':
+                        streamer_count = 0
+                        # only consider the streamer if they are playing Elite: Dangerous
+                        if streamer_data['game'] in ['Elite: Dangerous', 'Elite Dangerous']:
+                            # create a table for each streamer. The method avoids duplicates itself
                             create_streamer_table(database, streamer_name)
                             # get the data for this streamer
                             viewer_count = streamer_data['viewers']
@@ -97,17 +99,16 @@ def main():
                             partnership = 0
                             if streamer_data['channel']['partner']:
                                 partnership = 1
-                            print('[+] {}\n\tGame: {}\n\tViewers: {}\n\tFollowers: {}\n\tPartner: {}'.format(
-                                streamer_name,
-                                streamer_data['game'],
+                            streamer_count += 1
+                            print('[+] [{}] V: {}\tF: {}\tP: {}\tN: {}'.format(
+                                stream_count,
                                 viewer_count,
                                 follower_count,
-                                partnership == 1
+                                partnership == 1,
+                                streamer_name
                             ))
                             # api search isn't perfect despite filtering for E:D only
                             insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
-                        else:
-                            print('[-] {} is not playing Elite: Dangerous'.format(streamer_name))
                 current_count += 10
         pause(cycle_delay)
 
