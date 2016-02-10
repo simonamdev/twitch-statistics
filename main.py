@@ -44,7 +44,8 @@ def main():
     while True:
         # check if a day has passed
         current_day_number = date.day
-        if not current_day_number == previous_day_number or True:
+        if not current_day_number == previous_day_number:
+            print('[+] Starting up backup procedure')
             # update the previous day number
             previous_day_number = current_day_number
             print('[+] Closing the database connection')
