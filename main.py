@@ -69,12 +69,12 @@ def main():
         else:
             # pprint(data_games)
             print('[+] Streams online: {}'.format(stream_count))
-            print('[+] Determining streamer count')
-            current_count = 0
-            while current_count <= int(stream_count) + 10:  # TODO: Remove limit from API, see if I can grab all the streamers at once
+            api_offset_count = 0
+            # TODO: Remove limit from API, see if I can grab all the streamers at once
+            while api_offset_count <= int(stream_count) + 10:
                 # print('[+] Streamers: {}/{}'.format(current_count, stream_count))
                 # only ping the api again if you are not on the first page
-                if not current_count == 0:
+                if not api_offset_count == 0:
                     # print('[+] Accessing url: {}'.format(next_json_url))
                     try:
                         next_json_url = data_games['_links']['next']
@@ -88,7 +88,6 @@ def main():
                 else:
                     for streamer_data in streamers_data:
                         streamer_name = streamer_data['channel']['name']
-                        streamer_count = 0
                         # only consider the streamer if they are playing Elite: Dangerous
                         if streamer_data['game'] in ['Elite: Dangerous', 'Elite Dangerous']:
                             # create a table for each streamer. The method avoids duplicates itself
@@ -99,9 +98,7 @@ def main():
                             partnership = 0
                             if streamer_data['channel']['partner']:
                                 partnership = 1
-                            streamer_count += 1
-                            print('[+] [{}] V: {}\tF: {}\tP: {}\tN: {}'.format(
-                                stream_count,
+                            print('[+] V: {}\tF: {}\tP: {}\tN: {}'.format(
                                 viewer_count,
                                 follower_count,
                                 partnership == 1,
@@ -109,7 +106,7 @@ def main():
                             ))
                             # api search isn't perfect despite filtering for E:D only
                             insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
-                current_count += 10
+                api_offset_count += 10
         pause(cycle_delay)
 
 if __name__ == '__main__':
