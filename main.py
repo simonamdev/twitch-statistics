@@ -1,4 +1,5 @@
 import requests
+from cfg import SCP_COMMAND
 from time import sleep, strftime
 from pysqlite import Pysqlite
 from pprint import pprint
