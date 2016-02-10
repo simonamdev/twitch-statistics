@@ -22,6 +22,7 @@ tier_one_streamers = []
 tier_two_streamers = []
 tier_three_streamers = []
 tier_four_streamers = []
+streamer_to_plot = 'mahddogg'
 for streamer in table_names:
     streamer_data = database.get_db_data(streamer)
     # pprint(streamer_data)
@@ -47,6 +48,9 @@ for streamer in table_names:
         tier_four_streamers.append(streamer_dict)
     streamer_dict['followers'] = [data[2] for data in streamer_data]  # followers
     streamer_dict['times'] = [data[4] for data in streamer_data]  # times
+    if len(streamer_to_plot) > 0 and streamer == streamer_to_plot:
+        all_streamer_data = [streamer_dict]
+        break
     all_streamer_data.append(streamer_dict)
 
 print('Tier One: {} (>80)\nTier Two: {} (80-50)\nTier Three: {} (50-15)\nTier Four: {} (<15)\nTotal: {}'.format(
@@ -72,22 +76,8 @@ max_time_string = streamer_times[-1]
 # streamer_times = [int(time.mktime(time.strptime(str(stamp), pattern))) for stamp in streamer_times]
 """
 
-"""
-streamer_to_plot = 'deejayknight'
-streamer_dict = dict()
-print('Searching for: {}'.format(streamer_to_plot))
-for streamer_data in all_streamer_data:
-    if streamer_data['name'] == streamer_to_plot:
-        streamer_dict = streamer_data
-        print('Found data for: {}'.format(streamer_to_plot))
-        break
-else:
-    print('Streamer not found!')
-    quit()
-"""
-
-print('Sending data to plot.ly ({} plots)'.format(len(tier_one_streamers)))
-for streamer_dict in tier_one_streamers:
+print('Sending data to plot.ly ({} plots)'.format(len(all_streamer_data)))
+for streamer_dict in all_streamer_data:
     print('Plotting data for: {}'.format(streamer_dict['name']))
     viewersTrace = go.Bar(
         x=streamer_dict['times'],
