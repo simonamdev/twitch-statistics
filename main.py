@@ -58,7 +58,7 @@ def main():
             pause(3)
             print('[+] Reponening database connection')
             database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
-        json_url_streams = 'https://api.twitch.tv/kraken/search/streams?q=Elite%20Dangerous'
+        json_url_streams = 'https://api.twitch.tv/kraken/search/streams?limit=100&q=Elite%20Dangerous'
         # initial api ping to get the first set of streamers
         try:
             data_games = requests.get(json_url_streams).json()
@@ -70,9 +70,8 @@ def main():
             # pprint(data_games)
             print('[+] Streams online: {}'.format(stream_count))
             api_offset_count = 0
-            # TODO: Remove limit from API, see if I can grab all the streamers at once
-            while api_offset_count <= int(stream_count) + 10:
-                # print('[+] Streamers: {}/{}'.format(current_count, stream_count))
+            while api_offset_count <= int(stream_count) + 100:
+                # print('[+] Streamers: {}/{}'.format(api_offset_count, stream_count))
                 # only ping the api again if you are not on the first page
                 if not api_offset_count == 0:
                     # print('[+] Accessing url: {}'.format(next_json_url))
@@ -86,27 +85,27 @@ def main():
                 except KeyError as e:
                     print('[-] Error parsing JSON data: {}'.format(e))
                 else:
-                    for streamer_data in streamers_data:
+                    # only consider the streamer if they are playing Elite: Dangerous
+                    elite_streamers_data = [row for row in streamers_data if row['game'] in ['Elite: Dangerous', 'Elite Dangerous']]
+                    for streamer_data in elite_streamers_data:
                         streamer_name = streamer_data['channel']['name']
-                        # only consider the streamer if they are playing Elite: Dangerous
-                        if streamer_data['game'] in ['Elite: Dangerous', 'Elite Dangerous']:
-                            # create a table for each streamer. The method avoids duplicates itself
-                            create_streamer_table(database, streamer_name)
-                            # get the data for this streamer
-                            viewer_count = streamer_data['viewers']
-                            follower_count = streamer_data['channel']['followers']
-                            partnership = 0
-                            if streamer_data['channel']['partner']:
-                                partnership = 1
-                            print('[+] V: {}\tF: {}\tP: {}\tN: {}'.format(
-                                viewer_count,
-                                follower_count,
-                                partnership == 1,
-                                streamer_name
-                            ))
-                            # api search isn't perfect despite filtering for E:D only
-                            insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
-                api_offset_count += 10
+                        # create a table for each streamer. The method avoids duplicates itself
+                        create_streamer_table(database, streamer_name)
+                        # get the data for this streamer
+                        viewer_count = streamer_data['viewers']
+                        follower_count = streamer_data['channel']['followers']
+                        partnership = 0
+                        if streamer_data['channel']['partner']:
+                            partnership = 1
+                        print('[+] V: {}\tF: {}\tP: {}\tN: {}'.format(
+                            viewer_count,
+                            follower_count,
+                            partnership == 1,
+                            streamer_name
+                        ))
+                        # api search isn't perfect despite filtering for E:D only
+                        insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
+                api_offset_count += 90
         pause(cycle_delay)
 
 if __name__ == '__main__':
