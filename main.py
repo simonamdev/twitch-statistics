@@ -31,6 +31,20 @@ def create_streamer_table(db, streamer):
         print(e)
 
 
+def insert_data_into_csv(data_row=None, verbose=False):
+    if data_row is None:
+        if verbose:
+            print('[-] No row data sent provided to write to CSV!')
+    else:
+        file_name = '{}_{}.csv'.format(date.today().day, date.today().month)
+        with open(file_name, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile, quotechar='"')
+            writer.writerow(data_row)
+            if verbose:
+                print('[+] Successfully wrote {} to {}'.format(data_row, file_name))
+            csvfile.flush()
+
+
 def insert_data_into_db(db, streamer, viewers, followers, partner):
     try:
         db.insert_db_data(streamer, '(NULL, ?, ?, ?, CURRENT_TIMESTAMP)', (viewers, followers, partner))
@@ -46,6 +60,7 @@ def main():
     previous_day_number = date.today().day
     while True:
         # check if a day has passed
+        current_date_string = '{}_{}_{}'.format(date.today().day, date.today().month, date.today().year)
         current_day_number = date.today().day
         print('Current Day: {} Previous Day: {}'.format(current_day_number, previous_day_number))
         sleep(2)
@@ -61,14 +76,6 @@ def main():
                 # TODO: Export the entries done today only and send that as a csv, then put back together when needed.
                 # Will reduce network traffic greatly and shuffle all data into respective days
                 # maybe folder per week too?
-                """
-                file_name = '{}_{}'.format(date.today().day, date.today().month)
-                with open(file_name + '.csv', 'w', newline='') as csvfile:
-                    writer = csv.writer(csvfile, delimeter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                    writer.writerow([streamer_name, viewer_count, follower_count])
-                """
-                # the above should be opened, written and closed every 30 seconds, then sent once a day and deleted, before
-                # setting up the new one
                 print('[+] Backing up the database')
                 run_command(SCP_COMMAND)
                 p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup successful')
@@ -122,9 +129,12 @@ def main():
                             follower_count,
                             partnership == 1,
                             streamer_name))
-                        sleep(0.1)  # allows reading on linux boxes with screen
+                        sleep(0.1)  # allows reading the names when checking top streamer
                         # api search isn't perfect despite filtering for E:D only
-                        insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
+                        insert_data_into_csv(
+                            data_row=[streamer_name, viewer_count, follower_count, partnership],
+                            verbose=True)
+                        # insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
                 api_offset_count += 90
         pause(cycle_delay)
 
