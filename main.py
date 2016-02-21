@@ -121,8 +121,7 @@ def main():
                             viewer_count,
                             follower_count,
                             partnership == 1,
-                            streamer_name
-                        ))
+                            streamer_name))
                         sleep(0.1)  # allows reading on linux boxes with screen
                         # api search isn't perfect despite filtering for E:D only
                         insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
