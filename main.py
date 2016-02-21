@@ -1,5 +1,7 @@
 import requests
-from cfg import SCP_COMMAND
+import pynma
+import csv
+from cfg import SCP_COMMAND, pynma_api
 from datetime import date
 from time import sleep, strftime
 from pysqlite import Pysqlite
@@ -38,23 +40,41 @@ def insert_data_into_db(db, streamer, viewers, followers, partner):
 
 
 def main():
+    p = pynma.PyNMA(pynma_api)
     cycle_delay = 30  # seconds
     database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
-    previous_day_number = date.day
+    previous_day_number = date.today().day
     while True:
         # check if a day has passed
-        current_day_number = date.day
+        current_day_number = date.today().day
+        print('Current Day: {} Previous Day: {}'.format(current_day_number, previous_day_number))
+        sleep(2)
         if not current_day_number == previous_day_number:
             print('[+] Starting up backup procedure')
             # update the previous day number
             previous_day_number = current_day_number
             print('[+] Closing the database connection')
             database.close_connection()
-            print('[+] Backing up the database')
             try:
+                # TODO: Add zipping the DB to reduce network traffic
+                # print('[+] Zipping the database')
+                # TODO: Export the entries done today only and send that as a csv, then put back together when needed.
+                # Will reduce network traffic greatly and shuffle all data into respective days
+                # maybe folder per week too?
+                """
+                file_name = '{}_{}'.format(date.today().day, date.today().month)
+                with open(file_name + '.csv', 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile, delimeter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                    writer.writerow([streamer_name, viewer_count, follower_count])
+                """
+                # the above should be opened, written and closed every 30 seconds, then sent once a day and deleted, before
+                # setting up the new one
+                print('[+] Backing up the database')
                 run_command(SCP_COMMAND)
+                p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup successful')
             except Exception as e:
                 print('[-] Backing up error: {}'.format(e))
+                p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup did not finish!')
             pause(3)
             print('[+] Reponening database connection')
             database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
@@ -68,7 +88,7 @@ def main():
             sleep(10)  # delay before trying again
         else:
             # pprint(data_games)
-            print('[+] Streams online: {}'.format(stream_count))
+            print('[+] Total viewers watching: {}'.format(stream_count))
             api_offset_count = 0
             while api_offset_count <= int(stream_count) + 100:
                 # print('[+] Streamers: {}/{}'.format(api_offset_count, stream_count))
@@ -103,6 +123,7 @@ def main():
                             partnership == 1,
                             streamer_name
                         ))
+                        sleep(0.1)  # allows reading on linux boxes with screen
                         # api search isn't perfect despite filtering for E:D only
                         insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
                 api_offset_count += 90
