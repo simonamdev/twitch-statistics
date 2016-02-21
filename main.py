@@ -31,12 +31,12 @@ def create_streamer_table(db, streamer):
         print(e)
 
 
-def insert_data_into_csv(data_row=None, verbose=False):
+def insert_data_into_csv(file_name, data_row=None, verbose=False):
     if data_row is None:
         if verbose:
             print('[-] No row data sent provided to write to CSV!')
     else:
-        file_name = '{}_{}.csv'.format(date.today().day, date.today().month)
+        file_name += '.csv'  # append the format to the file name
         with open(file_name, 'a', newline='') as csvfile:
             writer = csv.writer(csvfile, quotechar='"')
             writer.writerow(data_row)
@@ -57,22 +57,26 @@ def main():
     p = pynma.PyNMA(pynma_api)
     cycle_delay = 30  # seconds
     database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
-    previous_day_number = date.today().day
+    previous_day = date.today().day
+    previous_month = date.today().month
+    previous_year = date.today().year
+    previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
     while True:
         # check if a day has passed
-        current_date_string = '{}_{}_{}'.format(date.today().day, date.today().month, date.today().year)
-        current_day_number = date.today().day
-        print('Current Day: {} Previous Day: {}'.format(current_day_number, previous_day_number))
-        sleep(2)
-        if not current_day_number == previous_day_number:
+        day = date.today().day
+        month = date.today().month
+        year = date.today().year
+        current_date_string = '{}_{}_{}'.format(day, month, year)
+        print('Current Day: {} Previous Day: {}'.format(day, previous_day))
+        if not day == previous_day:
             print('[+] Starting up backup procedure')
             # update the previous day number
-            previous_day_number = current_day_number
+            previous_day = day
+            """
             print('[+] Closing the database connection')
             database.close_connection()
+            """
             try:
-                # TODO: Add zipping the DB to reduce network traffic
-                # print('[+] Zipping the database')
                 # TODO: Export the entries done today only and send that as a csv, then put back together when needed.
                 # Will reduce network traffic greatly and shuffle all data into respective days
                 # maybe folder per week too?
@@ -132,6 +136,7 @@ def main():
                         sleep(0.1)  # allows reading the names when checking top streamer
                         # api search isn't perfect despite filtering for E:D only
                         insert_data_into_csv(
+                            file_name=current_date_string,
                             data_row=[streamer_name, viewer_count, follower_count, partnership],
                             verbose=True)
                         # insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
