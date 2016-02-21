@@ -6,6 +6,7 @@ from datetime import date
 from time import sleep, strftime
 from pysqlite import Pysqlite
 from pprint import pprint
+from os import remove as remove_file
 from os import system as run_command
 from os.path import getsize as get_file_size
 
@@ -82,6 +83,8 @@ def main():
                     previous_date_string,
                     round(get_file_size(previous_date_string + '.csv') / 1024, 2)
                 ))
+                print('[+] Deleting old data')
+                remove_file(previous_date_string + '.csv')
             except Exception as e:
                 print('[-] Backing up error: {}'.format(e))
                 p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup did not finish!')
@@ -136,8 +139,7 @@ def main():
                         # api search isn't perfect despite filtering for E:D only
                         insert_data_into_csv(
                             file_name=current_date_string,
-                            data_row=[streamer_name, viewer_count, follower_count, partnership],
-                            verbose=True)
+                            data_row=[streamer_name, viewer_count, follower_count, partnership])
                         # insert_data_into_db(database, streamer_name, viewer_count, follower_count, partnership)
                 api_offset_count += 90
         pause(cycle_delay)
