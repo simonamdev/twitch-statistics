@@ -7,6 +7,7 @@ from time import sleep, strftime
 from pysqlite import Pysqlite
 from pprint import pprint
 from os import system as run_command
+from os.path import getsize as get_file_size
 
 create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
                    'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
@@ -56,39 +57,38 @@ def insert_data_into_db(db, streamer, viewers, followers, partner):
 def main():
     p = pynma.PyNMA(pynma_api)
     cycle_delay = 30  # seconds
-    database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
-    previous_day = date.today().day
-    previous_month = date.today().month
-    previous_year = date.today().year
+    # database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
+    previous_day, previous_month, previous_year = date.today().day, date.today().month, date.today().year
     previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
     while True:
         # check if a day has passed
-        day = date.today().day
-        month = date.today().month
-        year = date.today().year
+        day, month, year = date.today().day, date.today().month, date.today().year
         current_date_string = '{}_{}_{}'.format(day, month, year)
         print('Current Day: {} Previous Day: {}'.format(day, previous_day))
         if not day == previous_day:
             print('[+] Starting up backup procedure')
-            # update the previous day number
+            # update the previous day number. No need to compare the month/year too
             previous_day = day
             """
             print('[+] Closing the database connection')
             database.close_connection()
             """
             try:
-                # TODO: Export the entries done today only and send that as a csv, then put back together when needed.
-                # Will reduce network traffic greatly and shuffle all data into respective days
-                # maybe folder per week too?
-                print('[+] Backing up the database')
-                run_command(SCP_COMMAND)
-                p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup successful')
+                # TODO: Export the entries done today only and send that as a csv, then put back together when needed.?
+                print('[+] Sending data to backup location')
+                run_command(SCP_COMMAND.format(previous_date_string + '.csv'))
+                # gather information for backup notification
+                p.push('Twitch-stats', 'Twitch-stats', 'Backup of {}.csv successful. File size: {} KB'.format(
+                    previous_date_string,
+                    round(get_file_size(previous_date_string + '.csv') / 1024, 2)
+                ))
             except Exception as e:
                 print('[-] Backing up error: {}'.format(e))
                 p.push('Twitch-stats', 'Twitch-stats', 'Twitch stats backup did not finish!')
             pause(3)
-            print('[+] Reponening database connection')
-            database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
+            # update the date string
+            previous_date_string = current_date_string
+            # database = Pysqlite('twitch_stats', 'twitch_stats_v2.db')
         json_url_streams = 'https://api.twitch.tv/kraken/search/streams?limit=100&q=Elite%20Dangerous'
         # initial api ping to get the first set of streamers
         try:
@@ -96,13 +96,12 @@ def main():
             stream_count = data_games['_total']
         except Exception as e:
             print('[-] Error getting JSON data for streamer list: {}'.format(e))
-            sleep(10)  # delay before trying again
+            pause(10)  # delay before trying again
         else:
             # pprint(data_games)
             print('[+] Total viewers watching: {}'.format(stream_count))
             api_offset_count = 0
             while api_offset_count <= int(stream_count) + 100:
-                # print('[+] Streamers: {}/{}'.format(api_offset_count, stream_count))
                 # only ping the api again if you are not on the first page
                 if not api_offset_count == 0:
                     # print('[+] Accessing url: {}'.format(next_json_url))
@@ -121,7 +120,7 @@ def main():
                     for streamer_data in elite_streamers_data:
                         streamer_name = streamer_data['channel']['name']
                         # create a table for each streamer. The method avoids duplicates itself
-                        create_streamer_table(database, streamer_name)
+                        # create_streamer_table(database, streamer_name)
                         # get the data for this streamer
                         viewer_count = streamer_data['viewers']
                         follower_count = streamer_data['channel']['followers']
