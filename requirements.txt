@@ -1,0 +1,2 @@
+pynma
+requests
