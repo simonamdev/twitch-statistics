@@ -16,20 +16,6 @@ def pause(amount=5):
     print('                                    ', end='\r')
 
 
-def create_streamer_table(db, streamer):
-    create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
-                   'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
-                   '`viewers`	INTEGER NOT NULL,' \
-                   '`followers`	INTEGER NOT NULL,' \
-                   '`partner`	INTEGER NOT NULL,' \
-                   '`time` TEXT NOT NULL)'
-    try:
-        db.execute_sql('{}'.format(create_statement.format(streamer)))
-        # TODO: add some sort of feedback if the table already exists
-    except Exception as e:
-        print(e)
-
-
 def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
     if file_name is None:
         if verbose:
