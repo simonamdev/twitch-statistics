@@ -30,19 +30,22 @@ def create_streamer_table(db, streamer):
         print(e)
 
 
-# TODO: Change this method to accept a list of lists to avoid writing separate rows
-def insert_data_into_csv(file_name, data_row=None, verbose=False):
-    if data_row is None:
+def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
+    if file_name is None:
         if verbose:
-            print('[-] No row data sent provided to write to CSV!')
+            print('[-] No file name given to write to as a CSV file!')
+    elif data_rows is None:
+        if verbose:
+            print('[-] No data rows provided to write to CSV!')
     else:
         file_name += '.csv'  # append the format to the file name
         with open(file_name, 'a', newline='') as csvfile:
             writer = csv.writer(csvfile, quotechar='"')
-            writer.writerow(data_row)
-            if verbose:
-                print('[+] Successfully wrote {} to {}'.format(data_row, file_name))
+            for row in data_rows:
+                writer.writerow(row)
             csvfile.flush()
+            if verbose:
+                print('[+] Successfully wrote {} rows to {}'.format(len(data_rows), file_name))
 
 
 def main():
@@ -109,6 +112,7 @@ def main():
                     continue
                 # only consider the streamer if they are playing Elite: Dangerous
                 elite_streamers_data = [row for row in streams_data if row['game'] in ['Elite: Dangerous', 'Elite Dangerous']]
+                current_stream_data = []  # store all current stream data in a list
                 for streamer_data in elite_streamers_data:
                     streamer_name = streamer_data['channel']['name']
                     # get the data for this streamer
@@ -125,9 +129,14 @@ def main():
                     sleep(0.1)  # allows reading the names when checking top streamer
                     # api search isn't perfect despite filtering for E:D only
                     timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, datetime.now().hour, datetime.now().minute, datetime.now().second)
-                    insert_data_into_csv(
+                    # add the data to the list
+                    current_stream_data.append([streamer_name, viewer_count, follower_count, partnership, timestamp])
+                # Write only if rows have been added
+                if len(current_stream_data) > 0:
+                    insert_data_rows_into_csv(
                         file_name=current_date_string,
-                        data_row=[streamer_name, viewer_count, follower_count, partnership, timestamp])
+                        data_rows=current_stream_data,
+                        verbose=True)
                 api_offset_count += 90
         pause(cycle_delay)
 
