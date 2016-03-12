@@ -103,6 +103,9 @@ def main():
                     streamer_name = streamer_data['channel']['name']
                     # get the data for this streamer
                     viewer_count = streamer_data['viewers']
+                    if viewer_count == 0:
+                        # skip this streamer if they have no viewers
+                        continue
                     follower_count = streamer_data['channel']['followers']
                     partnership = 0
                     if streamer_data['channel']['partner']:
