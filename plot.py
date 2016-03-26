@@ -14,16 +14,10 @@ def calculate_average(number_list):
     return int(average)
 
 print('Opening database connection')
-database = Pysqlite('twitch_stats', 'twitch_stats_v2_20.db')
+database = Pysqlite('twitch_stats', 'PC_stats.db')
 table_names = database.get_db_data('sqlite_sequence')
 table_names = [row[0] for row in table_names]
 all_streamer_data = []
-"""
-tier_one_streamers = []
-tier_two_streamers = []
-tier_three_streamers = []
-tier_four_streamers = []
-"""
 streamer_to_plot = ''
 streamers_to_ignore = ['legenddolby1986']
 print('Processing Streamer Data')
@@ -52,7 +46,7 @@ tier_two_streamers = [streamer for streamer in all_streamer_data if 100 > calcul
 tier_three_streamers = [streamer for streamer in all_streamer_data if 50 > calculate_average(streamer['viewers']) >= 15]
 tier_four_streamers = [streamer for streamer in all_streamer_data if calculate_average(streamer['viewers']) < 15]
 
-print('Tier One: {} (>100)\nTier Two: {} (99-50)\nTier Three: {} (50-15)\nTier Four: {} (<15)\nTotal: {}'.format(
+print('Tier One: {} ( >100 )\nTier Two: {} ( 99-50 )\nTier Three: {} ( 50-15 )\nTier Four: {} ( <15 )\nTotal: {}'.format(
     len(tier_one_streamers),
     len(tier_two_streamers),
     len(tier_three_streamers),
@@ -61,11 +55,27 @@ print('Tier One: {} (>100)\nTier Two: {} (99-50)\nTier Three: {} (50-15)\nTier F
 ))
 
 
-print('Tier One Streamers:')
+print('Tier One Streamers: (Average >=100 viewers)')
 print('Index : Name : Peak Viewership : Average Viewership : Followers')
 for streamer_dict in tier_one_streamers:
     print('{} : {} : {} : {} : {}'.format(
         tier_one_streamers.index(streamer_dict),
+        streamer_dict['name'], max(streamer_dict['viewers']),
+        calculate_average(streamer_dict['viewers']),
+        streamer_dict['followers'][-1]))
+print('Tier Two Streamers: (100 > Average >= 50 viewers)')
+print('Index : Name : Peak Viewership : Average Viewership : Followers')
+for streamer_dict in tier_two_streamers:
+    print('{} : {} : {} : {} : {}'.format(
+        tier_two_streamers.index(streamer_dict),
+        streamer_dict['name'], max(streamer_dict['viewers']),
+        calculate_average(streamer_dict['viewers']),
+        streamer_dict['followers'][-1]))
+print('Tier Three Streamers: (50 > Average >= 15 viewers)')
+print('Index : Name : Peak Viewership : Average Viewership : Followers')
+for streamer_dict in tier_three_streamers:
+    print('{} : {} : {} : {} : {}'.format(
+        tier_three_streamers.index(streamer_dict),
         streamer_dict['name'], max(streamer_dict['viewers']),
         calculate_average(streamer_dict['viewers']),
         streamer_dict['followers'][-1]))
@@ -119,6 +129,36 @@ def plot_viewers_followers(streamer_dict):
     fig = go.Figure(data=data, layout=layout)
     plot_url = py.plot(fig, filename='{} E:D Twitch Stream Stats'.format(streamer_dict['name']))
 
+
+def plot_several_streamers_by_viewers(streamers):
+    data = []
+    for streamer_dict in streamers:
+        print('Adding data for: {}'.format(streamer_dict['name']))
+        viewers_trace = go.Scatter(
+            x=streamer_dict['times'],
+            y=streamer_dict['viewers'],
+            connectgaps=False,
+            name=streamer_dict['name'])
+        data.append(viewers_trace)
+
+    layout = go.Layout(
+        title='Viewers for top {} E:D Streamers'.format(len(streamers)),
+        # barmode='group',
+        yaxis=dict(
+            title='Viewers'
+        )
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    print('Sending data to plotly')
+    plot_url = py.plot(fig, filename='{} E:D Twitch Stream Stats'.format(streamer_dict['name']))
+
+"""
+# Plots a graph PER streamer
 print('Sending data to plot.ly ({} plots)'.format(len(streamers_to_plot)))
 for streamer in streamers_to_plot:
     plot_viewers_followers(streamer)
+"""
+
+# Plots streamers on ONE graph
+plot_several_streamers_by_viewers(streamers_to_plot)
