@@ -82,7 +82,7 @@ def calculate_average(number_list, return_int=True):
 
 
 def main():
-    database_file = 'ED_stats.db'
+    database_file = 'PC_stats.db'
     # initialise the DB object
     database = Pysqlite('twitch_stats', database_file)
     table_names = database.get_db_data('sqlite_sequence')
@@ -106,17 +106,15 @@ def main():
     tier_three_streamers = [streamer for streamer in all_streamer_data if tier_three_bounds['upper'] >= streamer['viewers_average'] >= tier_three_bounds['lower']]
     tier_four_streamers = [streamer for streamer in all_streamer_data if tier_four_bounds['upper'] >= streamer['viewers_average'] >= tier_four_bounds['lower']]
 
-    print('Tier One: {} Tier Two: {} Tier Three: {} Tier Four: {} Total: {}'.format(
-        len(tier_one_streamers),
-        len(tier_two_streamers),
-        len(tier_three_streamers),
-        len(tier_four_streamers),
-        len(table_names)
-    ))
+    print('Tiers are set by AVERAGE viewership')
+    print('Tier One (>= {}): {}'.format(tier_one_bounds['lower'], len(tier_one_streamers)))
+    print('Tier Two ({} >= X >= {}): {}'.format(tier_two_bounds['upper'], tier_two_bounds['lower'], len(tier_two_streamers)))
+    print('Tier Three ({} >= X >= {}): {}'.format(tier_three_bounds['upper'], tier_three_bounds['lower'], len(tier_three_streamers)))
+    print('Tier Four ({} >= X >= {}): {}'.format(tier_four_bounds['upper'], tier_four_bounds['lower'], len(tier_four_streamers)))
 
     # assign which tier to sort here. If all, just set all_streamer_data
     # streamers_to_sort = all_streamer_data
-    streamers_to_sort = tier_one_streamers
+    streamers_to_sort = tier_two_streamers
     print('Unsorted:')
     print('Name : Average Viewers : Max Viewers : Followers')
     for streamer in streamers_to_sort:
@@ -142,11 +140,11 @@ def main():
         for duration in streamer['durations']:
             if duration < 1.0:
                 duration = round(duration * 60, 2)
-                durations_string += '{} minutes '.format(duration)
+                durations_string += '{} minutes\t'.format(duration)
             else:
-                durations_string += '{} hours '.format(duration)
+                durations_string += '{} hours\t'.format(duration)
         print(durations_string)
-        print('\tLongest Stream: {} hours Average Stream length: {} hours'.format(streamer['durations_max'], streamer['durations_average']))
+        print('\tLongest Stream: {} hours\tAverage Stream length: {} hours'.format(streamer['durations_max'], streamer['durations_average']))
 
 
 if __name__ == '__main__':
