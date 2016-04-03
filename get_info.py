@@ -1,7 +1,17 @@
 import datetime
 from pysqlite import Pysqlite
-from pprint import pprint
 from tqdm import tqdm
+
+games = [
+    {
+        'name': 'Elite: Dangerous',
+        'shorthand': 'ED'
+     },
+    {
+        'name': 'Planet Coaster',
+        'shorthand': 'PC'
+    }
+]
 
 # bounds for the tiers of streamers
 tier_one_bounds = {'upper': 9999, 'lower': 100}
@@ -18,6 +28,7 @@ def get_streamer_dict(db, streamer):
     streamer_dict['viewers'] = [field[1] for field in data]
     streamer_dict['viewers_max'] = max(viewers)
     streamer_dict['viewers_average'] = calculate_average(viewers)
+    streamer_dict['tier'] = return_streamer_tier(streamer_dict['viewers_average'])
     followers = [field[2] for field in data]
     streamer_dict['followers'] = followers
     streamer_dict['followers_max'] = followers[-1]
@@ -25,7 +36,20 @@ def get_streamer_dict(db, streamer):
     streamer_dict['durations'] = get_stream_durations(streamer_dict['times'])
     streamer_dict['durations_max'] = max(streamer_dict['durations'])
     streamer_dict['durations_average'] = calculate_average(streamer_dict['durations'], return_int=False)
+    streamer_dict['stream_count'] = len(streamer_dict['durations'])
     return streamer_dict
+
+
+def return_streamer_tier(average_viewers):
+    if tier_one_bounds['upper'] >= average_viewers >= tier_one_bounds['lower']:
+        return 1
+    if tier_two_bounds['upper'] >= average_viewers >= tier_two_bounds['lower']:
+        return 2
+    if tier_three_bounds['upper'] >= average_viewers >= tier_three_bounds['lower']:
+        return 3
+    if tier_four_bounds['upper'] >= average_viewers >= tier_four_bounds['lower']:
+        return 4
+    return 0
 
 
 def get_stream_durations(stream_times):
@@ -81,8 +105,9 @@ def calculate_average(number_list, return_int=True):
         return round(average, 2)
 
 
-def main():
-    database_file = 'PC_stats.db'
+def process_data(game):
+    print('Processing data for: {}'.format(game['name']))
+    database_file = '{}_stats.db'.format(game['shorthand'])
     # initialise the DB object
     database = Pysqlite('twitch_stats', database_file)
     table_names = database.get_db_data('sqlite_sequence')
@@ -101,10 +126,15 @@ def main():
         all_streamer_data.append(get_streamer_dict(database, streamer))
 
     print('Filtering streamer data by tier')
-    tier_one_streamers = [streamer for streamer in all_streamer_data if tier_one_bounds['upper'] >= streamer['viewers_average'] >= tier_one_bounds['lower']]
-    tier_two_streamers = [streamer for streamer in all_streamer_data if tier_two_bounds['upper'] >= streamer['viewers_average'] >= tier_two_bounds['lower']]
-    tier_three_streamers = [streamer for streamer in all_streamer_data if tier_three_bounds['upper'] >= streamer['viewers_average'] >= tier_three_bounds['lower']]
-    tier_four_streamers = [streamer for streamer in all_streamer_data if tier_four_bounds['upper'] >= streamer['viewers_average'] >= tier_four_bounds['lower']]
+    tier_one_streamers = [streamer for streamer in all_streamer_data if streamer['tier'] == 1]
+    tier_two_streamers = [streamer for streamer in all_streamer_data if streamer['tier'] == 2]
+    tier_three_streamers = [streamer for streamer in all_streamer_data if streamer['tier'] == 3]
+    tier_four_streamers = [streamer for streamer in all_streamer_data if streamer['tier'] == 4]
+    tier_zero_streamers = [streamer for streamer in all_streamer_data if streamer['tier'] == 0]
+
+    if len(tier_zero_streamers) > 0:
+        print(tier_zero_streamers)
+        input('Detected streamer which did not fit a streamer. Press any key to continue')
 
     print('Tiers are set by AVERAGE viewership')
     print('Tier One (>= {}): {}'.format(tier_one_bounds['lower'], len(tier_one_streamers)))
@@ -145,6 +175,17 @@ def main():
                 durations_string += '{} hours\t'.format(duration)
         print(durations_string)
         print('\tLongest Stream: {} hours\tAverage Stream length: {} hours'.format(streamer['durations_max'], streamer['durations_average']))
+    write_to_text_file(game_dict=game, streamer_list=streamers_to_sort)
+
+
+def write_to_text_file(game_dict, streamer_list):
+    with open('{}_Twitch_Stats.txt'.format(game_dict['shorthand'])) as file:
+        file.write('{} Twitch Streamer Statistics'.format(game_dict['name']))
+
+
+def main():
+    for game in games:
+        process_data(game)
 
 
 if __name__ == '__main__':
