@@ -14,7 +14,7 @@ games = [
 ]
 
 # bounds for the tiers of streamers
-tier_one_bounds = {'upper': 9999, 'lower': 100}
+tier_one_bounds = {'upper': 999999, 'lower': 100}
 tier_two_bounds = {'upper': 99, 'lower': 50}
 tier_three_bounds = {'upper': 49, 'lower': 15}
 tier_four_bounds = {'upper': 14, 'lower': 0}
@@ -36,6 +36,7 @@ def get_streamer_dict(db, streamer):
     streamer_dict['durations'] = get_stream_durations(streamer_dict['times'])
     streamer_dict['durations_max'] = max(streamer_dict['durations'])
     streamer_dict['durations_average'] = calculate_average(streamer_dict['durations'], return_int=False)
+    streamer_dict['durations_total'] = calculate_sum(streamer_dict['durations'], return_int=False)
     streamer_dict['stream_count'] = len(streamer_dict['durations'])
     return streamer_dict
 
@@ -105,6 +106,16 @@ def calculate_average(number_list, return_int=True):
         return round(average, 2)
 
 
+def calculate_sum(number_list, return_int=True):
+    total = 0
+    for number in number_list:
+        total += number
+    if return_int:
+        return int(total)
+    else:
+        return round(total, 2)
+
+
 def process_data(game):
     print('Processing data for: {}'.format(game['name']))
     database_file = '{}_stats.db'.format(game['shorthand'])
@@ -117,7 +128,6 @@ def process_data(game):
     all_streamer_data = []
     # list any streamers to ignore
     streamers_to_ignore = ['legenddolby1986']
-    print('Processing Streamer Data')
     for streamer in tqdm(table_names):
         if streamer in streamers_to_ignore:
             # skip if its on the ignore list
@@ -143,8 +153,11 @@ def process_data(game):
     print('Tier Four ({} >= X >= {}): {}'.format(tier_four_bounds['upper'], tier_four_bounds['lower'], len(tier_four_streamers)))
 
     # assign which tier to sort here. If all, just set all_streamer_data
-    # streamers_to_sort = all_streamer_data
-    streamers_to_sort = tier_two_streamers
+    streamers_to_sort = all_streamer_data
+    # streamers_to_sort = tier_one_streamers
+    # streamers_to_sort = tier_two_streamers
+    # streamers_to_sort = tier_three_streamers
+    # streamers_to_sort = tier_four_streamers
     print('Unsorted:')
     print('Name : Average Viewers : Max Viewers : Followers')
     for streamer in streamers_to_sort:
@@ -179,8 +192,49 @@ def process_data(game):
 
 
 def write_to_text_file(game_dict, streamer_list):
-    with open('{}_Twitch_Stats.txt'.format(game_dict['shorthand'])) as file:
-        file.write('{} Twitch Streamer Statistics'.format(game_dict['name']))
+    # calculate total time streamed over all streamers
+    total_duration = 0
+    for streamer in streamer_list:
+        for duration in streamer['durations']:
+            total_duration += duration
+    total_duration = round(total_duration, 2)
+    total_streams = 0
+    for streamer in streamer_list:
+        total_streams += streamer['stream_count']
+    with open('{}_Twitch_Stats.txt'.format(game_dict['shorthand']), mode='w', encoding='utf-8') as file:
+        file.write('{} Twitch Streamer Statistics\n'.format(game_dict['name']))
+        file.write('Data recorded 24/7 via twitch public API every 20 seconds\n')
+        file.write('Script written by CMDR Purrcat / Simon Agius Muscat\n')
+        file.write('More information can be found at: https://github.com/purrcat259/twitch-statistics\n')
+        file.write('Total streamers recorded: {}\n'.format(len(streamer_list)))
+        file.write('Total streams recorded: {}\n'.format(total_streams))
+        file.write('Total time streamed: {} hours\n'.format(total_duration))
+        file.write('Tier One Bounds: {} >= Average Viewers >= {}\n'.format(tier_one_bounds['upper'], tier_one_bounds['lower']))
+        file.write('Tier Two Bounds: {} >= Average Viewers >= {}\n'.format(tier_two_bounds['upper'], tier_two_bounds['lower']))
+        file.write('Tier Three Bounds: {} >= Average Viewers >= {}\n'.format(tier_three_bounds['upper'], tier_three_bounds['lower']))
+        file.write('Tier Four Bounds: {} >= Average Viewers >= {}\n'.format(tier_four_bounds['upper'], tier_four_bounds['lower']))
+        for streamer in streamer_list:
+            file.write('\nStreamer: {}\n'.format(streamer['name']))
+            file.write('Tier: {}\n'.format(streamer['tier']))
+            file.write('Average Viewers: {}\n'.format(streamer['viewers_average']))
+            file.write('Peak Viewers: {}\n'.format(streamer['viewers_max']))
+            file.write('Followers: {}\n'.format(streamer['followers_max']))
+            file.write('Stream count: {}\n'.format(streamer['stream_count']))
+            file.write('Average Stream duration: {} hours\n'.format(streamer['durations_average']))
+            file.write('Longest Stream duration: {} hours\n'.format(streamer['durations_max']))
+            file.write('Total time streamed: {} hours\n'.format(streamer['durations_total']))
+            time_percentage = round((streamer['durations_total'] / total_duration) * 100, 4)
+            file.write('Streamer portion of total duration: {}%\n'.format(time_percentage))
+            file.write('Stream durations:\n')
+            for duration in streamer['durations']:
+                if duration < 1.0:
+                    duration = round(duration * 60, 2)
+                    # skip stream durations less than 5 m inutes
+                    if duration < 5.0:
+                        continue
+                    file.write('\t{} minutes\n'.format(duration))
+                else:
+                    file.write('\t{} hours\n'.format(duration))
 
 
 def main():
