@@ -1,3 +1,4 @@
+import datetime
 from pysqlite import Pysqlite
 from pprint import pprint
 from tqdm import tqdm
@@ -33,7 +34,7 @@ def calculate_average(number_list):
 
 
 def main():
-    database_file = 'PC_stats.db'
+    database_file = 'ED_stats.db'
     # initialise the DB object
     database = Pysqlite('twitch_stats', database_file)
     table_names = database.get_db_data('sqlite_sequence')
@@ -68,7 +69,7 @@ def main():
     # assign which tier to sort here. If all, just set all_streamer_data
     # streamers_to_sort = all_streamer_data
     streamers_to_sort = tier_one_streamers
-
+    """
     print('Unsorted:')
     print('Name : Average Viewers : Max Viewers : Followers')
     for streamer in streamers_to_sort:
@@ -78,45 +79,69 @@ def main():
             streamer['viewers_max'],
             streamer['followers_max']
         ))
-
+    print()
     print('Sorted by average viewership:')
     for streamer in sorted(streamers_to_sort, key=lambda streamer: streamer['viewers_average'], reverse=True):
         print('{} : {}'.format(streamer['name'], streamer['viewers_average']))
-
+    print()
     print('Sorted by peak viewership:')
     for streamer in sorted(streamers_to_sort, key=lambda streamer: streamer['viewers_max'], reverse=True):
         print('{} : {}'.format(streamer['name'], streamer['viewers_max']))
-
+    print()
     print('Sorted by followers:')
     for streamer in sorted(streamers_to_sort, key=lambda streamer: streamer['viewers_max'], reverse=True):
         print('{} : {}'.format(streamer['name'], streamer['followers_max']))
-
     """
-    print('Tier One Streamers: (Average >=100 viewers)')
-    print('Index : Name : Peak Viewership : Average Viewership : Followers')
-    for streamer_dict in tier_one_streamers:
-        print('{} : {} : {} : {} : {}'.format(
-            tier_one_streamers.index(streamer_dict),
-            streamer_dict['name'], max(streamer_dict['viewers']),
-            calculate_average(streamer_dict['viewers']),
-            streamer_dict['followers'][-1]))
-    print('Tier Two Streamers: (100 > Average >= 50 viewers)')
-    print('Index : Name : Peak Viewership : Average Viewership : Followers')
-    for streamer_dict in tier_two_streamers:
-        print('{} : {} : {} : {} : {}'.format(
-            tier_two_streamers.index(streamer_dict),
-            streamer_dict['name'], max(streamer_dict['viewers']),
-            calculate_average(streamer_dict['viewers']),
-            streamer_dict['followers'][-1]))
-    print('Tier Three Streamers: (50 > Average >= 15 viewers)')
-    print('Index : Name : Peak Viewership : Average Viewership : Followers')
-    for streamer_dict in tier_three_streamers:
-        print('{} : {} : {} : {} : {}'.format(
-            tier_three_streamers.index(streamer_dict),
-            streamer_dict['name'], max(streamer_dict['viewers']),
-            calculate_average(streamer_dict['viewers']),
-            streamer_dict['followers'][-1]))
-    """
+    for streamer in streamers_to_sort:
+        # pop one field out to avoid odd numbered lists
+        if not len(streamer['times']) % 2 == 0:
+            streamer['times'].pop(0)
+        time_deltas = []
+        for i, field in enumerate(streamer['times']):
+            if i == 0 or i % 2 == 0:
+                # current field
+                # timestamp format: '2016-01-25 10:46:18'
+                date_part = field.split(' ')[0].split('-')
+                time_part = field.split(' ')[1].split(':')
+                year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
+                time1 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+                # caclulate a delta between the current and the next field
+                next_field = streamer['times'][i+1]
+                date_part = next_field.split(' ')[0].split('-')
+                time_part = next_field.split(' ')[1].split(':')
+                year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
+                time2 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+                difference = time2 - time1
+                time_deltas.append(difference)
+        # consolidate all the deltas
+        stream_durations = []
+        time_total = 0
+        for delta in time_deltas:
+            if delta.seconds < (5 * 60):
+                time_total += delta.seconds
+            else:
+                time_total = round(time_total / (60 * 60), 2)
+                stream_durations.append(time_total)
+                time_total = 0
+        else:
+            # if the streamer has only done one stream then a duration will never be appended
+            if len(stream_durations) == 0:
+                time_total = round(time_total / (60 * 60), 2)
+                stream_durations.append(time_total)
+        durations_string = ''
+        # remove durations less than 5 minutes
+        stream_durations = [duration for duration in stream_durations if duration * 60 > 5.0]
+        for duration in stream_durations:
+            if duration < 1.0:
+                duration = round(duration * 60, 2)
+                durations_string += '{} minutes '.format(duration)
+            else:
+                # if not float(duration).is_integer():
+                #     print(duration - int(duration))
+                durations_string += '{} hours '.format(duration)
+        print('{} durations of {} stream/s:\n{}'.format(streamer['name'], len(stream_durations), durations_string))
 
     """
     # take the first and last times as strings to put in the axis label
