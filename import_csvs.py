@@ -2,7 +2,6 @@ import csv
 import os
 from tqdm import tqdm
 from pysqlite import Pysqlite
-from os import remove as delete_file
 
 
 def sort_files_by_date(file_list):
@@ -48,14 +47,15 @@ def main():
         database = Pysqlite('{}_stats'.format(game), '{}_stats.db'.format(game))
         existing_tables = database.get_db_data('sqlite_sequence')
         existing_tables = [name[0] for name in existing_tables]
-        directory = os.getcwd() + '/data/' + game + '/'
+        directory = os.path.join(os.getcwd(), 'data', game)
         data_files = os.listdir(directory)
         print('Starting import of {} CSVs'.format(len(data_files)))
         sorted_files = sort_files_by_date(data_files)
         for file_name in sorted_files:
             csv_data = []
             print('Importing file: {}'.format(file_name))
-            with open(directory + file_name, newline='') as csvfile:
+            file_path = os.path.join(directory, file_name)
+            with open(file_path, newline='') as csvfile:
                 csvreader = csv.reader(csvfile, quotechar='"')
                 for row in csvreader:
                     csv_data.append(row)
@@ -72,8 +72,9 @@ def main():
                     print(e)
             # Commit the data to the db before moving onto the next set of data
             database.dbcon.commit()
+            # Remove the CSV file after import the data into the DB
             print('Deleting file: {}, {}/{}'.format(file_name, sorted_files.index(file_name) + 1, len(data_files)))
-            delete_file(directory + file_name)
+            os.remove(file_path)
     print('All done :)')
 
 if __name__ == '__main__':
