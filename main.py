@@ -77,7 +77,6 @@ def main():
             'shorthand_name': 'PC'
         }
     ]
-
     previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
     previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
     while True:
