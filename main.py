@@ -1,12 +1,15 @@
 import requests
 import pynma
 import csv
+import os
 from cfg import SCP_COMMAND, pynma_api
 from datetime import datetime
 from time import sleep
-# from os import remove as remove_file
-from os import system as run_command
-from os.path import getsize as get_file_size
+from shutil import move as move_file
+
+# Global values
+p = pynma.PyNMA(pynma_api)
+cycle_delay = 20  # seconds
 
 
 def pause(amount=5):
@@ -34,7 +37,32 @@ def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
                 print('[+] Successfully wrote {} rows to {}'.format(len(data_rows), file_name))
 
 
+def consolidate_data(game_dicts, previous_date_string):
+    # get the pynma object
+    global p
+    print('[+] Starting consolidation procedure')
+    notification_string = ''
+    for game in game_dicts:
+        try:
+            # gather information for the backup notification
+            file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
+            file_size = os.path.getsize(file_name)
+            file_size = round(file_size / (1024 * 1024), 2)
+            notification_string += '{}: {}MB. '.format(game['name'], file_size)
+            # run the backup command
+            os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
+            # move the file to its respective data directory for consolidation
+            data_folder = os.path.join(os.getcwd(), 'consolidate', 'data', game['shorthand_name'])
+            move_file(src=file_name, dst=data_folder)
+        except Exception as e:
+            print('[-] Backing up error: {}'.format(e))
+            p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
+    p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
+    pause(5)
+
+
 def main():
+    # TODO: Move these to a config file so that it is expandable to any number of games
     games = [
         {
             'url_name': 'Elite:%20Dangerous',
@@ -49,8 +77,7 @@ def main():
             'shorthand_name': 'PC'
         }
     ]
-    p = pynma.PyNMA(pynma_api)
-    cycle_delay = 20  # seconds
+
     previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
     previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
     while True:
@@ -59,24 +86,10 @@ def main():
         current_date_string = '{}_{}_{}'.format(day, month, year)
         # if a day has finished, then make a backup
         if not day == previous_day:
-            print('[+] Starting up backup procedure')
             # update the previous day number. No need to compare the month/year too
             previous_day = day
-            for game in games:
-                try:
-                    file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
-                    notification_string = '{}: {}MB successful'.format(
-                        file_name,
-                        round(get_file_size(file_name) / (1024 * 1024), 2))
-                    run_command(SCP_COMMAND.format(file_name, game['shorthand_name']))
-                    # gather information for backup notification
-                    p.push(application='Twitch-stats', event='Stats: {}'.format(game['shorthand']), description=notification_string)
-                    # remove the file
-                    # remove_file(previous_date_string + '.csv')
-                except Exception as e:
-                    print('[-] Backing up error: {}'.format(e))
-                    p.push('Twitch-stats', 'Twitch-stats', 'Backup for {} did not finish correctly'.format(game['name']))
-            pause(5)
+            # run consolidation procedure
+            consolidate_data(game_dicts=games, previous_date_string=previous_date_string)
             # update the date string
             previous_date_string = current_date_string
         # for each game, get the data
