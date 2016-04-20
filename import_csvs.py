@@ -4,7 +4,7 @@ from tqdm import tqdm
 from pysqlite import Pysqlite
 
 
-def create_streamer_table(self, db, streamer, ignore_list):
+def create_streamer_table(db, streamer, ignore_list):
     if streamer not in ignore_list:
         create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
                        'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
@@ -41,8 +41,9 @@ def sort_files_by_date(file_list):
 
 
 class CSVimport:
-    def __init__(self, games=None, delete_file=False):
+    def __init__(self, games=None, directory='', delete_file=False):
         self.games = games
+        self.mid_directory = directory
         self.delete_file = delete_file
 
     def run(self):
@@ -51,7 +52,7 @@ class CSVimport:
             db = Pysqlite(database_name='{} DB'.format(game), database_file='{}_stats.db'.format(game))
             existing_tables = db.get_db_data('sqlite_master')
             # existing_tables = [name[0] for name in existing_tables]
-            data_directory = os.path.join(os.getcwd(), 'data', game)
+            data_directory = os.path.join(os.getcwd(), self.mid_directory, 'data', game)
             data_files = os.listdir(data_directory)
             sorted_files = sort_files_by_date(data_files)
             print('Starting import of {} CSVs'.format(len(data_files)))
@@ -83,10 +84,10 @@ class CSVimport:
                     os.remove(file_path)
         print('Import complete')
 
-"""
+
 def main():
-    pass
+    c = CSVimport(games=['ED', 'PC'], directory='', delete_file=False)
+    c.run()
 
 if __name__ == '__main__':
     main()
-"""
