@@ -6,6 +6,7 @@ from cfg import SCP_COMMAND, pynma_api
 from datetime import datetime
 from time import sleep
 from shutil import move as move_file
+from import_csvs import CSVimport
 
 # Global values
 p = pynma.PyNMA(pynma_api)
@@ -56,8 +57,18 @@ def consolidate_data(game_dicts, previous_date_string):
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
-            p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
-    p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
+            # p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
+            notification_string += 'NOT FINISHED. '
+    else:
+        p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
+    # perform consolidation into DB
+    try:
+        c = CSVimport(games=['ED', 'PC'], directory='consolidate', delete_file=False)
+        c.run()
+        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
+    except Exception as e:
+        print('[-] Consolidation error: {}'.format(e))
+        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
     pause(5)
 
 
