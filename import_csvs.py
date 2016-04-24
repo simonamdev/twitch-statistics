@@ -2,6 +2,7 @@ import csv
 import os
 from tqdm import tqdm
 from pysqlite import Pysqlite
+from shutil import move as move_file
 
 
 def create_streamer_table(db, streamer, ignore_list):
@@ -41,10 +42,11 @@ def sort_files_by_date(file_list):
 
 
 class CSVimport:
-    def __init__(self, games=None, directory='', delete_file=False):
+    def __init__(self, games=None, directory='', delete_file=False, move_file_directory=''):
         self.games = games
         self.mid_directory = directory
         self.delete_file = delete_file
+        self.move_file_directory = move_file_directory
 
     def run(self):
         for game in self.games:
@@ -80,8 +82,12 @@ class CSVimport:
                 db.dbcon.commit()
                 if self.delete_file:
                     # Remove the CSV file after import the data into the DB
-                    print('Deleting file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    print('[!] Deleting file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
                     os.remove(file_path)
+                else:
+                    # move the CSV file after import
+                    print('[!] Moving file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    move_file(src=file_path, dst=self.move_file_directory)
         print('Import complete')
 
 

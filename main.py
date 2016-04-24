@@ -63,7 +63,7 @@ def consolidate_data(game_dicts, previous_date_string):
         p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
     # perform consolidation into DB
     try:
-        c = CSVimport(games=['ED', 'PC'], directory='consolidate', delete_file=False)
+        c = CSVimport(games=['ED', 'PC'], directory='consolidate', move_file_directory='/home/twitchstats/completed')
         c.run()
         p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
     except Exception as e:
