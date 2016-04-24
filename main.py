@@ -24,7 +24,6 @@ def get_config_values():
     with open('games.txt', 'r') as file:
         data = file.readlines()
     data = [data.strip() for data in data if not data.startswith('#')]
-    print(data)
     dicts_list = []
     for i in range(0, len(data) // 4):
         return_dict = {
