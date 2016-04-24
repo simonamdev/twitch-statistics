@@ -2,6 +2,22 @@ import csv
 import os
 from tqdm import tqdm
 from pysqlite import Pysqlite
+from shutil import move as move_file
+
+
+def create_streamer_table(db, streamer, ignore_list):
+    if streamer not in ignore_list:
+        create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
+                       'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
+                       '`viewers`	INTEGER NOT NULL,' \
+                       '`followers`	INTEGER NOT NULL,' \
+                       '`partner`	INTEGER NOT NULL,' \
+                       '`time` TEXT NOT NULL)'
+        try:
+            db.execute_sql('{}'.format(create_statement.format(streamer)))
+            # TODO: add some sort of feedback if the table already exists
+        except Exception as e:
+            print(e)
 
 
 def sort_files_by_date(file_list):
@@ -25,57 +41,59 @@ def sort_files_by_date(file_list):
     return return_list
 
 
-def create_streamer_table(db, streamer, ignore_list):
-    if streamer not in ignore_list:
-        create_statement = 'CREATE TABLE IF NOT EXISTS `{}` (`id` ' \
-                       'INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
-                       '`viewers`	INTEGER NOT NULL,' \
-                       '`followers`	INTEGER NOT NULL,' \
-                       '`partner`	INTEGER NOT NULL,' \
-                       '`time` TEXT NOT NULL)'
-        try:
-            db.execute_sql('{}'.format(create_statement.format(streamer)))
-            # TODO: add some sort of feedback if the table already exists
-        except Exception as e:
-            print(e)
+class CSVimport:
+    def __init__(self, games=None, directory='', delete_file=False, move_file_directory=''):
+        self.games = games
+        self.mid_directory = directory
+        self.delete_file = delete_file
+        self.move_file_directory = move_file_directory
+
+    def run(self):
+        for game in self.games:
+            print('Consolidating data for: {}'.format(game))
+            db = Pysqlite(database_name='{} DB'.format(game), database_file='{}_stats.db'.format(game))
+            existing_tables = db.get_db_data('sqlite_master')
+            # existing_tables = [name[0] for name in existing_tables]
+            data_directory = os.path.join(os.getcwd(), self.mid_directory, 'data', game)
+            data_files = os.listdir(data_directory)
+            sorted_files = sort_files_by_date(data_files)
+            print('Starting import of {} CSVs'.format(len(data_files)))
+            for i, file_name in enumerate(sorted_files):
+                print('Importing from file: {}'.format(file_name))
+                csv_data = []
+                file_path = os.path.join(data_directory, file_name)
+                # open the file in read mode and place the data in a list
+                with open(file_path, newline='') as csvfile:
+                    csvreader = csv.reader(csvfile, quotechar='"')
+                    for row in csvreader:
+                        csv_data.append(row)
+                for row in tqdm(csv_data):
+                    # Create a table in the DB according to the name in the row of data
+                    # Add an underscore to table names that start with a number, as sqlite complains about them
+                    if row[0][0].isdigit():
+                        row[0] = '_' + row[0]
+                    create_streamer_table(db=db, streamer=row[0], ignore_list=existing_tables)
+                    # insert the values into a database row
+                    try:
+                        db.dbcur.execute('INSERT INTO {} VALUES (NULL, ?, ?, ?, ?)'.format(row[0]), (row[1], row[2], row[3], row[4]))
+                    except Exception as e:
+                        print(e)
+                # Commit the data to the db before moving onto the next set of data
+                db.dbcon.commit()
+                if self.delete_file:
+                    # Remove the CSV file after import the data into the DB
+                    print('[!] Deleting file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    os.remove(file_path)
+                else:
+                    # move the CSV file after import
+                    print('[!] Moving file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    move_file(src=file_path, dst=self.move_file_directory)
+        print('Import complete')
 
 
 def main():
-    games = ['ED', 'PC']
-    for game in games:
-        print('Consolidating data for: {}'.format(game))
-        database = Pysqlite('{}_stats'.format(game), '{}_stats.db'.format(game))
-        existing_tables = database.get_db_data('sqlite_sequence')
-        existing_tables = [name[0] for name in existing_tables]
-        directory = os.path.join(os.getcwd(), 'data', game)
-        data_files = os.listdir(directory)
-        print('Starting import of {} CSVs'.format(len(data_files)))
-        sorted_files = sort_files_by_date(data_files)
-        for file_name in sorted_files:
-            csv_data = []
-            print('Importing file: {}'.format(file_name))
-            file_path = os.path.join(directory, file_name)
-            with open(file_path, newline='') as csvfile:
-                csvreader = csv.reader(csvfile, quotechar='"')
-                for row in csvreader:
-                    csv_data.append(row)
-            for row in tqdm(csv_data):
-                # Create a table in the DB according to the name in the row of data
-                # Add an underscore to table names that start with a number, as sqlite complains about them
-                if row[0][0].isdigit():
-                    row[0] = '_' + row[0]
-                create_streamer_table(database, row[0], existing_tables)
-                # Insert the values into the database
-                try:
-                    database.dbcur.execute('INSERT INTO {} VALUES (NULL, ?, ?, ?, ?)'.format(row[0]), (row[1], row[2], row[3], row[4]))
-                except Exception as e:
-                    print(e)
-            # Commit the data to the db before moving onto the next set of data
-            database.dbcon.commit()
-            # Remove the CSV file after import the data into the DB
-            print('Deleting file: {}, {}/{}'.format(file_name, sorted_files.index(file_name) + 1, len(data_files)))
-            os.remove(file_path)
-    print('All done :)')
+    c = CSVimport(games=['ED', 'PC'], directory='', delete_file=False)
+    c.run()
 
 if __name__ == '__main__':
     main()
