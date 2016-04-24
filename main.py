@@ -20,6 +20,23 @@ def pause(amount=5):
     print('                                    ', end='\r')
 
 
+def get_config_values():
+    with open('games.txt', 'r') as file:
+        data = file.readlines()
+    data = [data.strip() for data in data if not data.startswith('#')]
+    print(data)
+    dicts_list = []
+    for i in range(0, len(data) // 4):
+        return_dict = {
+            'url_name': data.pop(0),
+            'name': data.pop(0),
+            'game_names': data.pop(0).split(','),
+            'shorthand_name': data.pop(0)
+        }
+        dicts_list.append(return_dict)
+    return dicts_list
+
+
 def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
     if file_name is None:
         if verbose:
@@ -73,21 +90,7 @@ def consolidate_data(game_dicts, previous_date_string):
 
 
 def main():
-    # TODO: Move these to a config file so that it is expandable to any number of games
-    games = [
-        {
-            'url_name': 'Elite:%20Dangerous',
-            'name': 'Elite: Dangerous',
-            'game_names': ['Elite: Dangerous', 'Elite Dangerous'],
-            'shorthand_name': 'ED'
-        },
-        {
-            'url_name': 'Planet%20Coaster',
-            'name': 'Planet Coaster',
-            'game_names': ['Planet: Coaster', 'Planet Coaster'],
-            'shorthand_name': 'PC'
-        }
-    ]
+    games = get_config_values()
     previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
     previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
     while True:
