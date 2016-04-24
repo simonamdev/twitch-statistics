@@ -1,0 +1,12 @@
+# URL Name
+# Full Name
+# Possible names (comma seperated)
+# Shorthand Name
+Elite:%20Dangerous
+Elite: Dangerous
+Elite: Dangerous,Elite Dangerous
+ED
+Planet%20Coaster
+Planet Coaster
+Planet: Coaster,Planet Coaster
+PC
