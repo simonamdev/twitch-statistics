@@ -1,2 +1,6 @@
 # twitch-statistics
-Python script to gather viewer, follower and partnership data of all currently online twitch streamers for Elite: Dangerous
+
+[![Build Status](https://travis-ci.org/purrcat259/twitch-statistics.svg?branch=master)](https://travis-ci.org/purrcat259/twitch-statistics)
+
+A set of Python scripts aimed at gathering viewer, follower and partnership data of all twitch streamers currently live for a specific set of game/s.
+
