@@ -1,7 +1,7 @@
 import csv
 import os
+from neopysqlite.neopysqlite import Pysqlite
 from tqdm import tqdm
-from pysqlite import Pysqlite
 from shutil import move as move_file
 
 
@@ -52,7 +52,7 @@ class CSVimport:
         for game in self.games:
             print('Consolidating data for: {}'.format(game))
             db = Pysqlite(database_name='{} DB'.format(game), database_file='{}_stats.db'.format(game))
-            existing_tables = db.get_db_data('sqlite_master')
+            existing_tables = db.get_table_names()
             # existing_tables = [name[0] for name in existing_tables]
             data_directory = os.path.join(os.getcwd(), self.mid_directory, 'data', game)
             data_files = os.listdir(data_directory)
@@ -75,7 +75,7 @@ class CSVimport:
                     create_streamer_table(db=db, streamer=row[0], ignore_list=existing_tables)
                     # insert the values into a database row
                     try:
-                        db.dbcur.execute('INSERT INTO {} VALUES (NULL, ?, ?, ?, ?)'.format(row[0]), (row[1], row[2], row[3], row[4]))
+                        db.insert_row(table=row[0], row_string='(NULL, ?, ?, ?, ?)', row_data=(row[1], row[2], row[3], row[4]))
                     except Exception as e:
                         print(e)
                 # Commit the data to the db before moving onto the next set of data
