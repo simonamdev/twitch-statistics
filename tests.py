@@ -21,18 +21,8 @@ class TestConfigFile(unittest.TestCase):
 
 class TestCSVImport(unittest.TestCase):
     def test_import_csv(self):
-        test_csv_file = 'TEST_24_4_2016.csv'
-        # first clear up the test csv if it exists
-        completed_file_path = os.path.join(os.getcwd(), 'data', 'Completed', test_csv_file)
-        if os.path.isfile(completed_file_path):
-            os.remove(completed_file_path)
-        move_dir = os.path.join(os.getcwd(), 'data', 'Completed')
-        c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=False, move_file_directory=move_dir, verbose=True)
+        c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=True, verbose=True)
         c.run()
-        # move the file back to the normal dir
-        data_folder = os.path.join(os.getcwd(), 'data', 'TEST')
-        sleep(2)
-        move_file(src=completed_file_path, dst=data_folder)
         consolidated_db = Pysqlite(database_name='Consolidated DB', database_file=os.path.join(os.getcwd(), 'data', 'TEST_stats.db'), verbose=True)
         consolidated_streamers = consolidated_db.get_table_names()
         consolidated_data = []
