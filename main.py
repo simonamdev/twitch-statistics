@@ -69,7 +69,7 @@ def consolidate_data(game_dicts, previous_date_string):
             # run the backup command
             os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
             # move the file to its respective data directory for consolidation
-            data_folder = os.path.join(os.getcwd(), 'consolidate', 'data', game['shorthand_name'])
+            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'])
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
@@ -79,13 +79,15 @@ def consolidate_data(game_dicts, previous_date_string):
         p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
     # perform consolidation into DB
     try:
-        c = CSVimport(games=['ED', 'PC'], directory='consolidate', move_file_directory='/home/twitchstats/completed')
+        # db_mid_dir: empty as DBs are in the same directory
+        # data_mid_dir: empty as data folder is added automatically
+        c = CSVimport(games=['ED', 'PC'], db_mid_dir='', data_mid_dir='', move_file_dir='/home/twitchstats/completed')
         c.run()
         p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
         p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
-    pause(5)
+    pause(2)
 
 
 def main():
