@@ -1,3 +1,4 @@
 pynma
 requests
 tqdm
+neopysqlite

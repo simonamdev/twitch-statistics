@@ -1,7 +1,7 @@
 import csv
 import os
+from neopysqlite.neopysqlite import Pysqlite
 from tqdm import tqdm
-from pysqlite import Pysqlite
 from shutil import move as move_file
 
 
@@ -42,24 +42,29 @@ def sort_files_by_date(file_list):
 
 
 class CSVimport:
-    def __init__(self, games=None, directory='', delete_file=False, move_file_directory=''):
+    def __init__(self, games=None, db_mid_dir='', data_mid_dir='', delete_file=False, move_file_dir='', verbose=False):
         self.games = games
-        self.mid_directory = directory
+        self.db_mid_directory = db_mid_dir
+        self.data_mid_directory = data_mid_dir
         self.delete_file = delete_file
-        self.move_file_directory = move_file_directory
+        self.move_file_directory = move_file_dir
+        self.verbose = verbose
 
     def run(self):
         for game in self.games:
-            print('Consolidating data for: {}'.format(game))
-            db = Pysqlite(database_name='{} DB'.format(game), database_file='{}_stats.db'.format(game))
-            existing_tables = db.get_db_data('sqlite_master')
-            # existing_tables = [name[0] for name in existing_tables]
-            data_directory = os.path.join(os.getcwd(), self.mid_directory, 'data', game)
+            if self.verbose:
+                print('[!] Consolidating data for: {}'.format(game))
+            db_path = os.path.join(os.getcwd(), self.db_mid_directory, '{}_stats.db'.format(game))
+            db = Pysqlite(database_name='{} DB'.format(game), database_file=db_path, verbose=self.verbose)
+            existing_tables = db.get_table_names()
+            data_directory = os.path.join(os.getcwd(), self.data_mid_directory, 'data', game)
             data_files = os.listdir(data_directory)
             sorted_files = sort_files_by_date(data_files)
-            print('Starting import of {} CSVs'.format(len(data_files)))
+            if self.verbose:
+                print('[+] Starting import of {} CSVs'.format(len(data_files)))
             for i, file_name in enumerate(sorted_files):
-                print('Importing from file: {}'.format(file_name))
+                if self.verbose:
+                    print('[+] Importing from file: {}'.format(file_name))
                 csv_data = []
                 file_path = os.path.join(data_directory, file_name)
                 # open the file in read mode and place the data in a list
@@ -75,24 +80,28 @@ class CSVimport:
                     create_streamer_table(db=db, streamer=row[0], ignore_list=existing_tables)
                     # insert the values into a database row
                     try:
-                        db.dbcur.execute('INSERT INTO {} VALUES (NULL, ?, ?, ?, ?)'.format(row[0]), (row[1], row[2], row[3], row[4]))
+                        db.insert_row(table=row[0], row_string='(NULL, ?, ?, ?, ?)', row_data=(row[1], row[2], row[3], row[4]))
                     except Exception as e:
                         print(e)
                 # Commit the data to the db before moving onto the next set of data
                 db.dbcon.commit()
                 if self.delete_file:
                     # Remove the CSV file after import the data into the DB
-                    print('[!] Deleting file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    if self.verbose:
+                        print('[!] Deleting file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
                     os.remove(file_path)
                 else:
                     # move the CSV file after import
-                    print('[!] Moving file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
+                    if self.verbose:
+                        print('[!] Moving file: {}, {}/{}'.format(file_name, i + 1, len(data_files)))
                     move_file(src=file_path, dst=self.move_file_directory)
-        print('Import complete')
+        if self.verbose:
+            print('[+] Import complete')
 
 
 def main():
-    c = CSVimport(games=['ED', 'PC'], directory='', delete_file=False)
+    move_dir = os.path.join(os.getcwd(), 'data', 'Completed')
+    c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=False, move_file_dir=move_dir, verbose=True)
     c.run()
 
 if __name__ == '__main__':
