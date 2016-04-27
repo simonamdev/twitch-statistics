@@ -42,12 +42,12 @@ def sort_files_by_date(file_list):
 
 
 class CSVimport:
-    def __init__(self, games=None, db_mid_dir='', data_mid_dir='', delete_file=False, move_file_directory='', verbose=False):
+    def __init__(self, games=None, db_mid_dir='', data_mid_dir='', delete_file=False, move_file_dir='', verbose=False):
         self.games = games
         self.db_mid_directory = db_mid_dir
         self.data_mid_directory = data_mid_dir
         self.delete_file = delete_file
-        self.move_file_directory = move_file_directory
+        self.move_file_directory = move_file_dir
         self.verbose = verbose
 
     def run(self):
