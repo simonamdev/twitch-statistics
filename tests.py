@@ -8,11 +8,16 @@ class TestConfigFile(unittest.TestCase):
 
     def test_config_not_empty(self):
         with open('games.txt', 'r') as config:
-            self.assertNotEquals(first=len(config.readlines()), second=0, msg='Config file is empty')
+            self.assertNotEqual(first=len(config.readlines()), second=0, msg='Config file is empty')
 
     def test_config_contents_amount(self):
         with open('games.txt', 'r') as config:
             self.assertEqual(first=len(config.readlines()) % 4, second=0, msg='Config file lines not multiple of 4')
+
+
+class TestCSVImport(unittest.TestCase):
+    def test_import(self):
+        self.assertTrue(True)
 
 if __name__ == '__main__':
     unittest.main()
