@@ -102,7 +102,7 @@ class CSVimport:
 
 def main():
     move_dir = os.path.join(os.getcwd(), 'data', 'Completed')
-    c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=False, move_file_directory=move_dir, verbose=True)
+    c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=False, move_file_dir=move_dir, verbose=True)
     c.run()
 
 if __name__ == '__main__':
