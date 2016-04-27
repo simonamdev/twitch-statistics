@@ -1,8 +1,6 @@
 import os
 import unittest
 from import_csvs import CSVimport
-from shutil import move as move_file
-from time import sleep
 from neopysqlite.neopysqlite import Pysqlite
 
 
