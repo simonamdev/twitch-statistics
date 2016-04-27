@@ -57,7 +57,6 @@ class CSVimport:
             db_path = os.path.join(os.getcwd(), self.db_mid_directory, '{}_stats.db'.format(game))
             db = Pysqlite(database_name='{} DB'.format(game), database_file=db_path, verbose=self.verbose)
             existing_tables = db.get_table_names()
-            # existing_tables = [name[0] for name in existing_tables]
             data_directory = os.path.join(os.getcwd(), self.data_mid_directory, 'data', game)
             data_files = os.listdir(data_directory)
             sorted_files = sort_files_by_date(data_files)
