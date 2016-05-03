@@ -264,6 +264,9 @@ def write_to_text_file(game_dict, streamer_list):
         file.write('Tier Three Bounds: {} >= Average Viewers >= {}\n'.format(tier_three_bounds['upper'], tier_three_bounds['lower']))
         file.write('Tier Four Bounds: {} >= Average Viewers >= {}\n'.format(tier_four_bounds['upper'], tier_four_bounds['lower']))
         for streamer in streamer_list:
+            # skip streamers with total durations less than 10 minutes
+            if streamer['durations_total'] < 0.2:
+                continue
             file.write('\nStreamer: {} (T{})\n'.format(streamer['name'], streamer['tier']))
             file.write('Partnered: {} \n'.format(streamer['partnership']))
             file.write('Average Viewers: {}\n'.format(streamer['viewers_average']))
