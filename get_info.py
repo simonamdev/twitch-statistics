@@ -1,6 +1,6 @@
 import datetime
 import os
-from neopysqlite.neopysqlite import Pysqlite
+from neopysqlite.neopysqlite import *
 from tqdm import tqdm
 
 games = [
@@ -21,10 +21,32 @@ tier_three_bounds = {'upper': 49, 'lower': 15}
 tier_four_bounds = {'upper': 14, 'lower': 0}
 
 
+class TwitchStatisticsOutput:
+    def __init__(self, game_dicts):
+        self.games = game_dicts
+
+
 def get_streamer_dict(db, streamer):
-    data = db.get_all_rows(table=streamer)
     streamer_dict = dict()
     streamer_dict['name'] = streamer
+    try:
+        data = db.get_all_rows(table=streamer)
+    except PysqliteCouldNotRetrieveData:
+        streamer_dict['partnership'] = False
+        streamer_dict['tier'] = 4
+        streamer_dict['viewers'] = []
+        streamer_dict['viewers_max'] = 0
+        streamer_dict['viewers_average'] = 0.0
+        streamer_dict['followers'] = []
+        streamer_dict['followers_max'] = 0
+        streamer_dict['times'] = []
+        streamer_dict['durations'] = []
+        streamer_dict['durations_max'] = 0
+        streamer_dict['durations_average'] = 0.0
+        streamer_dict['durations_total'] = 0.0
+        streamer_dict['stream_count'] = 0
+        streamer_dict['exposure_index'] = 0
+        return streamer_dict
     streamer_dict['partnership'] = data[-1][3] == 1
     viewers = [field[1] for field in data]
     streamer_dict['viewers'] = [field[1] for field in data]
