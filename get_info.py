@@ -1,5 +1,6 @@
 import datetime
-from pysqlite import Pysqlite
+import os
+from neopysqlite.neopysqlite import Pysqlite
 from tqdm import tqdm
 
 games = [
@@ -21,9 +22,10 @@ tier_four_bounds = {'upper': 14, 'lower': 0}
 
 
 def get_streamer_dict(db, streamer):
-    data = db.get_db_data(streamer)
+    data = db.get_all_rows(table=streamer)
     streamer_dict = dict()
     streamer_dict['name'] = streamer
+    streamer_dict['partnership'] = data[-1][3] == 1
     viewers = [field[1] for field in data]
     streamer_dict['viewers'] = [field[1] for field in data]
     streamer_dict['viewers_max'] = max(viewers)
@@ -38,6 +40,7 @@ def get_streamer_dict(db, streamer):
     streamer_dict['durations_average'] = calculate_average(streamer_dict['durations'], return_int=False)
     streamer_dict['durations_total'] = calculate_sum(streamer_dict['durations'], return_int=False)
     streamer_dict['stream_count'] = len(streamer_dict['durations'])
+    streamer_dict['exposure_index'] = return_expoure_index(streamer_dict)
     return streamer_dict
 
 
@@ -51,6 +54,11 @@ def return_streamer_tier(average_viewers):
     if tier_four_bounds['upper'] >= average_viewers >= tier_four_bounds['lower']:
         return 4
     return 0
+
+
+def return_expoure_index(streamer):
+    # calculated as: average viewer count * total hours streamed
+    return round(streamer['viewers_average'] * streamer['durations_total'], 2)
 
 
 def get_stream_durations(stream_times):
@@ -118,17 +126,23 @@ def calculate_sum(number_list, return_int=True):
 
 def process_data(game):
     print('Processing data for: {}'.format(game['name']))
-    database_file = '{}_stats.db'.format(game['shorthand'])
+    database_path = os.path.join(os.getcwd(), 'data', '{}_stats.db'.format(game['shorthand']))
     # initialise the DB object
-    database = Pysqlite('twitch_stats', database_file)
-    table_names = database.get_db_data('sqlite_sequence')
-    # get the table names. Ignore it if it is called test
-    table_names = [row[0] for row in table_names if not row[0] == 'test']
+    database = Pysqlite(database_name='twitch_stats', database_file=database_path)
+    # get the table names. Ignore it if it is called test or sqlite_sequence
+    table_names = database.get_table_names()
+    table_names = [table for table in table_names if table not in ['test', 'sqlite_sequence']]
+    # get the table names which do not start with a number
+    valid_named_tables = [table for table in table_names if not table[0][0].isdigit()]
+    # get the table names which start with a number
+    number_start_tables = [table for table in table_names if table[0][0].isdigit()]
+    # reod the original table names
+    valid_named_tables.extend(['_' + table for table in number_start_tables])
     # initialise list for all the data
     all_streamer_data = []
     # list any streamers to ignore
     streamers_to_ignore = ['legenddolby1986']
-    for streamer in tqdm(table_names):
+    for streamer in tqdm(valid_named_tables):
         if streamer in streamers_to_ignore:
             # skip if its on the ignore list
             continue
@@ -192,38 +206,55 @@ def process_data(game):
 
 
 def write_to_text_file(game_dict, streamer_list):
-    # calculate total time streamed over all streamers
     total_duration = 0
+    total_streams = 0
+    total_exposure = 0
+    # calculate total time streamed over all streamers
     for streamer in streamer_list:
         for duration in streamer['durations']:
             total_duration += duration
     total_duration = round(total_duration, 2)
-    total_streams = 0
+    # calculate the total number of discrete streams
     for streamer in streamer_list:
         total_streams += streamer['stream_count']
-    with open('{}_Twitch_Stats.txt'.format(game_dict['shorthand']), mode='w', encoding='utf-8') as file:
+    # get the total exposure index from all streamers
+    for streamer in streamer_list:
+        total_exposure += streamer['exposure_index']
+    total_exposure = round(total_exposure, 2)
+    # get the longest consecutive stream
+    longest_stream = 0
+    for streamer in streamer_list:
+        if longest_stream < streamer['durations_max']:
+            longest_stream = streamer['durations_max']
+    text_file_path = os.path.join(os.getcwd(), 'data', '{}_Twitch_Stats.txt'.format(game_dict['shorthand']))
+    with open(text_file_path, mode='w', encoding='utf-8') as file:
         file.write('{} Twitch Streamer Statistics\n'.format(game_dict['name']))
-        file.write('Data recorded 24/7 via twitch public API every 20 seconds\n')
-        file.write('Script written by CMDR Purrcat / Simon Agius Muscat\n')
+        file.write('Data recorded 24/7 via twitch public API every ~20 seconds\n')
+        file.write('Script written by Simon Agius Muscat / CMDR Purrcat\n')
         file.write('More information can be found at: https://github.com/purrcat259/twitch-statistics\n')
         file.write('Total streamers recorded: {}\n'.format(len(streamer_list)))
         file.write('Total streams recorded: {}\n'.format(total_streams))
         file.write('Total time streamed: {} hours\n'.format(total_duration))
+        file.write('Total exposure value: {} average viewers per hour\n'.format(total_exposure))
+        file.write('Longest single stream: {} hours\n'.format(longest_stream))
         file.write('Tier One Bounds: {} >= Average Viewers >= {}\n'.format(tier_one_bounds['upper'], tier_one_bounds['lower']))
         file.write('Tier Two Bounds: {} >= Average Viewers >= {}\n'.format(tier_two_bounds['upper'], tier_two_bounds['lower']))
         file.write('Tier Three Bounds: {} >= Average Viewers >= {}\n'.format(tier_three_bounds['upper'], tier_three_bounds['lower']))
         file.write('Tier Four Bounds: {} >= Average Viewers >= {}\n'.format(tier_four_bounds['upper'], tier_four_bounds['lower']))
         for streamer in streamer_list:
-            file.write('\nStreamer: {}\n'.format(streamer['name']))
-            file.write('Tier: {}\n'.format(streamer['tier']))
+            file.write('\nStreamer: {} (T{})\n'.format(streamer['name'], streamer['tier']))
+            file.write('Partnered: {} \n'.format(streamer['partnership']))
             file.write('Average Viewers: {}\n'.format(streamer['viewers_average']))
             file.write('Peak Viewers: {}\n'.format(streamer['viewers_max']))
             file.write('Followers: {}\n'.format(streamer['followers_max']))
             file.write('Stream count: {}\n'.format(streamer['stream_count']))
+            file.write('Exposure index: {} average viewers per hour\n'.format(streamer['exposure_index']))
+            exposure_percentage = round((streamer['exposure_index'] / total_exposure) * 100, 2)
+            file.write('Exposure percentage: {}%\n'.format(exposure_percentage))
             file.write('Average Stream duration: {} hours\n'.format(streamer['durations_average']))
             file.write('Longest Stream duration: {} hours\n'.format(streamer['durations_max']))
             file.write('Total time streamed: {} hours\n'.format(streamer['durations_total']))
-            time_percentage = round((streamer['durations_total'] / total_duration) * 100, 4)
+            time_percentage = round((streamer['durations_total'] / total_duration) * 100, 3)
             file.write('Streamer portion of total duration: {}%\n'.format(time_percentage))
             file.write('Stream durations:\n')
             for duration in streamer['durations']:
