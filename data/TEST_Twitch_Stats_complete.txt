@@ -1,0 +1,68 @@
+Test Twitch Streamer Statistics
+Data recorded 24/7 via twitch's public API every ~20 seconds
+Script written by Simon Agius Muscat / CMDR Purrcat
+More information can be found at: https://github.com/purrcat259/twitch-statistics
+Total streamers recorded: 5
+Total streams recorded: 5
+Total time streamed: 3.29 hours
+Longest single stream: 0.92 hours
+Tier One Bounds: 999999 >= Average Viewers >= 100
+Tier One Streamers: 0
+Tier Two Bounds: 99 >= Average Viewers >= 50
+Tier Two Streamers: 0
+Tier Three Bounds: 49 >= Average Viewers >= 15
+Tier Three Streamers: 1
+Tier Four Bounds: 14 >= Average Viewers >= 0
+Tier Four Streamers: 4
+
+Streamer: test_one (T3)
+Partnered: False 
+Average Viewers: 16
+Peak Viewers: 25
+Followers: 111
+Stream count: 1
+Average Stream duration: 0.92 hours
+Longest Stream duration: 0.92 hours
+Total time streamed: 0.92 hours
+Percentage streamed of total duration: 27.964%
+Stream durations:
+	55.2 minutes
+
+Streamer: test_two (T4)
+Partnered: False 
+Average Viewers: 4
+Peak Viewers: 8
+Followers: 61
+Stream count: 1
+Average Stream duration: 0.92 hours
+Longest Stream duration: 0.92 hours
+Total time streamed: 0.92 hours
+Percentage streamed of total duration: 27.964%
+Stream durations:
+	55.2 minutes
+
+Streamer: test_three (T4)
+Partnered: False 
+Average Viewers: 3
+Peak Viewers: 5
+Followers: 4402
+Stream count: 1
+Average Stream duration: 0.92 hours
+Longest Stream duration: 0.92 hours
+Total time streamed: 0.92 hours
+Percentage streamed of total duration: 27.964%
+Stream durations:
+	55.2 minutes
+
+Streamer: test_five (T4)
+Partnered: False 
+Average Viewers: 1
+Peak Viewers: 2
+Followers: 7
+Stream count: 1
+Average Stream duration: 0.39 hours
+Longest Stream duration: 0.39 hours
+Total time streamed: 0.39 hours
+Percentage streamed of total duration: 11.854%
+Stream durations:
+	23.4 minutes

@@ -2,6 +2,8 @@ import os
 import unittest
 from import_csvs import CSVimport
 from neopysqlite.neopysqlite import Pysqlite
+from get_info import TwitchStatisticsOutput
+from filecmp import cmp as compare_files
 
 
 class TestConfigFile(unittest.TestCase):
@@ -32,6 +34,20 @@ class TestCSVImport(unittest.TestCase):
         for streamer in complete_streamers:
             complete_data.append(complete_db.get_all_rows(table=streamer))
         self.assertEqual(first=consolidated_data, second=complete_data)
+
+
+class TestStatisticsOutput(unittest.TestCase):
+    def test_output_stats(self):
+        out = TwitchStatisticsOutput(game_name='Test',
+                                     game_shorthand='TEST',
+                                     db_mid_directory='data',
+                                     db_name_format='{}_stats_complete.db',
+                                     verbose=True)
+        out.run()
+        self.assertTrue(os.path.isfile(os.path.join(os.getcwd(), 'data', 'TEST_Twitch_Stats.txt')))
+        self.assertTrue(compare_files(
+                f1=os.path.join(os.getcwd(), 'data', 'TEST_Twitch_Stats.txt'),
+                f2=os.path.join(os.getcwd(), 'data', 'TEST_Twitch_Stats_complete.txt')))
 
 if __name__ == '__main__':
     unittest.main()
