@@ -3,17 +3,6 @@ import os
 from neopysqlite.neopysqlite import Pysqlite, PysqliteCouldNotRetrieveData
 from tqdm import tqdm
 
-games = [
-    {
-        'name': 'Elite: Dangerous',
-        'shorthand': 'ED'
-     },
-    {
-        'name': 'Planet Coaster',
-        'shorthand': 'PC'
-    }
-]
-
 
 def get_stream_durations(stream_times):
     # pop one field out to avoid odd numbered lists
@@ -64,10 +53,10 @@ class TwitchStatisticsOutput:
     tier_three_bounds = {'upper': 49, 'lower': 15}
     tier_four_bounds = {'upper': 14, 'lower': 0}
 
-    def __init__(self, game_name, game_shorthand, db_mid_directory, verbose=False):
+    def __init__(self, game_name, game_shorthand, db_mid_directory, db_name_format='{}_stats.db', verbose=False):
         self.name = game_name
         self.shorthand = game_shorthand
-        self.db_file_path = os.path.join(os.getcwd(), db_mid_directory, '{}_stats.db'.format(game_shorthand))
+        self.db_file_path = os.path.join(os.getcwd(), db_mid_directory, db_name_format.format(game_shorthand))
         self.db = Pysqlite(database_name='twitch_stats', database_file=self.db_file_path)
         self.verbose = verbose
 
@@ -202,9 +191,28 @@ class TwitchStatisticsOutput:
 
 
 def main():
+    games = [
+        {
+            'name': 'Elite: Dangerous',
+            'shorthand': 'ED'
+         },
+        {
+            'name': 'Planet Coaster',
+            'shorthand': 'PC'
+        }
+    ]
     for game in games:
-        out = TwitchStatisticsOutput(game_name=game['name'], game_shorthand=game['shorthand'], db_mid_directory='data', verbose=True)
+        out = TwitchStatisticsOutput(game_name=game['name'],
+                                     game_shorthand=game['shorthand'],
+                                     db_mid_directory='data',
+                                     verbose=True)
         out.run()
 
 if __name__ == '__main__':
-    main()
+    # main()
+    out = TwitchStatisticsOutput(game_name='Test',
+                                 game_shorthand='TEST',
+                                 db_mid_directory='data',
+                                 db_name_format='{}_stats_complete.db',
+                                 verbose=True)
+    out.run()
