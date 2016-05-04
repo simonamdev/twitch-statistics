@@ -7,6 +7,7 @@ from datetime import datetime
 from time import sleep
 from shutil import move as move_file
 from import_csvs import CSVimport
+from get_info import TwitchStatisticsOutput
 
 # Global values
 p = pynma.PyNMA(pynma_api)
@@ -87,7 +88,15 @@ def consolidate_data(game_dicts, previous_date_string):
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
         p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
+    # hold for two seconds
     pause(2)
+    # run the get info object
+    for game in game_dicts:
+        output = TwitchStatisticsOutput(game_name=game['name'],
+                                        game_shorthand=game['shorthand_name'],
+                                        db_mid_directory='',
+                                        verbose=True)
+        output.run()
 
 
 def main():
