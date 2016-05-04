@@ -14,136 +14,109 @@ games = [
     }
 ]
 
-# bounds for the tiers of streamers
-tier_one_bounds = {'upper': 999999, 'lower': 100}
-tier_two_bounds = {'upper': 99, 'lower': 50}
-tier_three_bounds = {'upper': 49, 'lower': 15}
-tier_four_bounds = {'upper': 14, 'lower': 0}
-
 
 class TwitchStatisticsOutput:
-    def __init__(self, game_dicts):
-        self.games = game_dicts
+    # bounds for the tiers of streamers
+    tier_one_bounds = {'upper': 999999, 'lower': 100}
+    tier_two_bounds = {'upper': 99, 'lower': 50}
+    tier_three_bounds = {'upper': 49, 'lower': 15}
+    tier_four_bounds = {'upper': 14, 'lower': 0}
 
+    def __init__(self, game_name, game_shorthand, game_db):
+        self.name = game_name
+        self.shorthand = game_shorthand
+        self.db = game_db
 
-def get_streamer_dict(db, streamer):
-    streamer_dict = dict()
-    streamer_dict['name'] = streamer
-    try:
-        data = db.get_all_rows(table=streamer)
-    except PysqliteCouldNotRetrieveData:
-        streamer_dict['partnership'] = False
-        streamer_dict['tier'] = 4
-        streamer_dict['viewers'] = []
-        streamer_dict['viewers_max'] = 0
-        streamer_dict['viewers_average'] = 0.0
-        streamer_dict['followers'] = []
-        streamer_dict['followers_max'] = 0
-        streamer_dict['times'] = []
-        streamer_dict['durations'] = []
-        streamer_dict['durations_max'] = 0
-        streamer_dict['durations_average'] = 0.0
-        streamer_dict['durations_total'] = 0.0
-        streamer_dict['stream_count'] = 0
-        streamer_dict['exposure_index'] = 0
+    def return_streamer_tier(self, average_viewers):
+        if self.tier_one_bounds['upper'] >= average_viewers >= self.tier_one_bounds['lower']:
+            return 1
+        if self.tier_two_bounds['upper'] >= average_viewers >= self.tier_two_bounds['lower']:
+            return 2
+        if self.tier_three_bounds['upper'] >= average_viewers >= self.tier_three_bounds['lower']:
+            return 3
+        if self.tier_four_bounds['upper'] >= average_viewers >= self.tier_four_bounds['lower']:
+            return 4
+        return 0
+
+    def get_streamer_dict(self, streamer):
+        streamer_dict = dict()
+        streamer_dict['name'] = streamer
+        # catch an exception where the table cannot be found and return an empty dictionary instead
+        try:
+            data = self.db.get_all_rows(table=streamer)
+        except PysqliteCouldNotRetrieveData:
+            streamer_dict['partnership'] = False
+            streamer_dict['tier'] = 4
+            streamer_dict['viewers'] = []
+            streamer_dict['viewers_max'] = 0
+            streamer_dict['viewers_average'] = 0.0
+            streamer_dict['followers'] = []
+            streamer_dict['followers_max'] = 0
+            streamer_dict['times'] = []
+            streamer_dict['durations'] = []
+            streamer_dict['durations_max'] = 0
+            streamer_dict['durations_average'] = 0.0
+            streamer_dict['durations_total'] = 0.0
+            streamer_dict['stream_count'] = 0
+            streamer_dict['exposure_index'] = 0
+            return streamer_dict
+        streamer_dict['partnership'] = data[-1][3] == 1
+        viewers = [field[1] for field in data]
+        streamer_dict['viewers'] = [field[1] for field in data]
+        streamer_dict['viewers_max'] = max(viewers)
+        streamer_dict['viewers_average'] = sum(viewers) // len(viewers)
+        streamer_dict['tier'] = self.return_streamer_tier(streamer_dict['viewers_average'])
+        followers = [field[2] for field in data]
+        streamer_dict['followers'] = followers
+        streamer_dict['followers_max'] = followers[-1]
+        streamer_dict['times'] = [field[4] for field in data]  # times
+        streamer_dict['durations'] = self.get_stream_durations(streamer_dict['times'])
+        streamer_dict['durations_max'] = max(streamer_dict['durations'])
+        streamer_dict['durations_average'] = round(sum(streamer_dict['durations']), 2)
+        streamer_dict['durations_total'] = round(sum(streamer_dict['durations']), 2)
+        streamer_dict['stream_count'] = len(streamer_dict['durations'])
         return streamer_dict
-    streamer_dict['partnership'] = data[-1][3] == 1
-    viewers = [field[1] for field in data]
-    streamer_dict['viewers'] = [field[1] for field in data]
-    streamer_dict['viewers_max'] = max(viewers)
-    streamer_dict['viewers_average'] = calculate_average(viewers)
-    streamer_dict['tier'] = return_streamer_tier(streamer_dict['viewers_average'])
-    followers = [field[2] for field in data]
-    streamer_dict['followers'] = followers
-    streamer_dict['followers_max'] = followers[-1]
-    streamer_dict['times'] = [field[4] for field in data]  # times
-    streamer_dict['durations'] = get_stream_durations(streamer_dict['times'])
-    streamer_dict['durations_max'] = max(streamer_dict['durations'])
-    streamer_dict['durations_average'] = calculate_average(streamer_dict['durations'], return_int=False)
-    streamer_dict['durations_total'] = calculate_sum(streamer_dict['durations'], return_int=False)
-    streamer_dict['stream_count'] = len(streamer_dict['durations'])
-    streamer_dict['exposure_index'] = return_expoure_index(streamer_dict)
-    return streamer_dict
 
-
-def return_streamer_tier(average_viewers):
-    if tier_one_bounds['upper'] >= average_viewers >= tier_one_bounds['lower']:
-        return 1
-    if tier_two_bounds['upper'] >= average_viewers >= tier_two_bounds['lower']:
-        return 2
-    if tier_three_bounds['upper'] >= average_viewers >= tier_three_bounds['lower']:
-        return 3
-    if tier_four_bounds['upper'] >= average_viewers >= tier_four_bounds['lower']:
-        return 4
-    return 0
-
-
-def return_expoure_index(streamer):
-    # calculated as: average viewer count * total hours streamed
-    return round(streamer['viewers_average'] * streamer['durations_total'], 2)
-
-
-def get_stream_durations(stream_times):
-    # pop one field out to avoid odd numbered lists
-    time_deltas = []
-    for i, field in enumerate(stream_times):
-        # if i == 0 or i % 2 == 0:
-        # current field
-        # timestamp format: '2016-01-25 10:46:18'
-        date_part = field.split(' ')[0].split('-')
-        time_part = field.split(' ')[1].split(':')
-        year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
-        hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-        time1 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-        # caclulate a delta between the current and the next field
-        if i+1 == len(stream_times):
-            break
-        next_field = stream_times[i+1]
-        date_part = next_field.split(' ')[0].split('-')
-        time_part = next_field.split(' ')[1].split(':')
-        year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
-        hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-        time2 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-        time_deltas.append([time1, time2])
-    stream_durations = []
-    current_stream_duration = 0
-    for time_one, time_two in time_deltas:
-        delta = time_two - time_one
-        # operate on the assumption that different streams are a minimum of 1 hour away from each other
-        if delta.seconds / (60 * 60) > 1:
-            # print('DIFFERENT STREAM FOUND')
-            stream_durations.append(current_stream_duration)
-            current_stream_duration = 0
+    def get_stream_durations(self, stream_times):
+        # pop one field out to avoid odd numbered lists
+        time_deltas = []
+        for i, field in enumerate(stream_times):
+            # if i == 0 or i % 2 == 0:
+            # current field
+            # timestamp format: '2016-01-25 10:46:18'
+            date_part = field.split(' ')[0].split('-')
+            time_part = field.split(' ')[1].split(':')
+            year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+            hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
+            time1 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+            # caclulate a delta between the current and the next field
+            if i+1 == len(stream_times):
+                break
+            next_field = stream_times[i+1]
+            date_part = next_field.split(' ')[0].split('-')
+            time_part = next_field.split(' ')[1].split(':')
+            year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+            hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
+            time2 = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+            time_deltas.append([time1, time2])
+        stream_durations = []
+        current_stream_duration = 0
+        for time_one, time_two in time_deltas:
+            delta = time_two - time_one
+            # operate on the assumption that different streams are a minimum of 1 hour away from each other
+            if delta.seconds / (60 * 60) > 1:
+                # print('DIFFERENT STREAM FOUND')
+                stream_durations.append(current_stream_duration)
+                current_stream_duration = 0
+            else:
+                # print('{} {}\n{} {}\n\t{}\t{}s'.format(i, time_one, i, time_two, delta, delta.seconds))
+                current_stream_duration += delta.seconds
         else:
-            # print('{} {}\n{} {}\n\t{}\t{}s'.format(i, time_one, i, time_two, delta, delta.seconds))
-            current_stream_duration += delta.seconds
-    else:
-        # if the data ends then the last recorded stream will not be recorded, so add the deltas list anyway
-        stream_durations.append(current_stream_duration)
-    # change it from seconds to hours
-    stream_durations = [round(stream / (60 * 60), 2) for stream in stream_durations]
-    return stream_durations
-
-
-def calculate_average(number_list, return_int=True):
-    average = 0
-    for number in number_list:
-        average += number
-    average /= len(number_list)
-    if return_int:
-        return int(average)
-    else:
-        return round(average, 2)
-
-
-def calculate_sum(number_list, return_int=True):
-    total = 0
-    for number in number_list:
-        total += number
-    if return_int:
-        return int(total)
-    else:
-        return round(total, 2)
+            # if the data ends then the last recorded stream will not be recorded, so add the deltas list anyway
+            stream_durations.append(current_stream_duration)
+        # change it from seconds to hours
+        stream_durations = [round(stream / (60 * 60), 2) for stream in stream_durations]
+        return stream_durations
 
 
 def process_data(game):
