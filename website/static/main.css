@@ -1,13 +1,39 @@
 html, body {
     margin: 0 auto;
-    background-color: #E0E0E0;
+    background-color: #303F9F;
     color: white;
+    font-family: 'Roboto', sans-serif;
 }
 
-.grid-row {
-	background-color: #202020;
+.center-text {
+	text-align: center;
 }
 
-#intro-header h1, p {
+.justify-text {
+	text-align: justify;
+}
+
+.light-row {
+	background-color: #0D47A1;
+}
+
+.dark-row {
+	background-color: #1A237E;
+}
+
+#intro-header-row h1, h2, h5 {
+	font-size: 800%;
+	text-align: center;
+}
+
+#explanation-row p {
+	font-size: 150%;
+}
+
+.if-you-are-row span {
+	color: white;
+}
+
+.if-you-are-row h3 {
 	text-align: center;
 }
