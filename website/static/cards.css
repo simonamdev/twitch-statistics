@@ -27,3 +27,25 @@
 .blue-button {
 	background-color: #0D47A1;
 }
+
+.github-card-wide.mdl-card {
+  width: 512px;
+}
+
+.github-card-wide > .mdl-card__title {
+  height: 176px;
+	color: white;
+	background: url('../static/images/github.jpg') center / cover;
+}
+
+.mdl-link-card-wide.mdl-card {
+	margin-top: 50px;
+  width: 512px;
+}
+
+.mdl-link-card-wide > .mdl-card__title {
+  height: 176px;
+	color: white;
+	background: url('../static/images/mdl.jpg') center / cover;
+}
+
