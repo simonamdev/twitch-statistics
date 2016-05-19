@@ -3,11 +3,17 @@ from minify import minify as minify_css
 app = Flask(__name__)
 
 debug_mode = True
+app_version = 'Alpha 0.1'
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', app_version='Alpha 0.1', debug_mode=debug_mode)
+    return render_template('index.html', app_version=app_version, debug_mode=debug_mode)
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html', app_version=app_version, debug_mode=debug_mode)
 
 if __name__ == '__main__':
     if not debug_mode:

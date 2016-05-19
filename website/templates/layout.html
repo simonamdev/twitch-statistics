@@ -35,31 +35,37 @@
                         <div class="mdl-layout-spacer"></div>
                         <!-- Navigation. We hide it in small screens. -->
                         <nav class="mdl-navigation mdl-layout--large-screen-only">
+                            <a class="mdl-navigation__link" href="{{ url_for('index') }}">Home</a>
                             <a class="mdl-navigation__link" href="">Games</a>
                             <a class="mdl-navigation__link" href="">Streamers</a>
-                            <a class="mdl-navigation__link" href="">About</a>
+                            <a class="mdl-navigation__link" href="{{ url_for('about') }}">About</a>
                         </nav>
                     </div>
                 </header>
                 <div class="mdl-layout__drawer">
                     <span class="mdl-layout-title">Navigation Menu</span>
                     <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="{{ url_for('index') }}">Home</a>
                         <a class="mdl-navigation__link" href="">Elite: Dangerous Data</a>
                         <a class="mdl-navigation__link" href="">Planet Coaster Data</a>
                         <a class="mdl-navigation__link" href="">Stream Community Data</a>
-                        <a class="mdl-navigation__link" href="">About</a>
+                        <a class="mdl-navigation__link" href="{{ url_for('about') }}">About</a>
                     </nav>
                 </div>
                 {% endblock %}
                 <main class="mdl-layout__content">
-                    {% block content %}
-                    {% endblock %}
+                    <div class="page-content">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
                     {% block footer %}
                         <footer class="mdl-mini-footer">
                             <div class="mdl-mini-footer__left-section">
                                 <ul class="mdl-mini-footer__link-list">
+                                  <li><a href="{{ url_for('index') }}">Home</a></li>
                                   <li><a href="#">Game Data</a></li>
                                   <li><a href="#">Streamer Data</a></li>
+                                  <li><a href="{{ url_for('about') }}">About</a></li>
                                 </ul>
                             </div>
                             <div class="mdl-mini-footer__right-section">
