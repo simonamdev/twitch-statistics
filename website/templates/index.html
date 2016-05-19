@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
 {% block css %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% if debug_mode %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
 {% endblock %}
 {% block content %}
     <div class="page-content">
         <div class="mdl-grid dark-row" id="intro-header-row">
-            <div class="mdl-cell mdl-cell--12-col">
-                <h1>The Ocellus Project</h1>
-                <h5>Public twitch stream statistics for Elite: Dangerous and Planet Coaster for all to see and use</h5>
+            <div class="mdl-cell mdl-cell--12-col center-text">
+                <h5>The Ocellus Project</h5>
+                <h2>Public twitch stream statistics for Elite: Dangerous and Planet Coaster for all to see and use</h2>
             </div>
         </div>
         <div class="mdl-grid dark-row" id="explanation-row">
@@ -29,7 +33,7 @@
             <div class="mdl-cell mdl-cell--4-col"></div>
             <div class="mdl-cell mdl-cell--4-col">
                 <h1 class="center-text">Aim of the project</h1>
-                <h3>As a viewer</h3>
+                <h3 class="center-text">As a viewer</h3>
                 <ul class='mdl-list'>
                     <li class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
@@ -54,7 +58,7 @@
             <!-- Spacer -->
             <div class="mdl-cell mdl-cell--4-col"></div>
             <div class="mdl-cell mdl-cell--4-col">
-                <h3>As a streamer</h3>
+                <h3 class="center-text">As a streamer</h3>
                 <ul class='mdl-list'>
                     <li class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
