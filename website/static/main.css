@@ -27,16 +27,17 @@ html, body {
 	background-color: #7986CB;
 }
 
+/* Fix text sizes for paragraphs */
+.para-text {
+	font-size: 150%;
+}
+
 /* Specific size fixes */
 #intro-header-row h1, h5 {
 	font-size: 400%;
 }
 
 #intro-header-row h2 {
-	font-size: 150%;
-}
-
-#explanation-row p {
 	font-size: 150%;
 }
 
