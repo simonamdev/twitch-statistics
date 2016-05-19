@@ -1,10 +1,15 @@
 html, body {
     margin: 0 auto;
-    background-color: #303F9F;
-    color: white;
+    color: #F5F5F5;
     font-family: 'Roboto', sans-serif;
 }
 
+/* Change Icon colours to white */
+.mdl-list__item-icon.material-icons {
+	color: white;
+}
+
+/* Generic text classes */
 .center-text {
 	text-align: center;
 }
@@ -13,27 +18,29 @@ html, body {
 	text-align: justify;
 }
 
+/* Background colours for rows */
 .light-row {
-	background-color: #0D47A1;
+	background-color: #5C6BC0;
 }
 
 .dark-row {
-	background-color: #1A237E;
+	background-color: #7986CB;
 }
 
-#intro-header-row h1, h2, h5 {
-	font-size: 800%;
-	text-align: center;
+/* Specific size fixes */
+#intro-header-row h1, h5 {
+	font-size: 400%;
+}
+
+#intro-header-row h2 {
+	font-size: 150%;
 }
 
 #explanation-row p {
 	font-size: 150%;
 }
 
-.if-you-are-row span {
+.mdl-list span {
 	color: white;
 }
 
-.if-you-are-row h3 {
-	text-align: center;
-}
