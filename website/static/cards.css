@@ -10,6 +10,10 @@
 	/*background: url('../static/images/.jpg') center / cover;*/
 }
 
+.card-margin {
+	margin-top: 50px;
+}
+
 .game-card.mdl-card {
   width: 100%;
   height: 256px;
@@ -29,7 +33,7 @@
 }
 
 .github-card-wide.mdl-card {
-  width: 512px;
+  width: 100%;
 }
 
 .github-card-wide > .mdl-card__title {
@@ -38,9 +42,9 @@
 	background: url('../static/images/github.jpg') center / cover;
 }
 
+/* Can be folded into one width class for all cards */
 .mdl-link-card-wide.mdl-card {
-	margin-top: 50px;
-  width: 512px;
+  width: 100%;
 }
 
 .mdl-link-card-wide > .mdl-card__title {
