@@ -1,11 +1,21 @@
 .game-title {
+	position: relative;
+	top: 5%;
 	width: 100%;
-	font-size: 800%;
+	font-size: 1000%;
+
+}
+
+.cover-image {
+	position: relative;
+  background-size: cover;
+  height: 1024px;
 }
 
 #elitedangerous-title {
-	position: relative;
   background: url('../static/images/elitedangerous-cover.jpg') center top no-repeat;
-  background-size: cover;
-  height: 1024px;
+}
+
+#planetcoaster-title {
+	background: url('../static/images/planetcoaster-cover.jpg') center top no-repeat;
 }
