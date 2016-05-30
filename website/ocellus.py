@@ -32,6 +32,13 @@ def about():
 def games():
     return render_template('games.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
 
+
+@app.route('/game/<game_name>')
+def game(game_name):
+    # Get only the related dictionary
+    data = [data for data in game_names if data['url'] == game_name][0]
+    return render_template('game.html', app_version=app_version, debug_mode=debug_mode, game=data)
+
 if __name__ == '__main__':
     if not debug_mode:
         minify_css()
