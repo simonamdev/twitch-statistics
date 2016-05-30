@@ -102,7 +102,6 @@ def consolidate_data(game_dicts, previous_date_string):
     """
 
 
-
 def main():
     games = get_config_values()
     previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
@@ -124,7 +123,7 @@ def main():
             json_url_streams = r'https://api.twitch.tv/kraken/streams?game={}'.format(game['url_name'])
             # initial api ping to get the first set of streamers
             try:
-                data_games = requests.get(json_url_streams).json()
+                data_games = requests.get(json_url_streams, timeout=10).json()
                 total_stream_count = data_games['_total']
             except Exception as e:
                 print('[-] Error getting JSON data for streamer list: {}'.format(e))
