@@ -13,6 +13,11 @@ class StreamerDB:
         self.game = game
         self.streamer_name = streamer_name
         self.stream_data = data
+        if self.db_exists():
+            self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=True)
+        else:
+            self.create_db()
+            self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=True)
 
     def db_exists(self):
         return os.path.isfile(self.path)
@@ -26,6 +31,12 @@ class StreamerDB:
             )
         else:
             print('Database for {} already exists'.format(self.streamer_name))
+
+    def create_stream_table(self):
+        create_statement = 'CREATE TABLE "stream_" (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
+                           '`timestamp`	TEXT NOT NULL, `viewers` INTEGER NOT NULL, `followers` INTEGER NOT NULL, ' \
+                           '`partnership`INTEGER NOT NULL DEFAULT 0)'
+
 
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
@@ -103,7 +114,6 @@ def split_by_stream(raw_stream_data):
 
 def store_in_stream_table(game, streamer, streams_data):
     s_db = StreamerDB(game=game, streamer_name=streamer, data=streams_data)
-    s_db.create_db()
 
 
 def main():
