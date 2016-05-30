@@ -4,6 +4,18 @@ app = Flask(__name__)
 
 debug_mode = True
 app_version = 'Alpha 0.1'
+game_names = [
+    {
+        'short': 'ED',
+        'url': 'elitedangerous',
+        'full': 'Elite: Dangerous'
+    },
+    {
+        'short': 'PC',
+        'url': 'planetcoaster',
+        'full': 'Planet Coaster'
+    }
+]
 
 
 @app.route('/')
@@ -18,7 +30,7 @@ def about():
 
 @app.route('/games')
 def games():
-    return render_template('games.html', app_version=app_version, debug_mode=debug_mode)
+    return render_template('games.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
 
 if __name__ == '__main__':
     if not debug_mode:

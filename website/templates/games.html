@@ -12,18 +12,18 @@
             <h1>Games</h1>
         </div>
     </div>
-
-    <div class="mdl-grid dark-row">
+    {% for game in games %}
+        <div class="mdl-grid dark-row">
         <!-- Spacer -->
         <div class="mdl-cell mdl-cell--4-col"></div>
         <div class="mdl-cell mdl-cell--4-col">
-            <div class="game-card mdl-card mdl-shadow--2dp" id="ed-card">
+            <div class="game-card mdl-card mdl-shadow--2dp" id="{{ game.url }}-card">
                 <div class="mdl-card__title mdl-card--expand"></div>
                 <div class="mdl-card__actions">
                     <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
                         <i class="material-icons mdl-list__item-icon">headset_mic</i>
                         <span class="game-card-image__filename">
-                            Elite: Dangerous
+                            {{ game.full }}
                         </span>
                     </a>
                 </div>
@@ -32,42 +32,5 @@
         <!-- Spacer -->
         <div class="mdl-cell mdl-cell--4-col"></div>
     </div>
-    <div class="mdl-grid dark-row">
-        <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--4-col"></div>
-        <div class="mdl-cell mdl-cell--4-col">
-            <div class="game-card mdl-card mdl-shadow--2dp" id="pc-card">
-                <div class="mdl-card__title mdl-card--expand"></div>
-                <div class="mdl-card__actions">
-                    <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
-                        <i class="material-icons mdl-list__item-icon">headset_mic</i>
-                        <span class="game-card-image__filename">
-                            Planet Coaster
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--4-col"></div>
-    </div>
-    <div class="mdl-grid dark-row">
-        <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--4-col"></div>
-        <div class="mdl-cell mdl-cell--4-col">
-            <div class="game-card mdl-card mdl-shadow--2dp" id="streamer-card">
-                <div class="mdl-card__title mdl-card--expand"></div>
-                <div class="mdl-card__actions">
-                    <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
-                        <i class="material-icons mdl-list__item-icon">face</i>
-                        <span class="game-card-image__filename">
-                            Streamer community
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--4-col"></div>
-    </div>
+    {% endfor %}
 {% endblock %}
