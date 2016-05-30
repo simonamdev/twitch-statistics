@@ -2,8 +2,30 @@ import os
 import csv
 import time
 import datetime
+from shutil import copy2 as copy_file
 from pprint import pprint
 from neopysqlite.neopysqlite import Pysqlite
+
+
+class StreamerDB:
+    def __init__(self, game, streamer_name, data):
+        self.path = os.path.join(os.getcwd(), 'data', game, 'streamers', '{}.db'.format(streamer_name))
+        self.game = game
+        self.streamer_name = streamer_name
+        self.stream_data = data
+
+    def db_exists(self):
+        return os.path.isfile(self.path)
+
+    def create_db(self):
+        if not self.db_exists():
+            print('Database for {} does not exist. Creating DB now.'.format(self.streamer_name))
+            copy_file(
+                src=os.path.join(os.getcwd(), 'data', self.game, 'streamers', 'base', 'test_streamer.db'),
+                dst=self.path
+            )
+        else:
+            print('Database for {} already exists'.format(self.streamer_name))
 
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
@@ -45,7 +67,6 @@ def split_by_stream(raw_stream_data):
     # a list to store the raw csv data in for that particular stream
     raw_data = []
     # a rolling number to store the duration in seconds of the stream
-    current_duration = 0
     for i, row in enumerate(raw_stream_data):
         raw_data.append(row)
         time_field = row[4]
@@ -58,35 +79,31 @@ def split_by_stream(raw_stream_data):
         # then we will assume that it is a new stream
         time_delta = calculate_time_delta(time_field, next_time_field)
         if time_delta.seconds / (60 * 60) > 1:
-            print('New stream detected, storing old one')
+            # print('New stream detected, storing old one')
             print('[{}] Streamer {} held stream of duration {} seconds has {} rows and started at {}'.format(
                     len(stream_data),
                     raw_data[0][0],
-                    current_duration,
+                    calculate_time_delta(raw_data[0][4], raw_data[-1][4]).seconds,
                     len(raw_data),
                     raw_data[0][4]))
             data = {
                 'id': len(stream_data),  # assign it an ID according to how many streams have been found
                 'raw_data': raw_data,  # the list of raw CSV rows
-                'duration': current_duration,
+                'duration': calculate_time_delta(raw_data[0][4], raw_data[-1][4]).seconds,
                 'start_timestamp': raw_data[0][4]
             }
-
             # add the dict to the list
             stream_data.append(data)
             # reset the raw data
             raw_data = []
             # reset the duration
-            current_duration = 0
             continue  # continue to the next field to find the next stream
-        else:
-            # otherwise, if we're still in the same stream, store the delta to the duration
-            # print(current_duration)
-            current_duration += time_delta.seconds
+    return stream_data
 
 
-def store_in_stream_table(raw_stream_data):
-    pass
+def store_in_stream_table(game, streamer, streams_data):
+    s_db = StreamerDB(game=game, streamer_name=streamer, data=streams_data)
+    s_db.create_db()
 
 
 def main():
@@ -121,6 +138,7 @@ def main():
             # get the data for just that streamer
             streamer_data = [row for row in csv_data if row[0] == streamer]
             streams_data = split_by_stream(streamer_data)
+            store_in_stream_table(game=game, streamer=streamer, streams_data=streams_data)
             break  # temporary break
 
 
