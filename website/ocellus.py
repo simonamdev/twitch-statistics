@@ -15,6 +15,11 @@ def index():
 def about():
     return render_template('about.html', app_version=app_version, debug_mode=debug_mode)
 
+
+@app.route('/games')
+def games():
+    return render_template('games.html', app_version=app_version, debug_mode=debug_mode)
+
 if __name__ == '__main__':
     if not debug_mode:
         minify_css()
