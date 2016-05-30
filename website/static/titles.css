@@ -1,0 +1,11 @@
+.game-title {
+	width: 100%;
+	font-size: 800%;
+}
+
+#elitedangerous-title {
+	position: relative;
+  background: url('../static/images/elitedangerous-cover.jpg') center top no-repeat;
+  background-size: cover;
+  height: 1024px;
+}
