@@ -27,6 +27,10 @@ html, body {
 	background-color: #7986CB;
 }
 
+.white-row {
+	background-color: white;
+}
+
 /* Fix text sizes for paragraphs */
 .para-text {
 	font-size: 150%;
