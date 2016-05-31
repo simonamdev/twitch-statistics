@@ -8,12 +8,17 @@ from shutil import copy2 as copy_file
 from neopysqlite.neopysqlite import Pysqlite
 
 
+def calculate_average_from_list(data_list):
+    # convert the data list to ints
+    data_list = [int(data) for data in data_list]
+    return sum(data_list) // len(data_list)
+
+
 class StreamerDB:
-    def __init__(self, game, streamer_name, data):
+    def __init__(self, game, streamer_name, stream_dicts):
         self.path = os.path.join(os.getcwd(), 'data', game, 'streamers', '{}.db'.format(streamer_name))
         self.game = game
         self.streamer_name = streamer_name
-        self.stream_data = data
         self.next_stream_count = 0
         if self.db_exists():
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=True)
@@ -24,6 +29,12 @@ class StreamerDB:
             self.create_streams_table()
             self.create_overview_table()
             self.next_stream_count = len(self.db.get_table_names()) - 3
+        self.last_stream_stored = len(self.db.get_table_names()) - 4
+        self.stream_dicts = stream_dicts
+
+    def run(self):
+        self.import_csv_data()
+        self.generate_overview_for_all_streams()
 
     def db_exists(self):
         return os.path.isfile(self.path)
@@ -41,10 +52,14 @@ class StreamerDB:
     def create_overview_table(self):
         print('Creating the overview table for: {}'.format(self.streamer_name))
         time.sleep(1)
-        create_statement = 'CREATE TABLE `overview` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
-                           '`timestamp`	TEXT NOT NULL, `viewers_average` INTEGER NOT NULL, `viewers_peak`' \
-                           'INTEGER NOT NULL, `followers` INTEGER NOT NULL, `total_time_streamed`' \
-                           'INTEGER NOT NULL, `partnership` INTEGER NOT NULL DEFAULT 0)'
+        create_statement = 'CREATE TABLE `overview` (`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
+                           '`timestamp`	TEXT NOT NULL,' \
+                           '`viewers_average` INTEGER NOT NULL,' \
+                           '`viewers_peak` INTEGER NOT NULL,' \
+                           '`followers`	INTEGER NOT NULL,' \
+                           '`average_time_streamed`	INTEGER,' \
+                           '`total_time_streamed`	INTEGER NOT NULL,' \
+                           '`partnership`	INTEGER NOT NULL DEFAULT 0);'
         self.db.execute_sql(create_statement)
 
     def create_streams_table(self):
@@ -62,7 +77,68 @@ class StreamerDB:
                            '`timestamp`	TEXT NOT NULL, `viewers` INTEGER NOT NULL, `followers` INTEGER NOT NULL, ' \
                            '`partnership`INTEGER NOT NULL DEFAULT 0)'.format(self.next_stream_count)
         self.db.execute_sql(create_statement)
-        self.next_stream_count += 1
+
+    def import_csv_data(self):
+        for stream_dict in self.stream_dicts:
+            # create a table for each CSV
+            self.create_stream_table()
+            # CSV schema is NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
+            # DB schema is ID, TIMESTAMP, VIEWERS, FOLLOWERS, PARTNERSHIP
+            raw_data_list = stream_dict['raw_data']
+            fixed_schema_list = [[row[4], row[1], row[2], row[3]] for row in raw_data_list]
+            for row in tqdm(fixed_schema_list):
+                self.db.insert_row(
+                    table='stream_{}'.format(self.next_stream_count),
+                    row_string='(NULL, ?, ?, ?, ?)',
+                    row_data=row)
+            # generate a stream data row for the streams table
+            self.generate_stream_data_row(stream_dict=stream_dict)
+            # iterate the stream counter
+            self.next_stream_count += 1
+
+    def generate_stream_data_row(self, stream_dict):
+        print('Generating stream overview')
+        # Streams table schema:
+        # ID, Date + start time, duration (seconds), average viewership, peak viewership, follower differential
+        timestamp = stream_dict['start_timestamp']
+        duration = stream_dict['duration']
+        viewers_list = [row[1] for row in stream_dict['raw_data']]
+        viewers_average = calculate_average_from_list(viewers_list)
+        viewers_peak = max(viewers_list)
+        # last follower count - first follower count
+        follower_delta = int(stream_dict['raw_data'][-1][2]) - int(stream_dict['raw_data'][0][2])
+        self.db.insert_row(
+            table='streams',
+            row_string='(NULL, ?, ?, ?, ?, ?)',
+            row_data=[timestamp, duration, viewers_average, viewers_peak, follower_delta]
+        )
+
+    def generate_overview_for_all_streams(self):
+        print('Generating overview for all streams so far')
+        # Streams table schema:
+        # ID, Date + start time, duration (seconds), average viewership, peak viewership, follower differential
+        data = self.db.get_all_rows('streams')
+        # get the duration data
+        durations = [int(field[2]) for field in data]
+        total_duration = sum(durations)
+        total_average_duration = calculate_average_from_list(durations)
+        # get the viewer data
+        average_viewers_list = [int(field[3]) for field in data]
+        total_average_viewers = calculate_average_from_list(average_viewers_list)
+        peak_viewers_list = [int(field[4]) for field in data]
+        highest_peak_viewers = max(peak_viewers_list)
+        # get the follower data from the latest stream table and not the overview data
+        data = self.db.get_all_rows('stream_{}'.format(self.last_stream_stored))
+        last_follower_count = data[-1][3]
+        # get last partnership data from the latest stream table too
+        partnered = data[-1][4]
+        # Overview table schema:
+        # ID, CURRENT TIMESTAMP, AVERAGE VIEWERS, PEAK VIEWERS, FOLLOWERS, AVERAGE STREAM DURATION,
+        # TOTAL STREAM DURATION, PARTNERSHIP
+        self.db.insert_row(
+            table='overview',
+            row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?}',
+            row_data=[total_average_viewers, highest_peak_viewers, last_follower_count, total_average_duration, total_duration, partnered])
 
 
 # CSV SCHEMA:
@@ -101,7 +177,7 @@ def split_by_stream(raw_stream_data):
         raw_stream_data.pop(0)
     print('Raw stream rows: {}'.format(len(raw_stream_data)))
     # the list to store the dictionaries in
-    stream_data = []
+    stream_dicts = []
     # a list to store the raw csv data in for that particular stream
     raw_data = []
     # a rolling number to store the duration in seconds of the stream
@@ -119,28 +195,29 @@ def split_by_stream(raw_stream_data):
         if time_delta.seconds / (60 * 60) > 1:
             # print('New stream detected, storing old one')
             print('[{}] Streamer {} held stream of duration {} seconds has {} rows and started at {}'.format(
-                    len(stream_data),
+                    len(stream_dicts),
                     raw_data[0][0],
                     calculate_time_delta(raw_data[0][4], raw_data[-1][4]).seconds,
                     len(raw_data),
                     raw_data[0][4]))
             data = {
-                'id': len(stream_data),  # assign it an ID according to how many streams have been found
+                'id': len(stream_dicts),  # assign it an ID according to how many streams have been found
                 'raw_data': raw_data,  # the list of raw CSV rows
                 'duration': calculate_time_delta(raw_data[0][4], raw_data[-1][4]).seconds,
                 'start_timestamp': raw_data[0][4]
             }
             # add the dict to the list
-            stream_data.append(data)
+            stream_dicts.append(data)
             # reset the raw data
             raw_data = []
             # reset the duration
             continue  # continue to the next field to find the next stream
-    return stream_data
+    return stream_dicts
 
 
-def store_in_stream_table(game, streamer, streams_data):
-    s_db = StreamerDB(game=game, streamer_name=streamer, data=streams_data)
+def store_in_streamer_db(game, streamer, stream_dicts):
+    s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=stream_dicts)
+    s_db.run()
 
 
 def main():
@@ -175,8 +252,8 @@ def main():
             print('Processing data for: {}'.format(streamer))
             # get the data for just that streamer
             streamer_data = [row for row in csv_data if row[0] == streamer]
-            streams_data = split_by_stream(streamer_data)
-            store_in_stream_table(game=game, streamer=streamer, streams_data=streams_data)
+            stream_dicts = split_by_stream(streamer_data)
+            store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
             break  # temporary break
 
 
