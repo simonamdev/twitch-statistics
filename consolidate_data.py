@@ -2,8 +2,9 @@ import os
 import csv
 import time
 import datetime
-from shutil import copy2 as copy_file
+from tqdm import tqdm
 from pprint import pprint
+from shutil import copy2 as copy_file
 from neopysqlite.neopysqlite import Pysqlite
 
 
@@ -13,11 +14,16 @@ class StreamerDB:
         self.game = game
         self.streamer_name = streamer_name
         self.stream_data = data
+        self.next_stream_count = 0
         if self.db_exists():
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=True)
         else:
             self.create_db()
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=True)
+            # This means that the overview and the streams table need to be created
+            self.create_streams_table()
+            self.create_overview_table()
+            self.next_stream_count = len(self.db.get_table_names()) - 3
 
     def db_exists(self):
         return os.path.isfile(self.path)
@@ -32,10 +38,31 @@ class StreamerDB:
         else:
             print('Database for {} already exists'.format(self.streamer_name))
 
+    def create_overview_table(self):
+        print('Creating the overview table for: {}'.format(self.streamer_name))
+        time.sleep(1)
+        create_statement = 'CREATE TABLE `overview` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
+                           '`timestamp`	TEXT NOT NULL, `viewers_average` INTEGER NOT NULL, `viewers_peak`' \
+                           'INTEGER NOT NULL, `followers` INTEGER NOT NULL, `total_time_streamed`' \
+                           'INTEGER NOT NULL, `partnership` INTEGER NOT NULL DEFAULT 0)'
+        self.db.execute_sql(create_statement)
+
+    def create_streams_table(self):
+        print('Creating the streams table for: {}'.format(self.streamer_name))
+        time.sleep(1)
+        create_statement = 'CREATE TABLE `streams` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
+                           '`timestamp`	TEXT NOT NULL, `duration` INTEGER NOT NULL, `viewers_average` ' \
+                           'INTEGER NOT NULL, `viewers_peak` INTEGER NOT NULL, `follower_increase` INTEGER NOT NULL)'
+        self.db.execute_sql(create_statement)
+
     def create_stream_table(self):
-        create_statement = 'CREATE TABLE "stream_" (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
+        print('Creating stream_{} table for: {}'.format(self.next_stream_count, self.streamer_name))
+        time.sleep(1)
+        create_statement = 'CREATE TABLE "stream_{}" (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
                            '`timestamp`	TEXT NOT NULL, `viewers` INTEGER NOT NULL, `followers` INTEGER NOT NULL, ' \
-                           '`partnership`INTEGER NOT NULL DEFAULT 0)'
+                           '`partnership`INTEGER NOT NULL DEFAULT 0)'.format(self.next_stream_count)
+        self.db.execute_sql(create_statement)
+        self.next_stream_count += 1
 
 
 # CSV SCHEMA:
@@ -131,8 +158,9 @@ def main():
         csv_files = os.listdir(csv_dir)
         # get all the data from the CSVs
         csv_data = []
-        for csv_file in csv_files:
-            print('Opening file: {}'.format(csv_file))
+        print('Opening {} CSV files:'.format(len(csv_files)))
+        for csv_file in tqdm(csv_files):
+            # print('Opening file: {}'.format(csv_file))
             data = read_csv(os.path.join(csv_dir, csv_file))
             csv_data.extend(data)
         # get only the streamer names from the csv data
