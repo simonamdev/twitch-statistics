@@ -241,7 +241,15 @@ class GameDB:
         else:
             return 0
 
-    
+    def get_streamers_already_stored(self):
+        pass
+
+    def insert_or_update_streamer_data(self, streamer_dict):
+        # get the names of the streamers already in the database
+        pass
+
+    def set_streamer_tiers(self):
+        pass
 
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
@@ -355,13 +363,8 @@ def main():
         already_stored.remove('base')
         already_stored = [name.replace('.db', '') for name in already_stored]
         for streamer in streamer_names:
-<<<<<<< HEAD
-            # temporary skip through to find a streamer with a good set of data to test
-            if not streamer == 'rammpppp':
-=======
             if streamer in already_stored:
                 print('Skipping: {}'.format(streamer))
->>>>>>> origin/new-db-structure
                 continue
             # temporary skip through to find a streamer with a good set of data to test
             # if not streamer == 'spongietv':
@@ -373,11 +376,7 @@ def main():
             if len(stream_dicts) == 0:
                 continue
             store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
-<<<<<<< HEAD
-            break # remove this in final version
-=======
             # break  # remove this in final version
->>>>>>> origin/new-db-structure
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
