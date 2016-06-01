@@ -60,7 +60,7 @@ def streamers():
 def streamers_list(game_url_name, page_number):
     overview_access = db_access.OverviewsDataPagination(
             game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
-            per_page=2)
+            per_page=10)
     overview_access.run()
     overviews = overview_access.get_page(page_number)
     return render_template('streamer_list.html',
