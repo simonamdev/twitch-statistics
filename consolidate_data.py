@@ -266,6 +266,8 @@ class GameDB:
                                 '{} = {}, '
                                 '{} = {}, '
                                 '{} = {}, '
+                                '{} = {}, '
+                                '{} = {}, '
                                 '{} = {}, '.format(
                                                 'viewers_average',
                                                 streamer_dict['viewers_average'],
