@@ -152,6 +152,9 @@ class StreamerDB:
     def return_last_overview(self):
         return self.db.get_all_rows(table='overview')[-1]
 
+    def return_stream_count(self):
+        return self.next_stream_count
+
 
 class GameDB:
     def __init__(self, game):
@@ -202,7 +205,7 @@ class GameDB:
                            '`viewers_average` INTEGER NOT NULL,' \
                            '`viewers_peak` INTEGER NOT NULL,' \
                            '`followers` INTEGER NOT NULL,' \
-                           '`sream_count` INTEGER NOT NULL,' \
+                           '`stream_count` INTEGER NOT NULL,' \
                            '`total_time_streamed` INTEGER NOT NULL,' \
                            '`percentage_duration` REAL NOT NULL,' \
                            '`partnership` INTEGER NOT NULL)'
@@ -251,8 +254,50 @@ class GameDB:
 
     def insert_or_update_streamer_data(self, streamer_dict):
         # get the names of the streamers already in the database
-        already_stored = self.get_streamers_already_stored()
-        # if the name passed is the same
+        streamers_already_stored = self.get_streamers_already_stored()
+        # if the name passed is the above list, then the row is updated
+        if streamer_dict['name'] in streamers_already_stored:
+            print('Updating row for: {}'.format(streamer_dict['name']))
+            # update
+            # no neopysqlite method for updating rows yet :(
+            # UPDATE table_name SET column1 = value1, columnN = valueN... WHERE name = `streamer_name`
+            self.db.execute_sql('UPDATE streamers_data SET '
+                                '{} = {}, '
+                                '{} = {}, '
+                                '{} = {}, '
+                                '{} = {}, '
+                                '{} = {}, '.format(
+                                                'viewers_average',
+                                                streamer_dict['viewers_average'],
+                                                'viewers_peak',
+                                                streamer_dict['viewers_peak'],
+                                                'followers',
+                                                streamer_dict['followers'],
+                                                'stream_count',
+                                                streamer_dict['stream_count'],
+                                                'duration_total',
+                                                streamer_dict['total_time_streamed'],
+                                                'percentage_duration',
+                                                0.0,  # set as zero, update later
+                                                'partnership',
+                                                streamer_dict['partnership']
+                                            ))
+        else:
+            # add
+            print('Adding row for: {}'.format(streamer_dict['name']))
+            self.db.insert_row(
+                table='streamers_data',
+                row_string='(NULL, ?, ?, ?, ?, ?, ?, ?)',
+                row_data=[
+                    streamer_dict['viewers_average'],
+                    streamer_dict['viewers_peak'],
+                    streamer_dict['followers'],
+                    streamer_dict['stream_count'],
+                    streamer_dict['total_time_streamed'],
+                    0.0,
+                    streamer_dict['partnership']
+                ]
+            )
 
     def set_streamer_tiers(self):
         pass
@@ -390,13 +435,25 @@ def main():
             # break  # remove this in final version
         # initialise GameDB
         game_db = GameDB(game=game)
-        # get all the streamer data from all the databases
-        stream_data = []
+        # get all the streamer data from all the streamer databases
+        streamer_data = []
         streamer_db_names = get_streamer_db_names(game=game)
         for streamer in streamer_db_names:
-            data = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None).return_last_overview()
-            stream_dict = dict()
-            stream_dict['']
+            s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
+            data = s_db.return_last_overview()
+            streamer_dict = {
+                'name': streamer,
+                'last_update': data[0],
+                'viewers_average': data[1],
+                'viewers_peak': data[2],
+                'followers': data[3],
+                'duration_total': data[5],
+                'partnership': data[6],
+                'stream_count': s_db.return_stream_count()
+            }
+            streamer_data.append(streamer_dict)
+
+
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
