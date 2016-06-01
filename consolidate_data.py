@@ -149,6 +149,9 @@ class StreamerDB:
             row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)',
             row_data=[total_average_viewers, highest_peak_viewers, last_follower_count, total_average_duration, total_duration, partnered])
 
+    def return_last_overview(self):
+        return self.db.get_all_rows(table='overview')[-1]
+
 
 class GameDB:
     def __init__(self, game):
@@ -241,12 +244,15 @@ class GameDB:
         else:
             return 0
 
+    # return the names of the streamers already stored
     def get_streamers_already_stored(self):
-        pass
+        streamers = self.db.get_all_rows('streamers_data')
+        return [row[1] for row in streamers]
 
     def insert_or_update_streamer_data(self, streamer_dict):
         # get the names of the streamers already in the database
-        pass
+        already_stored = self.get_streamers_already_stored()
+        # if the name passed is the same
 
     def set_streamer_tiers(self):
         pass
@@ -333,6 +339,13 @@ def store_in_streamer_db(game, streamer, stream_dicts):
     s_db.run()
 
 
+def get_streamer_db_names(game):
+    files = os.listdir(os.path.join(os.getcwd(), 'data', game, 'streamers'))
+    files.remove('base')  # remove the base folder from the list
+    names = [name.replace('.db', '') for name in files]
+    return names
+
+
 def main():
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
@@ -359,9 +372,7 @@ def main():
         streamer_names = list(set(streamer_names))
         # for each UNIQUE streamer name, store the raw CSV data into the next respective stream table
         # get the names of dbs already stored
-        already_stored = os.listdir(os.path.join(os.getcwd(), 'data', game, 'streamers'))
-        already_stored.remove('base')
-        already_stored = [name.replace('.db', '') for name in already_stored]
+        already_stored = get_streamer_db_names(game=game)
         for streamer in streamer_names:
             if streamer in already_stored:
                 print('Skipping: {}'.format(streamer))
@@ -377,6 +388,15 @@ def main():
                 continue
             store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
             # break  # remove this in final version
+        # initialise GameDB
+        game_db = GameDB(game=game)
+        # get all the streamer data from all the databases
+        stream_data = []
+        streamer_db_names = get_streamer_db_names(game=game)
+        for streamer in streamer_db_names:
+            data = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None).return_last_overview()
+            stream_dict = dict()
+            stream_dict['']
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
