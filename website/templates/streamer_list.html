@@ -21,30 +21,42 @@
         </div>
     </div>
     <div class="mdl-grid light-row">
-        <!-- Spacer -->
-        <div class="mdl-layout-spacer"></div>
         <!-- Content -->
-        <div class="mdl-cell mdl-cell--4-col">
+        <div class="mdl-cell mdl-cell--12-col">
             <!-- TODO: Move these styles to a css sheet -->
-            <table class="mdl-data-table mdl-js-data-table" style="color: black; width: 100%">
+            <table class="mdl-data-table mdl-js-data-table" style="color: black; width: 100%;">
                 <thead>
                     <tr>
                         <th class="mdl-data-table__cell--non-numeric">ID</th>
+                        <th>Name</th>
                         <th>Last Updated</th>
                         <th>Average Viewers</th>
+                        <th>Peak Viewers</th>
+                        <th>Followers</th>
+                        <th>Average Duration</th>
+                        <th>Total Duration</th>
+                        <th>Partnered</th>
                     </tr>
                 </thead>
-                {% for streamer in streamer_list %}
+                {% for data in streamer_data %}
                     <tr>
-                        <td class="mdl-data-table__cell--non-numeric">{{ streamer }}</td>
-                        <td>25</td>
-                        <td>49021</td>
+                        <td class="mdl-data-table__cell--non-numeric">{{ loop.index }}</td>
+                        <td>{{ data[8] }}</td>
+                        <td>{{ data[1] }}</td>
+                        <td>{{ data[2] }}</td>
+                        <td>{{ data[3] }}</td>
+                        <td>{{ data[4] }}</td>
+                        <td>{{ data[5] }}</td>
+                        <td>{{ data[6] }}</td>
+                        <td>
+                            {% if data[7] == 1 %}
+                                <!-- Is partnered -->
+                                <i class="material-icons mdl-list__item-icon">done</i>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </table>
         </div>
-        <!-- Spacer -->
-        <div class="mdl-layout-spacer"></div>
     </div>
-
 {% endblock %}
