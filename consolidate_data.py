@@ -233,6 +233,16 @@ class GameDB:
                            '`streamer_tier` INTEGER NOT NULL)'
         self.db.execute_sql(create_statement)
 
+    def return_streamer_tier(self, average_viewers):
+        bounds = self.db.get_all_rows('tier_bounds')
+        for tier, upper, lower in bounds:
+            if upper >= average_viewers >= lower:
+                return tier
+        else:
+            return 0
+
+    
+
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
 
