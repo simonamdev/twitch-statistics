@@ -19,6 +19,11 @@ game_names = [
     }
 ]
 
+def return_full_name(url_name):
+    for name in game_names:
+        if name['url'] == url_name:
+            return name['full']
+
 
 @app.route('/')
 def index():
@@ -49,9 +54,14 @@ def streamers():
     return render_template('streamers.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
 
 
-@app.route('/streamers/<game_name>')
-def streamers_game(game_name):
-    pass
+@app.route('/streamers/<game_url_name>/<int:page>', defaults={'page': 1})
+def streamers_list(game_url_name, page):
+    return render_template('streamer_list.html',
+                           app_version=app_version,
+                           debug_mode=debug_mode,
+                           game_url_name=game_url_name,
+                           game_name=return_full_name(game_url_name),
+                           streamer_list=['test', 'names'])
 
 
 if __name__ == '__main__':

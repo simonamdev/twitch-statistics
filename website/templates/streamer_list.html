@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if debug_mode %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div id="{{ game_url_name }}-title" class="mdl-grid cover-image">
+        <h1 class="game-title center-text">{{ game_name }} Streamers</h1>
+    </div>
+    <div class="mdl-grid dark-row" >
+        <div  class="mdl-cell mdl-cell--12-col center-text">
+            <h1>Tiers</h1>
+        </div>
+    </div>
+    <div class="mdl-grid light-row" >
+        <div  class="mdl-cell mdl-cell--12-col center-text">
+            <h1>Streamers</h1>
+        </div>
+    </div>
+    <div class="mdl-grid light-row">
+        <!-- Spacer -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Content -->
+        <div class="mdl-cell mdl-cell--4-col">
+            <!-- TODO: Move these styles to a css sheet -->
+            <table class="mdl-data-table mdl-js-data-table" style="color: black; width: 100%">
+                <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric">ID</th>
+                        <th>Last Updated</th>
+                        <th>Average Viewers</th>
+                    </tr>
+                </thead>
+                {% for streamer in streamer_list %}
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric">{{ streamer }}</td>
+                        <td>25</td>
+                        <td>49021</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <!-- Spacer -->
+        <div class="mdl-layout-spacer"></div>
+    </div>
+
+{% endblock %}
