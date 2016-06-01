@@ -32,13 +32,16 @@ class OverviewsDataPagination:
             db = Pysqlite(database_name='{} Page DB'.format(self.game_name), database_file=db_path)
             # get the latest overview row
             row = db.get_specific_rows(table='overview', filter_string='id = (SELECT MAX(id) FROM overview)')
+            row = list(row[0])
+            # add the name to the end of the row
+            row.append(streamer)
             overview_rows.append(row)
         # split the data into pages according to the per page
         self.pages = paginate(overview_rows, self.per_page)
 
     def get_page(self, page_number):
         # do - 1 to set it as a zero index
-        print(self.pages[page_number - 1])
+        # print(self.pages[page_number - 1])
         return self.pages[page_number - 1]
 
     def get_page_count(self):
