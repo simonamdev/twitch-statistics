@@ -39,7 +39,7 @@
                         <nav class="mdl-navigation mdl-layout--large-screen-only">
                             <a class="mdl-navigation__link" href="{{ url_for('index') }}">Home</a>
                             <a class="mdl-navigation__link" href="{{ url_for('games') }}">Games</a>
-                            <a class="mdl-navigation__link" href="">Streamers</a>
+                            <a class="mdl-navigation__link" href="{{ url_for('streamers') }}">Streamers</a>
                             <a class="mdl-navigation__link" href="{{ url_for('about') }}">About</a>
                         </nav>
                     </div>
@@ -48,9 +48,9 @@
                     <span class="mdl-layout-title">Navigation Menu</span>
                     <nav class="mdl-navigation">
                         <a class="mdl-navigation__link" href="{{ url_for('index') }}">Home</a>
-                        <a class="mdl-navigation__link" href="">Elite: Dangerous Data</a>
-                        <a class="mdl-navigation__link" href="">Planet Coaster Data</a>
-                        <a class="mdl-navigation__link" href="">Stream Community Data</a>
+                        <a class="mdl-navigation__link" href="{{ url_for('game', game_name='elitedangerous') }}">Elite: Dangerous Data</a>
+                        <a class="mdl-navigation__link" href="{{ url_for('game', game_name='planetcoaster') }}">Planet Coaster Data</a>
+                        <a class="mdl-navigation__link" href="{{ url_for('streamers') }}">Stream Community Data</a>
                         <a class="mdl-navigation__link" href="{{ url_for('about') }}">About</a>
                     </nav>
                 </div>
@@ -65,8 +65,8 @@
                             <div class="mdl-mini-footer__left-section">
                                 <ul class="mdl-mini-footer__link-list">
                                   <li><a href="{{ url_for('index') }}">Home</a></li>
-                                  <li><a href="#">Game Data</a></li>
-                                  <li><a href="#">Streamer Data</a></li>
+                                  <li><a href="{{ url_for('games') }}">Game Data</a></li>
+                                  <li><a href="{{ url_for('streamers') }}">Streamer Data</a></li>
                                   <li><a href="{{ url_for('about') }}">About</a></li>
                                 </ul>
                             </div>
