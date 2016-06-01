@@ -157,7 +157,7 @@ class StreamerDB:
 
 
 class GameDB:
-    def __init__(self, game):
+    def __init__(self, game, streamer_dicts=None):
         self.path = os.path.join(os.getcwd(), 'data', game, '{}_data.db'.format(game))
         self.game = game
         if self.db_exists():
@@ -170,9 +170,16 @@ class GameDB:
             self.create_streamers_data_table()
             self.create_tier_bounds_table()
             self.create_tier_data_table()
+        self.streamer_dicts = streamer_dicts
 
     def run(self):
-        pass
+        # update the streamers data
+        for streamer_dict in self.streamer_dicts:
+            self.insert_or_update_streamer_data(streamer_dict)
+        # set the tiers data
+        # self.set_all_streamer_tiers()
+        # update the global data
+        # self.update_global_data()
 
     def db_exists(self):
         return os.path.isfile(self.path)
@@ -301,8 +308,42 @@ class GameDB:
                 ]
             )
 
-    def set_streamer_tiers(self):
-        pass
+    def set_all_streamer_tiers(self):
+        # get all streamer data
+        streamer_data = self.db.get_all_rows(table='streamers_data')
+        for data in streamer_data:
+            name = data[1]
+            tier = self.return_streamer_tier(data[2])
+            print('Streamer: {} is in tier: {} with average viewer number of: {}'.format(name, tier, data[2]))
+            # calculate the tier depending by checking the average viewer count against the bounds
+            self.db.insert_row(
+                    table='tier_data',
+                    row_string='(NULL, ?, ?)',
+                    row_data=[name, tier])
+
+    def update_global_data(self):
+        # update the global data table from all the new streamer data
+        streamers_data = self.db.get_all_rows(table='streamers_data')
+        # SCHEMA:
+        # ID, TIMESTAMP, STREAMER COUNT, STREAM COUNT, AVERAGE GLOBAL DURATION, TOTAL TIME STREAMED, LONGEST STREAM
+        streamer_count = len(streamers_data)
+        stream_count = sum([int(row[5]) for row in streamers_data])
+        durations = [int(row[7] for row in streamers_data)]
+        total_global_duration = sum(durations)
+        average_global_duration = calculate_average_from_list(durations)
+        longest_stream = max(durations)
+        self.db.insert_row(
+                table='global_data',
+                row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)',
+                row_data=[
+                    streamer_count,
+                    stream_count,
+                    average_global_duration,
+                    total_global_duration,
+                    longest_stream
+                ]
+        )
+
 
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
@@ -437,6 +478,7 @@ def main():
             # break  # remove this in final version
         # initialise GameDB
         game_db = GameDB(game=game)
+        game_db.run()
         # get all the streamer data from all the streamer databases
         streamer_data = []
         streamer_db_names = get_streamer_db_names(game=game)
