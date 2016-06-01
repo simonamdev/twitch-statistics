@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 from minify import minify as minify_css
+
+
 app = Flask(__name__)
 
 debug_mode = True
@@ -40,6 +42,17 @@ def game(game_name):
     # get the data for this specific game from the DB
     data = dict()
     return render_template('game.html', app_version=app_version, debug_mode=debug_mode, game=name, data=data)
+
+
+@app.route('/streamers')
+def streamers():
+    return render_template('streamers.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
+
+
+@app.route('/streamers/<game_name>')
+def streamers_game(game_name):
+    pass
+
 
 if __name__ == '__main__':
     if not debug_mode:
