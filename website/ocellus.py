@@ -1,3 +1,4 @@
+import db_access
 from flask import Flask, render_template
 from minify import minify as minify_css
 
@@ -19,10 +20,11 @@ game_names = [
     }
 ]
 
-def return_full_name(url_name):
+
+def convert_name(given_type, given_name, return_type):
     for name in game_names:
-        if name['url'] == url_name:
-            return name['full']
+        if name[given_type] == given_name:
+            return name[return_type]
 
 
 @app.route('/')
@@ -54,14 +56,19 @@ def streamers():
     return render_template('streamers.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
 
 
-@app.route('/streamers/<game_url_name>/<int:page>', defaults={'page': 1})
-def streamers_list(game_url_name, page):
+@app.route('/streamers/<game_url_name>/<int:page_number>')
+def streamers_list(game_url_name, page_number):
+    overview_access = db_access.OverviewsDataPagination(
+            game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
+            per_page=2)
+    overview_access.run()
+    overviews = overview_access.get_page(page_number)
     return render_template('streamer_list.html',
                            app_version=app_version,
                            debug_mode=debug_mode,
                            game_url_name=game_url_name,
-                           game_name=return_full_name(game_url_name),
-                           streamer_list=['test', 'names'])
+                           game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
+                           streamer_data=overviews)
 
 
 if __name__ == '__main__':
