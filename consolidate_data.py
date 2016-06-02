@@ -175,10 +175,15 @@ class GameDB:
 
     def run(self):
         # update the streamers data
-        print('Inserting/Updating new data:')
+        streamers_to_update = self.get_streamers_already_stored()
+        print('Additions: {}'.format(len(self.streamer_dicts) - len(streamers_to_update)))
+        print('Updates: {}'.format(len(streamers_to_update)))
         for streamer_dict in tqdm(self.streamer_dicts):
-            self.insert_or_update_streamer_data(streamer_dict)
-        # commit the data after updating
+            if streamer_dict['name'] in streamers_to_update:
+                self.update_streamer_data(streamer_dict)
+            else:
+                self.insert_streamer_data(streamer_dict)
+        # commit the data after updating as it does not do so itself
         self.db.dbcon.commit()
         # set the tiers data
         self.set_all_streamer_tiers()
@@ -266,56 +271,51 @@ class GameDB:
         streamers = self.db.get_all_rows('streamers_data')
         return [row[1] for row in streamers]
 
-    def insert_or_update_streamer_data(self, streamer_dict):
-        # get the names of the streamers already in the database
-        streamers_already_stored = self.get_streamers_already_stored()
-        # if the name passed is the above list, then the row is updated
-        if streamer_dict['name'] in streamers_already_stored:
-            # print('Updating row for: {}'.format(streamer_dict['name']))
-            # no neopysqlite method for updating rows yet :(
-            # UPDATE table_name SET column1 = value1, columnN = valueN... WHERE name = `streamer_name`
-            self.db.dbcur.execute('UPDATE streamers_data SET '
-                                  'last_updated = ?,'
-                                  'viewers_average = ?,'
-                                  'viewers_peak = ?,'
-                                  'followers = ?,'
-                                  'stream_count = ?,'
-                                  'total_time_streamed = ?,'
-                                  'average_time_streamed = ?,'
-                                  'percentage_duration = ?,'
-                                  'partnership = ?'
-                                  'WHERE name = ?',
-                                  (
-                                      streamer_dict['last_update'],
-                                      streamer_dict['viewers_average'],
-                                      streamer_dict['viewers_peak'],
-                                      streamer_dict['followers'],
-                                      streamer_dict['stream_count'],
-                                      streamer_dict['total_duration'],
-                                      streamer_dict['average_duration'],
-                                      streamer_dict['percentage_duration'],
-                                      streamer_dict['partnership'],
-                                      streamer_dict['name']
-                                  ))
-        else:
-            # add
-            # print('Adding row for: {}'.format(streamer_dict['name']))
-            self.db.insert_row(
-                table='streamers_data',
-                row_string='(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                row_data=[
-                    streamer_dict['name'],
-                    streamer_dict['last_update'],
-                    streamer_dict['viewers_average'],
-                    streamer_dict['viewers_peak'],
-                    streamer_dict['followers'],
-                    streamer_dict['stream_count'],
-                    streamer_dict['average_duration'],
-                    streamer_dict['total_duration'],
-                    streamer_dict['percentage_duration'],
-                    streamer_dict['partnership']
-                ]
-            )
+    def insert_streamer_data(self, streamer_dict):
+        # print('Adding row for: {}'.format(streamer_dict['name']))
+        self.db.insert_row(
+            table='streamers_data',
+            row_string='(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            row_data=[
+                streamer_dict['name'],
+                streamer_dict['last_update'],
+                streamer_dict['viewers_average'],
+                streamer_dict['viewers_peak'],
+                streamer_dict['followers'],
+                streamer_dict['stream_count'],
+                streamer_dict['average_duration'],
+                streamer_dict['total_duration'],
+                streamer_dict['percentage_duration'],
+                streamer_dict['partnership']
+            ]
+        )
+
+    def update_streamer_data(self, streamer_dict):
+        # no neopysqlite method for updating rows yet :(
+        # UPDATE table_name SET column1 = value1, columnN = valueN... WHERE name = `streamer_name`
+        self.db.dbcur.execute('UPDATE streamers_data SET '
+                              'last_updated = ?,'
+                              'viewers_average = ?,'
+                              'viewers_peak = ?,'
+                              'followers = ?,'
+                              'stream_count = ?,'
+                              'total_time_streamed = ?,'
+                              'average_time_streamed = ?,'
+                              'percentage_duration = ?,'
+                              'partnership = ?'
+                              'WHERE name = ?',
+                              (
+                                  streamer_dict['last_update'],
+                                  streamer_dict['viewers_average'],
+                                  streamer_dict['viewers_peak'],
+                                  streamer_dict['followers'],
+                                  streamer_dict['stream_count'],
+                                  streamer_dict['total_duration'],
+                                  streamer_dict['average_duration'],
+                                  streamer_dict['percentage_duration'],
+                                  streamer_dict['partnership'],
+                                  streamer_dict['name']
+                              ))
 
     def set_all_streamer_tiers(self):
         print('Clearing old tier data')
