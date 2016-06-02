@@ -178,6 +178,7 @@ class GameDB:
         streamers_to_update = self.get_streamers_already_stored()
         print('Additions: {}'.format(len(self.streamer_dicts) - len(streamers_to_update)))
         print('Updates: {}'.format(len(streamers_to_update)))
+        time.sleep(0.1) # avoids same line progress bar
         for streamer_dict in tqdm(self.streamer_dicts):
             if streamer_dict['name'] in streamers_to_update:
                 self.update_streamer_data(streamer_dict)
@@ -188,7 +189,7 @@ class GameDB:
         # commit the data after updating as it does not do so itself
         self.db.dbcon.commit()
         # update the global data
-        # self.update_global_data()
+        self.update_global_data()
         print('Vacuuming Database to retrieve space')
         # vacuum the old space now
         self.db.execute_sql('VACUUM')
@@ -211,11 +212,13 @@ class GameDB:
     def create_global_data_table(self):
         print('Creating global data table for: {}'.format(self.game))
         time.sleep(1)
-        create_statement = 'CREATE TABLE `global_data` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
+        create_statement = 'CREATE TABLE "global_data" (' \
+                           '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
                            '`timestamp`	TEXT NOT NULL,' \
+                           '`streamer_count` INTEGER NOT NULL,' \
                            '`stream_count` INTEGER NOT NULL,' \
-                           '`average_time_streamed` INTEGER NOT NULL,' \
-                           '`total_time_streamed` INTEGER NOT NULL, ' \
+                           '`average_time_streamed`	INTEGER NOT NULL,' \
+                           '`total_time_streamed` INTEGER NOT NULL,' \
                            '`longest_stream` INTEGER NOT NULL)'
         self.db.execute_sql(create_statement)
 
@@ -343,11 +346,11 @@ class GameDB:
     def update_global_data(self):
         # update the global data table from all the new streamer data
         streamers_data = self.db.get_all_rows(table='streamers_data')
-        # SCHEMA:
+        # GLOBAL DATA SCHEMA:
         # ID, TIMESTAMP, STREAMER COUNT, STREAM COUNT, AVERAGE GLOBAL DURATION, TOTAL TIME STREAMED, LONGEST STREAM
         streamer_count = len(streamers_data)
-        stream_count = sum([int(row[5]) for row in streamers_data])
-        durations = [int(row[7] for row in streamers_data)]
+        stream_count = sum([int(row[6]) for row in streamers_data])
+        durations = [int(row[8]) for row in streamers_data]
         total_global_duration = sum(durations)
         average_global_duration = calculate_average_from_list(durations)
         longest_stream = max(durations)
@@ -366,7 +369,6 @@ class GameDB:
 
 # CSV SCHEMA:
 # NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
-
 
 def read_csv(file_path):
     data = []
