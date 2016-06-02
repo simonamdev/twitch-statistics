@@ -58,10 +58,17 @@ def streamers():
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
 def streamers_list(game_url_name, page_number):
+    # id the page number requested is less than 1, then return 1
+    if page_number < 1:
+        page_number = 1
+    # get access to the database through an object which will take care of pagination
     overview_access = db_access.OverviewsDataPagination(
             game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
             per_page=10)
     overview_access.run()
+    # if the page number requested is greater than the last page number, then return the last page
+    if page_number > overview_access.get_page_count():
+        page_number = overview_access.get_page_count()
     overviews = overview_access.get_page(page_number)
     return render_template('streamer_list.html',
                            app_version=app_version,
