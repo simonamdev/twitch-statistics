@@ -181,14 +181,19 @@ class GameDB:
         for streamer_dict in tqdm(self.streamer_dicts):
             if streamer_dict['name'] in streamers_to_update:
                 self.update_streamer_data(streamer_dict)
+                self.update_streamer_tier(streamer_dict)
             else:
                 self.insert_streamer_data(streamer_dict)
+                self.add_streamer_tier(streamer_dict)
         # commit the data after updating as it does not do so itself
         self.db.dbcon.commit()
-        # set the tiers data
-        self.set_all_streamer_tiers()
         # update the global data
         # self.update_global_data()
+        print('Vacuuming Database to retrieve space')
+        # vacuum the old space now
+        self.db.execute_sql('VACUUM')
+        # commit the vacuum
+        self.db.dbcon.commit()
 
     def db_exists(self):
         return os.path.isfile(self.path)
@@ -317,31 +322,23 @@ class GameDB:
                                   streamer_dict['name']
                               ))
 
-    def set_all_streamer_tiers(self):
-        print('Clearing old tier data')
-        # clear the old data from the tiers data table
-        self.db.delete_all_rows(table='tier_data')
-        # vacuum the old space now
-        self.db.execute_sql('VACUUM')
-        # commit the vacuum
-        self.db.dbcon.commit()
-        print('Getting data to set tiers')
-        # get all streamer data
-        streamer_data = self.db.get_all_rows(table='streamers_data')
-        tier_rows = []
-        for data in streamer_data:
-            name = data[1]
-            tier = self.return_streamer_tier(data[3])
-            # print('Streamer: {} is in tier: {} with average viewer number of: {}'.format(name, tier, data[3]))
-            # calculate the tier depending by checking the average viewer count against the bounds
-            tier_rows.append([name, tier])
-        print('Inserting tier data')
-        for row in tqdm(tier_rows):
-            self.db.insert_row(
+    def add_streamer_tier(self, streamer_dict):
+        self.db.insert_row(
                     table='tier_data',
                     row_string='(NULL, ?, ?)',
-                    row_data=row)
-        print('Tier setting complete')
+                    row_data=[
+                        streamer_dict['name'],
+                        self.return_streamer_tier(average_viewers=streamer_dict['viewers_average'])
+                    ])
+
+    def update_streamer_tier(self, streamer_dict):
+        self.db.dbcur.execute('UPDATE tier_data SET '
+                              'streamer_tier = ? '
+                              'WHERE streamer_name = ?',
+                              (
+                                  self.return_streamer_tier(average_viewers=streamer_dict['viewers_average']),
+                                  streamer_dict['name']
+                              ))
 
     def update_global_data(self):
         # update the global data table from all the new streamer data
@@ -507,6 +504,7 @@ def main():
             print('Retrieving streamer data')
             streamer_db_names = get_streamer_db_names(game=game)
             streamer_overviews = []
+            time.sleep(0.1)
             for streamer in tqdm(streamer_db_names):
                 s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
                 overview = list(s_db.return_last_overview())
