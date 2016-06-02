@@ -5,6 +5,7 @@
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
     {% endif %}
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/tables-min.css">
 {% endblock %}
 {% block content %}
     <div class="mdl-grid dark-row" >
@@ -23,13 +24,14 @@
         </div>
     </div>
     <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--2-col"></div>
         <!-- Content -->
-        <div class="mdl-cell mdl-cell--12-col">
+        <div class="mdl-cell mdl-cell--8-col">
             <!-- TODO: Move these styles to a css sheet -->
-            <table class="mdl-data-table mdl-js-data-table" style="color: black; width: 100%;">
+            <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
                 <thead>
                     <tr>
-                        <th class="mdl-data-table__cell--non-numeric">ID</th>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Last Updated</th>
                         <th>Average Viewers</th>
@@ -42,7 +44,7 @@
                 </thead>
                 {% for data in streamer_data %}
                     <tr>
-                        <td class="mdl-data-table__cell--non-numeric">{{ loop.index }}</td>
+                        <td >{{ loop.index }}</td>
                         <td>{{ data[8] }}</td>
                         <td>{{ data[1] }}</td>
                         <td>{{ data[2] }}</td>
@@ -60,5 +62,6 @@
                 {% endfor %}
             </table>
         </div>
+        <div class="mdl-cell mdl-cell--2-col"></div>
     </div>
 {% endblock %}
