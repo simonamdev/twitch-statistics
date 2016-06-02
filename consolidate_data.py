@@ -25,6 +25,7 @@ class StreamerDB:
         self.next_stream_count = 0
         if self.db_exists():
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=False)
+            self.next_stream_count = len(self.db.get_table_names()) - 3
         else:
             self.create_db()
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=False)
@@ -174,10 +175,13 @@ class GameDB:
 
     def run(self):
         # update the streamers data
-        for streamer_dict in self.streamer_dicts:
+        print('Inserting/Updating new data:')
+        for streamer_dict in tqdm(self.streamer_dicts):
             self.insert_or_update_streamer_data(streamer_dict)
+        # commit the data after updating
+        self.db.dbcon.commit()
         # set the tiers data
-        # self.set_all_streamer_tiers()
+        self.set_all_streamer_tiers()
         # update the global data
         # self.update_global_data()
 
@@ -208,12 +212,15 @@ class GameDB:
     def create_streamers_data_table(self):
         print('Creating streamers data table for: {}'.format(self.game))
         time.sleep(1)
-        create_statement = 'CREATE TABLE `streamers_data` (`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
-                           '`viewers_average` INTEGER NOT NULL,' \
-                           '`viewers_peak` INTEGER NOT NULL,' \
-                           '`followers` INTEGER NOT NULL,' \
-                           '`stream_count` INTEGER NOT NULL,' \
-                           '`total_time_streamed` INTEGER NOT NULL,' \
+        create_statement = 'CREATE TABLE "streamers_data" (`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' \
+                           '`name`	TEXT NOT NULL, ' \
+                           '`last_updated` TEXT NOT NULL, ' \
+                           '`viewers_average` INTEGER NOT NULL, ' \
+                           '`viewers_peak` INTEGER NOT NULL, ' \
+                           '`followers`	INTEGER NOT NULL, ' \
+                           '`stream_count` INTEGER NOT NULL, ' \
+                           '`average_time_streamed` INTEGER NOT NULL, ' \
+                           '`total_time_streamed` INTEGER NOT NULL, ' \
                            '`percentage_duration` REAL NOT NULL,' \
                            '`partnership` INTEGER NOT NULL)'
         self.db.execute_sql(create_statement)
@@ -225,18 +232,18 @@ class GameDB:
                            '`number` INTEGER NOT NULL, ' \
                            '`upper_bound` INTEGER NOT NULL, ' \
                            '`lower_bound` INTEGER NOT NULL)'
+        self.db.execute_sql(create_statement)
         time.sleep(1)
         tier_amount = int(input('Please enter the number of tiers that will be present: '))
         for i in range(0, tier_amount):
             i += 1
             print('BOUND NUMBERS ARE BOTH INCLUSIVE. FOR 100 TO 50, ENTER 100 AS UPPER AND 50 AS LOWER')
-            upper_bound = int(input('Please enter the upper bound for tier {}'.format(i)))
-            lower_bound = int(input('Please enter the lower bound for tier {}'.format(i)))
+            upper_bound = int(input('Please enter the upper bound for tier {}: '.format(i)))
+            lower_bound = int(input('Please enter the lower bound for tier {}: '.format(i)))
             self.db.insert_row(
                 table='tier_bounds',
                 row_string='(NULL, ?, ?, ?)',
                 row_data=[i, upper_bound, lower_bound])
-        self.db.execute_sql(create_statement)
 
     def create_tier_data_table(self):
         print('Creating tier data table for: {}'.format(self.game))
@@ -248,7 +255,7 @@ class GameDB:
 
     def return_streamer_tier(self, average_viewers):
         bounds = self.db.get_all_rows('tier_bounds')
-        for tier, upper, lower in bounds:
+        for i, tier, upper, lower in bounds:
             if upper >= average_viewers >= lower:
                 return tier
         else:
@@ -264,62 +271,77 @@ class GameDB:
         streamers_already_stored = self.get_streamers_already_stored()
         # if the name passed is the above list, then the row is updated
         if streamer_dict['name'] in streamers_already_stored:
-            print('Updating row for: {}'.format(streamer_dict['name']))
-            # update
+            # print('Updating row for: {}'.format(streamer_dict['name']))
             # no neopysqlite method for updating rows yet :(
             # UPDATE table_name SET column1 = value1, columnN = valueN... WHERE name = `streamer_name`
-            self.db.execute_sql('UPDATE streamers_data SET '
-                                '{} = {}, '
-                                '{} = {}, '
-                                '{} = {}, '
-                                '{} = {}, '
-                                '{} = {}, '
-                                '{} = {}, '
-                                '{} = {}, '.format(
-                                                'viewers_average',
-                                                streamer_dict['viewers_average'],
-                                                'viewers_peak',
-                                                streamer_dict['viewers_peak'],
-                                                'followers',
-                                                streamer_dict['followers'],
-                                                'stream_count',
-                                                streamer_dict['stream_count'],
-                                                'duration_total',
-                                                streamer_dict['total_time_streamed'],
-                                                'percentage_duration',
-                                                0.0,  # set as zero, update later
-                                                'partnership',
-                                                streamer_dict['partnership']
-                                            ))
+            self.db.dbcur.execute('UPDATE streamers_data SET '
+                                  'last_updated = ?,'
+                                  'viewers_average = ?,'
+                                  'viewers_peak = ?,'
+                                  'followers = ?,'
+                                  'stream_count = ?,'
+                                  'total_time_streamed = ?,'
+                                  'average_time_streamed = ?,'
+                                  'percentage_duration = ?,'
+                                  'partnership = ?'
+                                  'WHERE name = ?',
+                                  (
+                                      streamer_dict['last_update'],
+                                      streamer_dict['viewers_average'],
+                                      streamer_dict['viewers_peak'],
+                                      streamer_dict['followers'],
+                                      streamer_dict['stream_count'],
+                                      streamer_dict['total_duration'],
+                                      streamer_dict['average_duration'],
+                                      streamer_dict['percentage_duration'],
+                                      streamer_dict['partnership'],
+                                      streamer_dict['name']
+                                  ))
         else:
             # add
-            print('Adding row for: {}'.format(streamer_dict['name']))
+            # print('Adding row for: {}'.format(streamer_dict['name']))
             self.db.insert_row(
                 table='streamers_data',
-                row_string='(NULL, ?, ?, ?, ?, ?, ?, ?)',
+                row_string='(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 row_data=[
+                    streamer_dict['name'],
+                    streamer_dict['last_update'],
                     streamer_dict['viewers_average'],
                     streamer_dict['viewers_peak'],
                     streamer_dict['followers'],
                     streamer_dict['stream_count'],
-                    streamer_dict['total_time_streamed'],
-                    0.0,
+                    streamer_dict['average_duration'],
+                    streamer_dict['total_duration'],
+                    streamer_dict['percentage_duration'],
                     streamer_dict['partnership']
                 ]
             )
 
     def set_all_streamer_tiers(self):
+        print('Clearing old tier data')
+        # clear the old data from the tiers data table
+        self.db.delete_all_rows(table='tier_data')
+        # vacuum the old space now
+        self.db.execute_sql('VACUUM')
+        # commit the vacuum
+        self.db.dbcon.commit()
+        print('Getting data to set tiers')
         # get all streamer data
         streamer_data = self.db.get_all_rows(table='streamers_data')
+        tier_rows = []
         for data in streamer_data:
             name = data[1]
-            tier = self.return_streamer_tier(data[2])
-            print('Streamer: {} is in tier: {} with average viewer number of: {}'.format(name, tier, data[2]))
+            tier = self.return_streamer_tier(data[3])
+            # print('Streamer: {} is in tier: {} with average viewer number of: {}'.format(name, tier, data[3]))
             # calculate the tier depending by checking the average viewer count against the bounds
+            tier_rows.append([name, tier])
+        print('Inserting tier data')
+        for row in tqdm(tier_rows):
             self.db.insert_row(
                     table='tier_data',
                     row_string='(NULL, ?, ?)',
-                    row_data=[name, tier])
+                    row_data=row)
+        print('Tier setting complete')
 
     def update_global_data(self):
         # update the global data table from all the new streamer data
@@ -435,6 +457,8 @@ def get_streamer_db_names(game):
 
 
 def main():
+    process_streamer_data = False
+    process_global_data = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # For each game,
@@ -443,61 +467,74 @@ def main():
         'PC'
     ]
     for game in games:
-        print('Consolidation data for: {}'.format(game))
-        # Get the paths of current CSVs
-        csv_dir = os.path.join(os.getcwd(), 'data', game, 'csv')
-        csv_files = os.listdir(csv_dir)
-        # get all the data from the CSVs
-        csv_data = []
-        print('Opening {} CSV files:'.format(len(csv_files)))
-        for csv_file in tqdm(csv_files):
-            # print('Opening file: {}'.format(csv_file))
-            data = read_csv(os.path.join(csv_dir, csv_file))
-            csv_data.extend(data)
-        # get only the streamer names from the csv data
-        streamer_names = [row[0] for row in csv_data]
-        # remove duplicates by converting it to a set and then back to a list
-        streamer_names = list(set(streamer_names))
-        # for each UNIQUE streamer name, store the raw CSV data into the next respective stream table
-        # get the names of dbs already stored
-        already_stored = get_streamer_db_names(game=game)
-        for streamer in streamer_names:
-            if streamer in already_stored:
-                print('Skipping: {}'.format(streamer))
-                continue
-            # temporary skip through to find a streamer with a good set of data to test
-            # if not streamer == 'spongietv':
-            #     continue
-            print('Processing data for: {}'.format(streamer))
-            # get the data for just that streamer
-            streamer_data = [row for row in csv_data if row[0] == streamer]
-            stream_dicts = split_by_stream(streamer_data)
-            if len(stream_dicts) == 0:
-                continue
-            store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
-            # break  # remove this in final version
-        # initialise GameDB
-        game_db = GameDB(game=game)
-        game_db.run()
-        # get all the streamer data from all the streamer databases
-        streamer_data = []
-        streamer_db_names = get_streamer_db_names(game=game)
-        for streamer in streamer_db_names:
-            s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
-            data = s_db.return_last_overview()
-            streamer_dict = {
-                'name': streamer,
-                'last_update': data[0],
-                'viewers_average': data[1],
-                'viewers_peak': data[2],
-                'followers': data[3],
-                'duration_total': data[5],
-                'partnership': data[6],
-                'stream_count': s_db.return_stream_count()
-            }
-            streamer_data.append(streamer_dict)
-
-
+        if process_streamer_data:
+            print('Consolidating data for: {}'.format(game))
+            # Get the paths of current CSVs
+            csv_dir = os.path.join(os.getcwd(), 'data', game, 'csv')
+            csv_files = os.listdir(csv_dir)
+            # get all the data from the CSVs
+            csv_data = []
+            print('Opening {} CSV files:'.format(len(csv_files)))
+            for csv_file in tqdm(csv_files):
+                # print('Opening file: {}'.format(csv_file))
+                data = read_csv(os.path.join(csv_dir, csv_file))
+                csv_data.extend(data)
+            # get only the streamer names from the csv data
+            streamer_names = [row[0] for row in csv_data]
+            # remove duplicates by converting it to a set and then back to a list
+            streamer_names = list(set(streamer_names))
+            # for each UNIQUE streamer name, store the raw CSV data into the next respective stream table
+            # get the names of dbs already stored
+            already_stored = get_streamer_db_names(game=game)
+            for streamer in streamer_names:
+                if streamer in already_stored:
+                    print('Skipping: {}'.format(streamer))
+                    continue
+                # temporary skip through to find a streamer with a good set of data to test
+                # if not streamer == 'spongietv':
+                #     continue
+                print('Processing data for: {}'.format(streamer))
+                # get the data for just that streamer
+                streamer_data = [row for row in csv_data if row[0] == streamer]
+                stream_dicts = split_by_stream(streamer_data)
+                if len(stream_dicts) == 0:
+                    continue
+                store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
+        if process_global_data:
+            # get all the streamer data from all the streamer databases
+            streamer_dicts = []
+            # get all the overviews for the global total
+            print('Retrieving streamer data')
+            streamer_db_names = get_streamer_db_names(game=game)
+            streamer_overviews = []
+            for streamer in tqdm(streamer_db_names):
+                s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
+                overview = list(s_db.return_last_overview())
+                # add the streamer name at the end
+                overview.append(streamer)
+                streamer_overviews.append(overview)
+            global_total_duration = sum([int(row[6]) for row in streamer_overviews])
+            print('Retrieving overviews')
+            for overview in streamer_overviews:
+                # get the stream count from the streamer db
+                s_db = StreamerDB(game=game, streamer_name=overview[8], stream_dicts=None)
+                stream_count = len(s_db.db.get_table_names()) - 3
+                streamer_dict = {
+                    'name': overview[8],
+                    'last_update': overview[1],
+                    'viewers_average': overview[2],
+                    'viewers_peak': overview[3],
+                    'followers': overview[4],
+                    'average_duration': overview[5],
+                    'total_duration': overview[6],
+                    'percentage_duration': round((overview[6] / global_total_duration) * 100, 3),
+                    'partnership': overview[7],
+                    'stream_count': stream_count
+                }
+                streamer_dicts.append(streamer_dict)
+            # initialise GameDB
+            game_db = GameDB(game=game, streamer_dicts=streamer_dicts)
+            game_db.run()
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
