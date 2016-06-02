@@ -36,6 +36,8 @@ class OverviewsDataPagination:
             # add the name to the end of the row
             row.append(streamer)
             overview_rows.append(row)
+        # point the data list to the overview rows
+        self.data_list = overview_rows
         # split the data into pages according to the per page
         self.pages = paginate(overview_rows, self.per_page)
 
