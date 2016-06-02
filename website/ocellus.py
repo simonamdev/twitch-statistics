@@ -68,7 +68,9 @@ def streamers_list(game_url_name, page_number):
                            debug_mode=debug_mode,
                            game_url_name=game_url_name,
                            game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
-                           streamer_data=overviews)
+                           streamer_data=overviews,
+                           page_number=page_number,
+                           page_total=overview_access.get_page_count())
 
 
 if __name__ == '__main__':
