@@ -3,7 +3,6 @@ from math import ceil
 from neopysqlite.neopysqlite import Pysqlite
 from ocellus import convert_name
 
-
 def get_streamer_names(game):
     names = os.listdir(os.path.join(os.getcwd(), 'data', game, 'streamers'))
     # remove the .db extension and return
@@ -45,7 +44,20 @@ class StreamerOverviewsDataPagination:
     def get_page(self, page_number):
         # do - 1 to set it as a zero index
         # print(self.pages[page_number - 1])
-        return self.pages[page_number - 1]
+        page_data_dicts = []
+        for page in self.pages[page_number - 1]:
+            page_dict = {
+                'name': page[8],
+                'last_update': page[1],
+                'viewers_average': page[2],
+                'viewers_peak': page[3],
+                'followers': page[4],
+                'duration_average': page[5],
+                'duration_total': page[6],
+                'partnership': page[7]
+            }
+            page_data_dicts.append(page_dict)
+        return page_data_dicts
 
     def get_page_count(self):
         return int(ceil(len(self.data_list) / float(self.per_page)))

@@ -40,19 +40,19 @@
                         <th>Partnered</th>
                     </tr>
                 </thead>
-                {% for data in streamer_data %}
+                {% for data in streamer_overviews %}
                     <tr>
                         {% set streamer_id = loop.index + (per_page * (page_number - 1)) %}
                         <td>{{ streamer_id }}</td>
-                        <td>{{ data[8] }}</td>
-                        <td>{{ data[1] }}</td>
-                        <td>{{ data[2] }}</td>
-                        <td>{{ data[3] }}</td>
-                        <td>{{ data[4] }}</td>
-                        <td>{{ data[5] }}</td>
-                        <td>{{ data[6] }}</td>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.last_update }}</td>
+                        <td>{{ data.viewers_average }}</td>
+                        <td>{{ data.viewers_peak }}</td>
+                        <td>{{ data.followers }}</td>
+                        <td>{{ data.duration_average }}</td>
+                        <td>{{ data.duration_total }}</td>
                         <td>
-                            {% if data[7] == 1 %}
+                            {% if data.partnership == 1 %}
                                 <!-- 1 = Is partnered -->
                                 <i class="material-icons mdl-list__item-icon">done</i>
                             {% endif %}
