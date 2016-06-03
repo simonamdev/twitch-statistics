@@ -70,7 +70,8 @@ def streamers_list(game_url_name, page_number):
     streamer_overview_dicts = overview_access.get_page(page_number)
     # get the game overview
     global_game_data = db_access.GlobalGameData(game_url_name=game_url_name)
-    tier_overview_dict = global_game_data.return_tier_data_dict()
+    tier_bounds = global_game_data.return_tier_bounds()
+    tier_streamers = global_game_data.return_tier_streamers()
     # if the page number requested is greater than the last page number, then return the last page
     if page_number > overview_access.get_page_count():
         page_number = overview_access.get_page_count()
@@ -86,7 +87,8 @@ def streamers_list(game_url_name, page_number):
                            game_url_name=game_url_name,
                            game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
                            streamer_overviews=streamer_overview_dicts,
-                           tier_overview=tier_overview_dict,
+                           tier_bounds=tier_bounds,
+                           tier_streamers=tier_streamers,
                            page_data=page_data)
 
 
