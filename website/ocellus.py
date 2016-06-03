@@ -66,13 +66,14 @@ def streamers_list(game_url_name, page_number):
             game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
             per_page=10)
     overview_access.run()
+    # get the overview data for that page
+    streamer_overview_dicts = overview_access.get_page(page_number)
     # get the game overview
-    game_overview_dict = db_access.GameOverviewsData(game_url_name=game_url_name).run()
+    global_game_data = db_access.GlobalGameData(game_url_name=game_url_name)
+    tier_overview_dict = global_game_data.return_tier_data_dict()
     # if the page number requested is greater than the last page number, then return the last page
     if page_number > overview_access.get_page_count():
         page_number = overview_access.get_page_count()
-    # get the overview data for that page
-    overview_dicts = overview_access.get_page(page_number)
     # put the page data in a dictionary
     page_data = {
         'current': page_number,
@@ -84,7 +85,8 @@ def streamers_list(game_url_name, page_number):
                            debug_mode=debug_mode,
                            game_url_name=game_url_name,
                            game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
-                           streamer_overviews=overview_dicts,
+                           streamer_overviews=streamer_overview_dicts,
+                           tier_overview=tier_overview_dict,
                            page_data=page_data)
 
 

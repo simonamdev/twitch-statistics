@@ -74,30 +74,39 @@ class StreamerOverviewsDataPagination:
         return self.page < self.get_page_count()
 
 
-class GameOverviewsData:
+class GlobalGameData:
     def __init__(self, game_url_name):
         self.game_url_name = game_url_name
-        self.data_list = []
-
-    def run(self):
+        self.global_data_list = []
         short_name = convert_name('url', self.game_url_name, 'short')
-        db_path = os.path.join(
-                os.getcwd(), 'data', short_name, '{}_data.db'.format(short_name)
-        )
-        db = Pysqlite(database_name='{} Global Overview DB'.format(self.game_url_name), database_file=db_path)
-        row = db.get_specific_rows(table='global_data', filter_string='id = (SELECT MAX(id) FROM global_data)')
-        # Get the latest row
-        self.data_list = list(row[0])
-        return self.return_data_dict()
+        self.db_path = os.path.join(os.getcwd(), 'data', short_name, '{}_data.db'.format(short_name))
+        self.db = Pysqlite(database_name='{} Global Overview DB'.format(self.game_url_name), database_file=self.db_path)
 
-    def return_data_dict(self):
-        game_data = {
-            'last_updated': self.data_list[0],
-            'streamer_count': self.data_list[1],
-            'stream_count': self.data_list[2],
-            'stream_duration_average': convert_to_hours(self.data_list[3]),
-            'stream_duration_total': convert_to_hours(self.data_list[4]),
-            'stream_duration_max': convert_to_hours(self.data_list[5])
+    def return_global_overview_dict(self):
+        row = self.db.get_specific_rows(table='global_data', filter_string='id = (SELECT MAX(id) FROM global_data)')
+        data_list = list(row[0])
+        game_dict = {
+            'last_updated': data_list[0],
+            'streamer_count': data_list[1],
+            'stream_count': data_list[2],
+            'stream_duration_average': convert_to_hours(data_list[3]),
+            'stream_duration_total': convert_to_hours(data_list[4]),
+            'stream_duration_max': convert_to_hours(data_list[5])
         }
-        return game_data
+        return game_dict
 
+    def return_tier_data_dict(self):
+        tier_bounds = self.db.get_all_rows(table='tier_bounds')[0]
+        tier_bounds_dict = {
+            'tier': tier_bounds[1],
+            'upper': tier_bounds[2],
+            'lower': tier_bounds[3],
+        }
+        streamer_tiers = self.db.get_all_rows(table='tier_data')
+        streamer_tiers_dict = dict()
+        for index, streamer, tier in streamer_tiers:
+            streamer_tiers_dict[streamer] = tier
+        return {
+            'bounds': tier_bounds_dict,
+            'streamers': streamer_tiers_dict
+        }
