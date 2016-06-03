@@ -3,6 +3,11 @@ from math import ceil
 from neopysqlite.neopysqlite import Pysqlite
 from ocellus import convert_name
 
+
+def convert_to_hours(seconds):
+    return round(seconds / (60 * 60), 2)
+
+
 def get_streamer_names(game):
     names = os.listdir(os.path.join(os.getcwd(), 'data', game, 'streamers'))
     # remove the .db extension and return
@@ -52,8 +57,8 @@ class StreamerOverviewsDataPagination:
                 'viewers_average': page[2],
                 'viewers_peak': page[3],
                 'followers': page[4],
-                'duration_average': page[5],
-                'duration_total': page[6],
+                'duration_average': convert_to_hours(page[5]),
+                'duration_total': convert_to_hours(page[6]),
                 'partnership': page[7]
             }
             page_data_dicts.append(page_dict)
@@ -90,9 +95,9 @@ class GameOverviewsData:
             'last_updated': self.data_list[0],
             'streamer_count': self.data_list[1],
             'stream_count': self.data_list[2],
-            'stream_duration_average': self.data_list[3],
-            'stream_duration_total': self.data_list[4],
-            'stream_duration_max': self.data_list[5]
+            'stream_duration_average': convert_to_hours(self.data_list[3]),
+            'stream_duration_total': convert_to_hours(self.data_list[4]),
+            'stream_duration_max': convert_to_hours(self.data_list[5])
         }
         return game_data
 
