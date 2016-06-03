@@ -73,15 +73,19 @@ def streamers_list(game_url_name, page_number):
         page_number = overview_access.get_page_count()
     # get the overview data for that page
     overview_dicts = overview_access.get_page(page_number)
+    # put the page data in a dictionary
+    page_data = {
+        'current': page_number,
+        'per_page': 10,
+        'total': overview_access.get_page_count()
+    }
     return render_template('streamer_list.html',
                            app_version=app_version,
                            debug_mode=debug_mode,
                            game_url_name=game_url_name,
                            game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
                            streamer_overviews=overview_dicts,
-                           per_page=10,
-                           page_number=page_number,
-                           page_total=overview_access.get_page_count())
+                           page_data=page_data)
 
 
 if __name__ == '__main__':

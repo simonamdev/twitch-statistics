@@ -25,7 +25,7 @@
         <!-- Content -->
         <div class="mdl-cell mdl-cell--8-col">
             <!-- TODO: Move inline styles to a css sheet -->
-            <h1 style="font-size: 200%;">Page {{ page_number }} out of {{ page_total }}</h1>
+            <h1 style="font-size: 200%;">Page {{ page_data.current }} out of {{ page_data.total }}</h1>
             <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
                 <thead>
                     <tr>
@@ -42,7 +42,7 @@
                 </thead>
                 {% for data in streamer_overviews %}
                     <tr>
-                        {% set streamer_id = loop.index + (per_page * (page_number - 1)) %}
+                        {% set streamer_id = loop.index + (page_data.per_page * (page_data.current - 1)) %}
                         <td>{{ streamer_id }}</td>
                         <td>{{ data.name }}</td>
                         <td>{{ data.last_update }}</td>
@@ -66,8 +66,8 @@
     <div class="mdl-grid dark-row" >
         <div class="mdl-cell mdl-cell--5-col"></div>
         <div class="mdl-cell mdl-cell--1-col">
-            {% set prev_page_number = page_number - 1 %}
-            {% set next_page_number = page_number + 1 %}
+            {% set prev_page_number = page_data.current - 1 %}
+            {% set next_page_number = page_data.current + 1 %}
             {% if not prev_page_number == 0 %}
                 <a href="{{ url_for('streamers_list', game_url_name=game_url_name, page_number=prev_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_rewind</i>
@@ -75,7 +75,7 @@
             {% endif %}
         </div>
         <div class="mdl-cell mdl-cell--1-col center-text">
-            {% if not next_page_number > page_total %}
+            {% if not next_page_number > page_data.total %}
                 <a href="{{ url_for('streamers_list', game_url_name=game_url_name, page_number=next_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_forward</i>
                 </a>
