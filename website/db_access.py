@@ -96,12 +96,9 @@ class GlobalGameData:
         return game_dict
 
     def return_tier_bounds(self):
-        tier_bounds = self.db.get_all_rows(table='tier_bounds')[0]
-        return {
-            'tier': tier_bounds[1],
-            'upper': tier_bounds[2],
-            'lower': tier_bounds[3],
-        }
+        tier_bounds = self.db.get_all_rows(table='tier_bounds')
+        tier_bounds_dict = [{'tier': bound[1], 'upper': bound[2], 'lower': bound[3]} for bound in tier_bounds]
+        return tier_bounds_dict
 
     def return_tier_streamers(self):
         streamer_tiers = self.db.get_all_rows(table='tier_data')

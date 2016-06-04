@@ -88,14 +88,14 @@
             <h1>Tiers</h1>
         </div>
     </div>
-    {% for key, value in tier_bounds.items() %}
-        <div class="mdl-grid light-row">
-            <div class="mdl-cell mdl-cell--4-col"></div>
-            <div class="mdl-cell mdl-cell--4-col center-text">
-                <p>{{ key }}</p>
-                <p>{{ value }}</p>
-            </div>
-            <div class="mdl-cell mdl-cell--4-col"></div>
+    {% for bound in tier_bounds %}
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--4-col"></div>
+        <div class="mdl-cell mdl-cell--4-col center-text">
+            <p>Tier {{ bound.tier }}</p>
+            <p>{{ bound.upper }} >= Average Viewer Count >= {{ bound.lower }}</p>
         </div>
+        <div class="mdl-cell mdl-cell--4-col"></div>
+    </div>
     {% endfor %}
 {% endblock %}
