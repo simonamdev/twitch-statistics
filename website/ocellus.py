@@ -27,6 +27,13 @@ def convert_name(given_type, given_name, return_type):
             return name[return_type]
 
 
+def return_name_dict(name):
+    for name_dict in game_names:
+        if name in list(name_dict.values()):
+            print(name_dict)
+            return name_dict
+
+
 @app.route('/')
 def index():
     return render_template('index.html', app_version=app_version, debug_mode=debug_mode)
@@ -44,11 +51,10 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
-    # Get only the related dictionary
-    name = [data for data in game_names if data['url'] == game_name][0]
-    # get the data for this specific game from the DB
-    data = dict()
-    return render_template('game.html', app_version=app_version, debug_mode=debug_mode, game=name, data=data)
+    return render_template('game.html',
+                           app_version=app_version,
+                           debug_mode=debug_mode,
+                           game_name=return_name_dict(name=game_name))
 
 
 @app.route('/streamers')
