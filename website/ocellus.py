@@ -30,7 +30,6 @@ def convert_name(given_type, given_name, return_type):
 def return_name_dict(name):
     for name_dict in game_names:
         if name in list(name_dict.values()):
-            print(name_dict)
             return name_dict
 
 
@@ -51,10 +50,13 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
+    name_dict = return_name_dict(name=game_name)
+    global_game_data = db_access.GlobalGameData(game_url_name=name_dict['url'])
     return render_template('game.html',
                            app_version=app_version,
                            debug_mode=debug_mode,
-                           game_name=return_name_dict(name=game_name))
+                           game_name=name_dict,
+                           game_data=global_game_data.return_global_overview_dict())
 
 
 @app.route('/streamers')
@@ -91,8 +93,7 @@ def streamers_list(game_url_name, page_number):
     return render_template('streamer_list.html',
                            app_version=app_version,
                            debug_mode=debug_mode,
-                           game_url_name=game_url_name,
-                           game_name=convert_name(given_type='url', given_name=game_url_name, return_type='full'),
+                           game_name=return_name_dict(name=game_url_name),
                            streamer_overviews=streamer_overview_dicts,
                            tier_bounds=tier_bounds,
                            tier_counts=tier_counts,
