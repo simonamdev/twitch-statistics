@@ -91,6 +91,13 @@ class StreamerDB:
             # DB schema is ID, TIMESTAMP, VIEWERS, FOLLOWERS, PARTNERSHIP
             raw_data_list = stream_dict['raw_data']
             fixed_schema_list = [[row[4], row[1], row[2], row[3]] for row in raw_data_list]
+            """
+            self.db.insert_rows(
+                table='stream_{}'.format(self.next_stream_count),
+                row_string='(NULL, ?, ?, ?, ?)',
+                row_data_list=fixed_schema_list
+            )
+            """
             for row in tqdm(fixed_schema_list):
                 self.db.insert_row(
                     table='stream_{}'.format(self.next_stream_count),
@@ -104,7 +111,7 @@ class StreamerDB:
         self.last_stream_stored = len(self.db.get_table_names()) - 3
 
     def generate_stream_data_row(self, stream_dict):
-        print('Generating stream overview')
+        # print('Generating stream overview')
         # Streams table schema:
         # ID, Date + start time, duration (seconds), average viewership, peak viewership, follower differential
         timestamp = stream_dict['start_timestamp']
@@ -411,7 +418,7 @@ def split_by_stream(raw_stream_data):
         raw_data.append(row)
         time_field = row[4]
         if i+1 == len(raw_stream_data):  # avoid out of index exception
-            print('End of CSV data found')
+            # print('End of CSV data found')
             end_found = True
         if not end_found:
             # get the next time field in the list
@@ -456,14 +463,14 @@ def get_streamer_db_names(game):
 
 
 def main():
-    process_streamer_data = False
-    process_global_data = True
+    process_streamer_data = True
+    process_global_data = False
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # For each game,
     games = [
-        # 'ED',
-        'PC'
+        'ED',
+        # 'PC'
     ]
     for game in games:
         if process_streamer_data:
@@ -471,34 +478,49 @@ def main():
             # Get the paths of current CSVs
             csv_dir = os.path.join(os.getcwd(), 'data', game, 'csv')
             csv_files = os.listdir(csv_dir)
-            # get all the data from the CSVs
-            csv_data = []
-            print('Opening {} CSV files:'.format(len(csv_files)))
+            streamer_names = []
+            # open each csv file and append only the streamer names to the above list.
+            print('Opening {} CSV files'.format(len(csv_files)))
+            print('Retrieving streamer names')
             for csv_file in tqdm(csv_files):
                 # print('Opening file: {}'.format(csv_file))
                 data = read_csv(os.path.join(csv_dir, csv_file))
-                csv_data.extend(data)
-            # get only the streamer names from the csv data
-            streamer_names = [row[0] for row in csv_data]
+                for row in data:
+                    if not len(row) == 0:
+                        streamer_names.append(row[0])
             # remove duplicates by converting it to a set and then back to a list
             streamer_names = list(set(streamer_names))
             # for each UNIQUE streamer name, store the raw CSV data into the next respective stream table
             # get the names of dbs already stored
             already_stored = get_streamer_db_names(game=game)
-            for streamer in streamer_names:
+            for i, streamer in enumerate([row for row in streamer_names if row not in already_stored]):
                 if streamer in already_stored:
                     print('Skipping: {}'.format(streamer))
+                    # streamer_names.remove(streamer)
                     continue
-                # temporary skip through to find a streamer with a good set of data to test
-                # if not streamer == 'spongietv':
-                #     continue
-                print('Processing data for: {}'.format(streamer))
-                # get the data for just that streamer
-                streamer_data = [row for row in csv_data if row[0] == streamer]
+                print('Retrieving data for: {}'.format(streamer))
+                # open every CSV file and get the data only for that streamer
+                streamer_data = []
+                for csv_file in tqdm(csv_files):
+                    data = read_csv(os.path.join(csv_dir, csv_file))
+                    # for every line in the csv...
+                    for row in data:
+                        if len(row) == 0:
+                            # skip empty rows
+                            continue
+                        if row[0] == streamer:
+                            streamer_data.append(row)
                 stream_dicts = split_by_stream(streamer_data)
                 if len(stream_dicts) == 0:
+                    print('No streams detected for: {}'.format(streamer))
                     continue
                 store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
+                print('Complete: {} / {}. {}% complete'.format(
+                        i,
+                        len(streamer_names),
+                        round((i / len(streamer_names)) * 100, 2)))
+                # add the streamer to the already stored list
+                already_stored.append(streamer)
         if process_global_data:
             # get all the streamer data from all the streamer databases
             streamer_dicts = []
