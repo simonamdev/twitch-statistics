@@ -10,19 +10,15 @@
     <div id="{{ game_name.url }}-title" class="mdl-grid cover-image">
         <h1 class="game-title center-text">{{ game_name.full }}</h1>
     </div>
-    <div class="mdl-grid dark-row" >
-        <div  class="mdl-cell mdl-cell--12-col center-text">
-            <h1>Game Data</h1>
-        </div>
-        <div class="mdl-grid dark-row">
-            <!-- Spacer -->
-            <div class="mdl-cell mdl-cell--4-col"></div>
-            <!-- Content -->
-            <div class="mdl-cell mdl-cell--4-col">
-
-            </div>
-            <!-- Spacer -->
-            <div class="mdl-cell mdl-cell--4-col"></div>
+    <div class="mdl-grid dark-row">
+        <!-- Content -->
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>Total number of streamser: {{ game_data.streamer_count }}</h1>
+            <h1>Total number of streams: {{ game_data.stream_count }}</h1>
+            <h1>Total time streamed by all streamers: {{ game_data.stream_duration_total }} hours</h1>
+            <h1>Average stream duration: {{ game_data.stream_duration_average }} hours</h1>
+            <h1>Longest stream duration: {{ game_data.stream_duration_max }} hours</h1>
+            <h1>Last updated on: {{ game_data.last_updated }}</h1>
         </div>
     </div>
 {% endblock %}

@@ -86,12 +86,12 @@ class GlobalGameData:
         row = self.db.get_specific_rows(table='global_data', filter_string='id = (SELECT MAX(id) FROM global_data)')
         data_list = list(row[0])
         game_dict = {
-            'last_updated': data_list[0],
-            'streamer_count': data_list[1],
-            'stream_count': data_list[2],
-            'stream_duration_average': convert_to_hours(data_list[3]),
-            'stream_duration_total': convert_to_hours(data_list[4]),
-            'stream_duration_max': convert_to_hours(data_list[5])
+            'last_updated': data_list[1],
+            'streamer_count': data_list[2],
+            'stream_count': data_list[3],
+            'stream_duration_average': convert_to_hours(data_list[4]),
+            'stream_duration_total': convert_to_hours(data_list[5]),
+            'stream_duration_max': convert_to_hours(data_list[6])
         }
         return game_dict
 
