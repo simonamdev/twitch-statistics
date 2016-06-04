@@ -10,7 +10,7 @@
 {% block content %}
     <div class="mdl-grid dark-row">
         <div  class="mdl-cell mdl-cell--12-col center-text">
-            <h1>{{ game_name }} Streamer Data</h1>
+            <h1>{{ game_name.full }} Streamer Data</h1>
         </div>
     </div>
 <!--
@@ -69,14 +69,14 @@
             {% set prev_page_number = page_data.current - 1 %}
             {% set next_page_number = page_data.current + 1 %}
             {% if not prev_page_number == 0 %}
-                <a href="{{ url_for('streamers_list', game_url_name=game_url_name, page_number=prev_page_number) }}">
+                <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=prev_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_rewind</i>
                 </a>
             {% endif %}
         </div>
         <div class="mdl-cell mdl-cell--1-col center-text">
             {% if not next_page_number > page_data.total %}
-                <a href="{{ url_for('streamers_list', game_url_name=game_url_name, page_number=next_page_number) }}">
+                <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=next_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_forward</i>
                 </a>
             {% endif %}
