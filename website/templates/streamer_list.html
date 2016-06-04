@@ -35,8 +35,8 @@
                         <th>Average Viewers</th>
                         <th>Peak Viewers</th>
                         <th>Followers</th>
-                        <th>Average Duration</th>
-                        <th>Total Duration</th>
+                        <th>Average Duration (hours)</th>
+                        <th>Total Duration (hours)</th>
                         <th>Partnered</th>
                     </tr>
                 </thead>
@@ -84,16 +84,24 @@
         <div class="mdl-cell mdl-cell--5-col"></div>
     </div>
     <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--12-col center-text">
+        <div class="mdl-cell mdl-cell--4-col center-text"></div>
+        <div class="mdl-cell mdl-cell--4-col center-text">
             <h1>Tiers</h1>
+            <p>
+                Tiers help sort and visualise the distribution of streamers depending on their
+                average viewer count. The bounds are completely artifical and should not be used
+                as definitive "ranking" for a streamer.
+            </p>
         </div>
+        <div class="mdl-cell mdl-cell--4-col center-text"></div>
     </div>
     {% for bound in tier_bounds %}
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--4-col"></div>
         <div class="mdl-cell mdl-cell--4-col center-text">
-            <p>Tier {{ bound.tier }}</p>
-            <p>{{ bound.upper }} >= Average Viewer Count >= {{ bound.lower }}</p>
+            <h1 class="tier-text">Tier {{ bound.tier }}</h1>
+            <h1 class="tier-text">{{ bound.upper }} >= Average Viewer Count >= {{ bound.lower }}</h1>
+            <h1 class="tier-text">{{ tier_counts[loop.index - 1] }}</h1>
         </div>
         <div class="mdl-cell mdl-cell--4-col"></div>
     </div>

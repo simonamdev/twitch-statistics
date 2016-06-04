@@ -19,3 +19,7 @@
 #planetcoaster-title {
 	background: url('../static/images/planetcoaster-cover.jpg') center top no-repeat;
 }
+
+.tier-text {
+	font-size: 200%;
+}

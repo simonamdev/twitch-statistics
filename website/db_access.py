@@ -106,3 +106,15 @@ class GlobalGameData:
         for index, streamer, tier in streamer_tiers:
             streamer_tiers_dict[streamer] = tier
         return streamer_tiers_dict
+
+    def return_tier_count(self, tier_number=0):
+        streamer_tiers = self.db.get_all_rows(table='tier_data')
+        return len([tier for tier in streamer_tiers if tier[2] == tier_number])
+
+    def return_tier_counts(self):
+        tier_count_list = []
+        tier_bounds = self.db.get_all_rows(table='tier_bounds')
+        for i in range(1, len(tier_bounds) + 1):
+            tier_count_list.append(self.return_tier_count(tier_number=i))
+        return tier_count_list
+
