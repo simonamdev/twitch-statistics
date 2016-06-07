@@ -7,6 +7,12 @@ from pprint import pprint
 from shutil import copy2 as copy_file
 from neopysqlite.neopysqlite import Pysqlite
 
+# For each game
+games = [
+    # 'ED',
+    'PC'
+]
+
 
 def calculate_average_from_list(data_list):
     # avoid division by zero
@@ -26,6 +32,7 @@ class StreamerDB:
         if self.db_exists():
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=False)
             self.next_stream_count = len(self.db.get_table_names()) - 3
+            print('DB for: {} already exists and already holds {} stream tables'.format(streamer_name, self.next_stream_count))
         else:
             self.create_db()
             self.db = Pysqlite('{} {} Stream Database'.format(game, streamer_name), self.path, verbose=False)
@@ -158,7 +165,10 @@ class StreamerDB:
             row_data=[total_average_viewers, highest_peak_viewers, last_follower_count, total_average_duration, total_duration, partnered])
 
     def return_last_overview(self):
-        return self.db.get_all_rows(table='overview')[-1]
+        overviews = self.db.get_all_rows(table='overview')
+        if len(overviews) == 0:
+            return []
+        return overviews[-1]
 
     def return_stream_count(self):
         return self.next_stream_count
@@ -464,14 +474,10 @@ def get_streamer_db_names(game):
 
 def main():
     process_streamer_data = True
-    process_global_data = False
+    process_global_data = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
-    # For each game,
-    games = [
-        'ED',
-        # 'PC'
-    ]
+    # for each game,
     for game in games:
         if process_streamer_data:
             print('Consolidating data for: {}'.format(game))
@@ -493,12 +499,19 @@ def main():
             # for each UNIQUE streamer name, store the raw CSV data into the next respective stream table
             # get the names of dbs already stored
             already_stored = get_streamer_db_names(game=game)
-            for i, streamer in enumerate([row for row in streamer_names if row not in already_stored]):
+            # for i, streamer in enumerate([row for row in streamer_names if row not in already_stored]):
+            for i, streamer in enumerate(streamer_names):
+                """
                 if streamer in already_stored:
                     print('Skipping: {}'.format(streamer))
                     # streamer_names.remove(streamer)
                     continue
-                print('Retrieving data for: {}'.format(streamer))
+                """
+                print('[{} / {}] Retrieving data for: {} [{}%]'.format(
+                        i,
+                        len(streamer_names),
+                        streamer,
+                        round((i / len(streamer_names)) * 100, 2)))
                 # open every CSV file and get the data only for that streamer
                 streamer_data = []
                 for csv_file in tqdm(csv_files):
@@ -515,13 +528,15 @@ def main():
                     print('No streams detected for: {}'.format(streamer))
                     continue
                 store_in_streamer_db(game=game, streamer=streamer, stream_dicts=stream_dicts)
-                print('Complete: {} / {}. {}% complete'.format(
-                        i,
-                        len(streamer_names),
-                        round((i / len(streamer_names)) * 100, 2)))
                 # add the streamer to the already stored list
                 already_stored.append(streamer)
+            # delete the csv files
+            for csv_file in csv_files:
+                print('Deleting: {}'.format(csv_file))
+                os.remove(os.path.join(csv_dir, csv_file))
+        time.sleep(0.5)
         if process_global_data:
+            print('Processing globals')
             # get all the streamer data from all the streamer databases
             streamer_dicts = []
             # get all the overviews for the global total
@@ -532,6 +547,9 @@ def main():
             for streamer in tqdm(streamer_db_names):
                 s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
                 overview = list(s_db.return_last_overview())
+                if len(overview) == 0:
+                    print('DB for: {} has no stream tables'.format(streamer))
+                    continue
                 # add the streamer name at the end
                 overview.append(streamer)
                 streamer_overviews.append(overview)
@@ -561,6 +579,11 @@ def main():
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
 
+
+def consolidate_all_data(game_shorthands=['ED', 'PC']):
+    global games
+    games = game_shorthands
+    main()
 
 if __name__ == '__main__':
     main()
