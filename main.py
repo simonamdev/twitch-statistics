@@ -2,12 +2,13 @@ import requests
 import pynma
 import csv
 import os
-from cfg import SCP_COMMAND, pynma_api
+from cfg import SCP_COMMAND, pynma_api, EMAIL_COMMAND
 from datetime import datetime
 from time import sleep
 from shutil import move as move_file
 from import_csvs import CSVimport
 from get_info import TwitchStatisticsOutput
+from consolidate_data import consolidate_all_data
 
 # Global values
 p = pynma.PyNMA(pynma_api)
@@ -60,7 +61,9 @@ def consolidate_data(game_dicts, previous_date_string):
     global p
     print('[+] Starting consolidation procedure')
     notification_string = ''
+    game_shorthands = []
     for game in game_dicts:
+        game_shorthands.append(game['shorthand_name'])
         try:
             # gather information for the backup notification
             file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
@@ -70,15 +73,17 @@ def consolidate_data(game_dicts, previous_date_string):
             # run the backup command
             os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
             # move the file to its respective data directory for consolidation
-            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'])
+            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'], 'csv')
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
             # p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
             notification_string += 'NOT FINISHED. '
     else:
-        p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
+        os.system(EMAIL_COMMAND.format(notification_string))
+        # p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
     # perform consolidation into DB
+    """
     try:
         # db_mid_dir: empty as DBs are in the same directory
         # data_mid_dir: empty as data folder is added automatically
@@ -88,6 +93,17 @@ def consolidate_data(game_dicts, previous_date_string):
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
         p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
+    """
+    try:
+        # db_mid_dir: empty as DBs are in the same directory
+        # data_mid_dir: empty as data folder is added automatically
+        consolidate_all_data(game_shorthands=game_shorthands)
+        os.system(EMAIL_COMMAND.format('Consolidation of files completed successfully'))
+        # p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
+    except Exception as e:
+        print('[-] Consolidation error: {}'.format(e))
+        # p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
+        os.system(EMAIL_COMMAND.format('Consolidation of files did not complete correctly'))
     # hold for two seconds
     pause(2)
     # run the get info object
