@@ -139,7 +139,7 @@ def process_streamer_data(data_list=None):
 
 def write_tick_timestamp():
     with open('tick_timestamps.txt', mode='a') as textfile:
-        textfile.write('{} {}:{}:{}'.format(
+        textfile.write('{} {}:{}:{}\n'.format(
                 get_current_date_string().replace('_', '-'),
                 datetime.now().hour,
                 datetime.now().minute,
