@@ -1,4 +1,4 @@
-pynma
 requests
 tqdm
 neopysqlite
+flask
