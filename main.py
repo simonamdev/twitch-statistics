@@ -200,7 +200,7 @@ def main():
                         # print('[+] Accessing url: {}'.format(next_json_url))
                         try:
                             next_json_url = data_games['_links']['next']
-                            data_games = requests.get(next_json_url).json()
+                            data_games = requests.get(next_json_url, timeout=10).json()
                         except Exception as e:
                             print('[-] Error getting JSON data for streamer list: {}'.format(e))
                     try:
