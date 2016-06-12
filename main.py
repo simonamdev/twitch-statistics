@@ -118,14 +118,19 @@ def consolidate_data(game_dicts, previous_date_string):
     """
 
 
+def get_current_date_string():
+    previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
+    return '{}_{}_{}'.format(previous_day, previous_month, previous_year)
+
+
 def main():
     games = get_config_values()
-    previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
-    previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
+    previous_day = datetime.now().day
+    previous_date_string = get_current_date_string()
     while True:
         # check if a day has passed
-        day, month, year = datetime.now().day, datetime.now().month, datetime.now().year
-        current_date_string = '{}_{}_{}'.format(day, month, year)
+        day = datetime.now().day
+        current_date_string = get_current_date_string()
         # if a day has finished, then make a backup
         if not day == previous_day:
             # update the previous day number. No need to compare the month/year too
