@@ -123,6 +123,41 @@ def get_current_date_string():
     return '{}_{}_{}'.format(previous_day, previous_month, previous_year)
 
 
+def process_streamer_data(data_list=None):
+    if data_list is None:
+        return []
+    return_data = []
+    for i, streamer_data in enumerate(data_list):
+        streamer_name = streamer_data['channel']['name']
+        # get the data for this streamer
+        viewer_count = streamer_data['viewers']
+        if viewer_count == 0:
+            # skip this streamer if they have no viewers
+            continue
+        follower_count = streamer_data['channel']['followers']
+        partnership = 0
+        if streamer_data['channel']['partner']:
+            partnership = 1
+        print('[{}] {}\t\t({}, {}, {})'.format(
+            i,
+            streamer_name,
+            viewer_count,
+            follower_count,
+            partnership
+        ))
+        # sleep(0.1)  # allows reading the names when checking top streamer
+        # replace the underscores for dashes in this timestamp
+        timestamp = '{} {}:{}:{}'.format(
+                get_current_date_string().replace('_', '-'),
+                datetime.now().hour,
+                datetime.now().minute,
+                datetime.now().second
+        )
+        # add the data to the list
+        return_data.append([streamer_name, viewer_count, follower_count, partnership, timestamp])
+    return return_data
+
+
 def main():
     games = get_config_values()
     previous_day = datetime.now().day
@@ -176,39 +211,8 @@ def main():
                         continue
                     # only consider the streamer if they are playing the game
                     game_streamers_data = [row for row in streams_data if row['game'] in game['game_names']]
-                    current_stream_data = []  # store all current stream data in a list
-                    streamer_index = 0
-                    for streamer_data in game_streamers_data:
-                        streamer_name = streamer_data['channel']['name']
-                        # get the data for this streamer
-                        viewer_count = streamer_data['viewers']
-                        if viewer_count == 0:
-                            # skip this streamer if they have no viewers
-                            continue
-                        streamer_index += 1
-                        follower_count = streamer_data['channel']['followers']
-                        partnership = 0
-                        if streamer_data['channel']['partner']:
-                            partnership = 1
-                        print('[{}] {}\t\t({}, {}, {})'.format(
-                            streamer_index,
-                            streamer_name,
-                            viewer_count,
-                            follower_count,
-                            partnership
-                        ))
-                        # sleep(0.1)  # allows reading the names when checking top streamer
-                        # replace the underscores for dashes in this timestamp
-                        timestamp = '{} {}:{}:{}'.format(
-                                get_current_date_string().replace('_', '-'),
-                                datetime.now().hour,
-                                datetime.now().minute,
-                                datetime.now().second
-                        )
-                        # add the data to the list
-                        current_stream_data.append(
-                                [streamer_name, viewer_count, follower_count, partnership, timestamp]
-                        )
+                    # store all current stream data in a list
+                    current_stream_data = process_streamer_data(data_list=game_streamers_data)
                     # Write only if rows have been added
                     if len(current_stream_data) > 0:
                         insert_data_rows_into_csv(
