@@ -1,17 +1,14 @@
 import requests
-import pynma
 import csv
 import os
-from cfg import SCP_COMMAND, pynma_api, EMAIL_COMMAND
+from cfg import SCP_COMMAND, EMAIL_COMMAND
 from datetime import datetime
 from time import sleep
 from shutil import move as move_file
-from import_csvs import CSVimport
 from get_info import TwitchStatisticsOutput
 from consolidate_data import consolidate_all_data
 
 # Global values
-p = pynma.PyNMA(pynma_api)
 cycle_delay = 20  # seconds
 
 
@@ -58,7 +55,6 @@ def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
 
 def consolidate_data(game_dicts, previous_date_string):
     # get the pynma object
-    global p
     print('[+] Starting consolidation procedure')
     notification_string = ''
     game_shorthands = []
@@ -77,38 +73,21 @@ def consolidate_data(game_dicts, previous_date_string):
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
-            # p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
             notification_string += 'NOT FINISHED. '
     else:
         os.system(EMAIL_COMMAND.format(notification_string))
-        # p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
     # perform consolidation into DB
-    """
     try:
-        # db_mid_dir: empty as DBs are in the same directory
-        # data_mid_dir: empty as data folder is added automatically
-        c = CSVimport(games=['ED', 'PC'], db_mid_dir='', data_mid_dir='', move_file_dir='/home/twitchstats/completed')
-        c.run()
-        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
-    except Exception as e:
-        print('[-] Consolidation error: {}'.format(e))
-        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
-    """
-    try:
-        # db_mid_dir: empty as DBs are in the same directory
-        # data_mid_dir: empty as data folder is added automatically
         consolidate_all_data(game_shorthands=game_shorthands)
         os.system(EMAIL_COMMAND.format('Consolidation of files completed successfully'))
-        # p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
-        # p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
         os.system(EMAIL_COMMAND.format('Consolidation of files did not complete correctly'))
     # hold for two seconds
     pause(2)
+    """
     # run the get info object
     # CURRENTLY DISABLED DUE TO LACK OF VPS RESOURCES
-    """
     for game in game_dicts:
         output = TwitchStatisticsOutput(game_name=game['name'],
                                         game_shorthand=game['shorthand_name'],
