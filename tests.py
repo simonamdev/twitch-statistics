@@ -1,6 +1,5 @@
 import os
 import unittest
-from import_csvs import CSVimport
 from neopysqlite.neopysqlite import Pysqlite
 from get_info import TwitchStatisticsOutput
 from filecmp import cmp as compare_files
@@ -17,7 +16,7 @@ class TestConfigFile(unittest.TestCase):
     def test_config_contents_amount(self):
         with open('games.txt', 'r') as config:
             self.assertEqual(first=len(config.readlines()) % 4, second=0, msg='Config file lines not multiple of 4')
-
+"""
 
 class TestCSVImport(unittest.TestCase):
     def test_import_csv(self):
@@ -34,6 +33,7 @@ class TestCSVImport(unittest.TestCase):
         for streamer in complete_streamers:
             complete_data.append(complete_db.get_all_rows(table=streamer))
         self.assertEqual(first=consolidated_data, second=complete_data)
+"""
 
 
 class TestStatisticsOutput(unittest.TestCase):
