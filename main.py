@@ -9,7 +9,7 @@ from get_info import TwitchStatisticsOutput
 from consolidate_data import consolidate_all_data
 
 # Global values
-cycle_delay = 20  # seconds
+cycle_delay = 30  # seconds
 
 
 def pause(amount=5):
