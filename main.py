@@ -137,11 +137,23 @@ def process_streamer_data(data_list=None):
     return return_data
 
 
+def write_tick_timestamp():
+    with open('tick_timestamps.txt', mode='a') as textfile:
+        textfile.write('{} {}:{}:{}'.format(
+                get_current_date_string().replace('_', '-'),
+                datetime.now().hour,
+                datetime.now().minute,
+                datetime.now().second
+        ))
+
+
 def main():
     games = get_config_values()
     previous_day = datetime.now().day
     previous_date_string = get_current_date_string()
     while True:
+        # write the timestamp to a text file to allow checking for uptime
+        write_tick_timestamp()
         # check if a day has passed
         day = datetime.now().day
         current_date_string = get_current_date_string()
