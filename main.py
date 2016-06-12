@@ -198,9 +198,17 @@ def main():
                             partnership
                         ))
                         # sleep(0.1)  # allows reading the names when checking top streamer
-                        timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, datetime.now().hour, datetime.now().minute, datetime.now().second)
+                        # replace the underscores for dashes in this timestamp
+                        timestamp = '{} {}:{}:{}'.format(
+                                get_current_date_string().replace('_', '-'),
+                                datetime.now().hour,
+                                datetime.now().minute,
+                                datetime.now().second
+                        )
                         # add the data to the list
-                        current_stream_data.append([streamer_name, viewer_count, follower_count, partnership, timestamp])
+                        current_stream_data.append(
+                                [streamer_name, viewer_count, follower_count, partnership, timestamp]
+                        )
                     # Write only if rows have been added
                     if len(current_stream_data) > 0:
                         insert_data_rows_into_csv(
