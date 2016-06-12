@@ -9,7 +9,7 @@ from neopysqlite.neopysqlite import Pysqlite
 
 # For each game
 games = [
-    # 'ED',
+    'ED',
     'PC'
 ]
 
