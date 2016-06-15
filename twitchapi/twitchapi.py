@@ -52,6 +52,9 @@ class APIStreamsRequest:
     def return_streams_data(self):
         return self.streams_data
 
+    def clear_streams_data(self):
+        self.streams_data = []
+
     def return_required_data(self):
         if not self.streams_data:
             self.print('[ERROR] No data is present. Have you requested the data yet?')
