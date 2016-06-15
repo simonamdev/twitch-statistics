@@ -21,7 +21,7 @@ class APIStreamsRequest:
         # url = self.json_url + '?game=' + self.game_url_name
         self.print('[INFO] Sending a request to: {}'.format(url))
         try:
-            response = requests.get(url=url)
+            response = requests.get(url=url, timeout=self.timeout)
         except Exception as e:
             self.print('Encountered an exception:')
             print(e)
