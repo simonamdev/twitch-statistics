@@ -69,6 +69,7 @@ class APIStreamsRequest:
     def return_required_data(self):
         if not self.streams_data:
             self.print('[ERROR] No data is present. Have you requested the data yet?')
+            return None
         # create a timestamp string for now
         timestamp = '{}-{}-{} {}:{}:{}'.format(
                 datetime.now().day,
