@@ -74,15 +74,14 @@ def consolidate_data(game_dicts, previous_date_string):
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
             notification_string += 'NOT FINISHED. '
-    else:
-        os.system(EMAIL_COMMAND.format(notification_string))
     # perform consolidation into DB
     try:
         consolidate_all_data(game_shorthands=game_shorthands)
-        os.system(EMAIL_COMMAND.format('Consolidation of files completed successfully'))
+        notification_string += '\nConsolidation of files completed successfully'
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
-        os.system(EMAIL_COMMAND.format('Consolidation of files did not complete correctly'))
+        notification_string += '\nConsolidation of files did not complete successfully'
+    os.system(EMAIL_COMMAND.format(notification_string))
     # hold for two seconds
     pause(2)
     """
@@ -152,8 +151,7 @@ def main():
     previous_day = datetime.now().day
     previous_date_string = get_current_date_string()
     while True:
-        # write the timestamp to a text file to allow checking for uptime
-        write_tick_timestamp()
+
         # check if a day has passed
         day = datetime.now().day
         current_date_string = get_current_date_string()
@@ -176,7 +174,8 @@ def main():
                 print('[-] Error getting JSON data for streamer list: {}'.format(e))
                 pause(10)  # delay before trying again
             else:
-                # pprint(data_games)
+                # write the timestamp to a text file to allow checking for uptime
+                write_tick_timestamp()
                 print('[+] {} ongoing streams for {}'.format(total_stream_count, game['name']))
                 api_offset_count = 0
                 try:
