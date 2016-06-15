@@ -5,6 +5,7 @@ from get_info import TwitchStatisticsOutput
 from filecmp import cmp as compare_files
 
 
+# Test whether the configuration file is valid
 class TestConfigFile(unittest.TestCase):
     def test_config_exists(self):
         self.assertTrue(expr=os.path.isfile('games.txt'), msg='Config file games.txt does not exists')
@@ -16,8 +17,16 @@ class TestConfigFile(unittest.TestCase):
     def test_config_contents_amount(self):
         with open('games.txt', 'r') as config:
             self.assertEqual(first=len(config.readlines()) % 4, second=0, msg='Config file lines not multiple of 4')
-"""
 
+
+# Test whether we can reach the twitch api
+class TestTwitchAPIModule(unittest.TestCase):
+    def test_module_present(self):
+        self.assertTrue(os.path.isdir(os.path.join(os.getcwd(), 'twitchapi')))
+        self.assertTrue(os.path.isfile(os.path.join(os.getcwd(), 'twitchapi', 'twitchapi.py')))
+
+
+"""
 class TestCSVImport(unittest.TestCase):
     def test_import_csv(self):
         c = CSVimport(games=['TEST'], db_mid_dir='data', delete_file=True, verbose=True)
