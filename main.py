@@ -1,17 +1,15 @@
 import requests
-import pynma
 import csv
 import os
-from cfg import SCP_COMMAND, pynma_api
+from cfg import SCP_COMMAND, EMAIL_COMMAND
 from datetime import datetime
 from time import sleep
 from shutil import move as move_file
-from import_csvs import CSVimport
 from get_info import TwitchStatisticsOutput
+from consolidate_data import consolidate_all_data
 
 # Global values
-p = pynma.PyNMA(pynma_api)
-cycle_delay = 20  # seconds
+cycle_delay = 30  # seconds
 
 
 def pause(amount=5):
@@ -57,10 +55,11 @@ def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
 
 def consolidate_data(game_dicts, previous_date_string):
     # get the pynma object
-    global p
     print('[+] Starting consolidation procedure')
     notification_string = ''
+    game_shorthands = []
     for game in game_dicts:
+        game_shorthands.append(game['shorthand_name'])
         try:
             # gather information for the backup notification
             file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
@@ -70,29 +69,24 @@ def consolidate_data(game_dicts, previous_date_string):
             # run the backup command
             os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
             # move the file to its respective data directory for consolidation
-            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'])
+            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'], 'csv')
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
-            # p.push('Twitch-stats', 'Statistics Backup', 'Backup for {} did not finish correctly'.format(game['name']))
             notification_string += 'NOT FINISHED. '
-    else:
-        p.push(application='Twitch-stats', event='Statistics Backup', description=notification_string)
     # perform consolidation into DB
     try:
-        # db_mid_dir: empty as DBs are in the same directory
-        # data_mid_dir: empty as data folder is added automatically
-        c = CSVimport(games=['ED', 'PC'], db_mid_dir='', data_mid_dir='', move_file_dir='/home/twitchstats/completed')
-        c.run()
-        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files completed correctly')
+        consolidate_all_data(game_shorthands=game_shorthands)
+        notification_string += '\nConsolidation of files completed successfully'
     except Exception as e:
         print('[-] Consolidation error: {}'.format(e))
-        p.push('Twitch-stats', 'Statistics Consolidation', 'Consolidation of files did not complete correctly')
+        notification_string += '\nConsolidation of files did not complete successfully'
+    os.system(EMAIL_COMMAND.format(notification_string))
     # hold for two seconds
     pause(2)
+    """
     # run the get info object
     # CURRENTLY DISABLED DUE TO LACK OF VPS RESOURCES
-    """
     for game in game_dicts:
         output = TwitchStatisticsOutput(game_name=game['name'],
                                         game_shorthand=game['shorthand_name'],
@@ -102,14 +96,65 @@ def consolidate_data(game_dicts, previous_date_string):
     """
 
 
+def get_current_date_string():
+    previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
+    return '{}_{}_{}'.format(previous_day, previous_month, previous_year)
+
+
+def process_streamer_data(data_list=None):
+    if data_list is None:
+        return []
+    return_data = []
+    for i, streamer_data in enumerate(data_list):
+        streamer_name = streamer_data['channel']['name']
+        # get the data for this streamer
+        viewer_count = streamer_data['viewers']
+        if viewer_count == 0:
+            # skip this streamer if they have no viewers
+            continue
+        follower_count = streamer_data['channel']['followers']
+        partnership = 0
+        if streamer_data['channel']['partner']:
+            partnership = 1
+        print('[{}] {}\t\t({}, {}, {})'.format(
+            i,
+            streamer_name,
+            viewer_count,
+            follower_count,
+            partnership
+        ))
+        # sleep(0.1)  # allows reading the names when checking top streamer
+        # replace the underscores for dashes in this timestamp
+        timestamp = '{} {}:{}:{}'.format(
+                get_current_date_string().replace('_', '-'),
+                datetime.now().hour,
+                datetime.now().minute,
+                datetime.now().second
+        )
+        # add the data to the list
+        return_data.append([streamer_name, viewer_count, follower_count, partnership, timestamp])
+    return return_data
+
+
+def write_tick_timestamp():
+    with open('tick_timestamps.txt', mode='a') as textfile:
+        textfile.write('{} {}:{}:{}\n'.format(
+                get_current_date_string().replace('_', '-'),
+                datetime.now().hour,
+                datetime.now().minute,
+                datetime.now().second
+        ))
+
+
 def main():
     games = get_config_values()
-    previous_day, previous_month, previous_year = datetime.now().day, datetime.now().month, datetime.now().year
-    previous_date_string = '{}_{}_{}'.format(previous_day, previous_month, previous_year)
+    previous_day = datetime.now().day
+    previous_date_string = get_current_date_string()
     while True:
+
         # check if a day has passed
-        day, month, year = datetime.now().day, datetime.now().month, datetime.now().year
-        current_date_string = '{}_{}_{}'.format(day, month, year)
+        day = datetime.now().day
+        current_date_string = get_current_date_string()
         # if a day has finished, then make a backup
         if not day == previous_day:
             # update the previous day number. No need to compare the month/year too
@@ -129,7 +174,8 @@ def main():
                 print('[-] Error getting JSON data for streamer list: {}'.format(e))
                 pause(10)  # delay before trying again
             else:
-                # pprint(data_games)
+                # write the timestamp to a text file to allow checking for uptime
+                write_tick_timestamp()
                 print('[+] {} ongoing streams for {}'.format(total_stream_count, game['name']))
                 api_offset_count = 0
                 try:
@@ -144,7 +190,7 @@ def main():
                         # print('[+] Accessing url: {}'.format(next_json_url))
                         try:
                             next_json_url = data_games['_links']['next']
-                            data_games = requests.get(next_json_url).json()
+                            data_games = requests.get(next_json_url, timeout=10).json()
                         except Exception as e:
                             print('[-] Error getting JSON data for streamer list: {}'.format(e))
                     try:
@@ -155,31 +201,8 @@ def main():
                         continue
                     # only consider the streamer if they are playing the game
                     game_streamers_data = [row for row in streams_data if row['game'] in game['game_names']]
-                    current_stream_data = []  # store all current stream data in a list
-                    streamer_index = 0
-                    for streamer_data in game_streamers_data:
-                        streamer_name = streamer_data['channel']['name']
-                        # get the data for this streamer
-                        viewer_count = streamer_data['viewers']
-                        if viewer_count == 0:
-                            # skip this streamer if they have no viewers
-                            continue
-                        streamer_index += 1
-                        follower_count = streamer_data['channel']['followers']
-                        partnership = 0
-                        if streamer_data['channel']['partner']:
-                            partnership = 1
-                        print('[{}] {}\t\t({}, {}, {})'.format(
-                            streamer_index,
-                            streamer_name,
-                            viewer_count,
-                            follower_count,
-                            partnership
-                        ))
-                        # sleep(0.1)  # allows reading the names when checking top streamer
-                        timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, datetime.now().hour, datetime.now().minute, datetime.now().second)
-                        # add the data to the list
-                        current_stream_data.append([streamer_name, viewer_count, follower_count, partnership, timestamp])
+                    # store all current stream data in a list
+                    current_stream_data = process_streamer_data(data_list=game_streamers_data)
                     # Write only if rows have been added
                     if len(current_stream_data) > 0:
                         insert_data_rows_into_csv(
