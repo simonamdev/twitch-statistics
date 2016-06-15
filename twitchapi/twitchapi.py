@@ -2,8 +2,12 @@ import requests
 from datetime import datetime
 
 
+class IllegalArgumentError(ValueError):
+    pass
+
+
 class APIStreamsRequest:
-    def __init__(self, game_url_name, game_proper_name, timeout=10, verbose=False):
+    def __init__(self, game_url_name=None, game_proper_name=None, timeout=10, verbose=False):
         self.game_url_name = game_url_name
         self.game_proper_name = game_proper_name
         self.json_url = 'https://api.twitch.tv/kraken/streams'
@@ -11,6 +15,13 @@ class APIStreamsRequest:
         self.last_status_code = 0
         self.streams_data = []
         self.verbose = verbose
+        self.verify_parameters()
+
+    def verify_parameters(self):
+        if self.game_url_name is None:
+            raise IllegalArgumentError('Game URL name must be provided')
+        if self.game_proper_name is None:
+            raise IllegalArgumentError('Game proper name must be provided')
 
     def print(self, string=''):
         if self.verbose:
