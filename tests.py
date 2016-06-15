@@ -23,10 +23,12 @@ class TestConfigFile(unittest.TestCase):
 # Test the twitch API module
 class TestTwitchAPIModule(unittest.TestCase):
     def test_module_present(self):
+        print('Testing if the module is present')
         self.assertTrue(os.path.isdir(os.path.join(os.getcwd(), 'twitchapi')))
         self.assertTrue(os.path.isfile(os.path.join(os.getcwd(), 'twitchapi', 'twitchapi.py')))
 
     def test_passing_no_game_names(self):
+        print('Testing that passing illegal arguments will raise the appropriate exception')
         with self.assertRaises(twitchapi.IllegalArgumentError):
             twitchapi.APIStreamsRequest()
         with self.assertRaises(twitchapi.IllegalArgumentError):
@@ -35,12 +37,30 @@ class TestTwitchAPIModule(unittest.TestCase):
             twitchapi.APIStreamsRequest(game_url_name='some%20game')
 
     def test_initial_conditions(self):
+        print('Testing that the initial conditions are consistent')
         api_request = twitchapi.APIStreamsRequest(game_url_name='Elite:%20Dangerous', game_proper_name='Elite: Dangerous')
         self.assertEquals(first=api_request.last_status_code, second=0)
         self.assertEquals(first=api_request.streams_data, second=[])
         self.assertEquals(first=api_request.json_url, second='https://api.twitch.tv/kraken/streams')
 
+    def test_invalid_request(self):
+        print('Testing not making a valid request')
+        api_request = twitchapi.APIStreamsRequest(
+                game_url_name='League%20of%20Legends',
+                game_proper_name='League of Legends'
+        )
+        response = api_request.make_request()
+        self.assertIsNone(obj=response)
 
+    def test_valid_request(self):
+        print('Testing a valid request')
+        api_request = twitchapi.APIStreamsRequest(
+                game_url_name='League%20of%20Legends',
+                game_proper_name='League of Legends'
+        )
+        url = api_request.json_url + '?game=' + api_request.game_url_name
+        response = api_request.make_request(url=url)
+        self.assertIsNotNone(obj=response)
 
 """
 class TestCSVImport(unittest.TestCase):
