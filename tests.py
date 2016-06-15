@@ -39,9 +39,9 @@ class TestTwitchAPIModule(unittest.TestCase):
     def test_initial_conditions(self):
         print('[TWITCH API] Testing that the initial conditions are consistent')
         api_request = twitchapi.APIStreamsRequest(game_url_name='Elite:%20Dangerous', game_proper_name='Elite: Dangerous')
-        self.assertEquals(first=api_request.last_status_code, second=0)
-        self.assertEquals(first=api_request.streams_data, second=[])
-        self.assertEquals(first=api_request.json_url, second='https://api.twitch.tv/kraken/streams')
+        self.assertEqual(first=api_request.last_status_code, second=0)
+        self.assertEqual(first=api_request.streams_data, second=[])
+        self.assertEqual(first=api_request.json_url, second='https://api.twitch.tv/kraken/streams')
 
     def test_invalid_request(self):
         print('[TWITCH API] Testing not making a valid request')
