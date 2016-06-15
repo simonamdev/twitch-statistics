@@ -3,6 +3,7 @@ import unittest
 from neopysqlite.neopysqlite import Pysqlite
 from get_info import TwitchStatisticsOutput
 from filecmp import cmp as compare_files
+from twitchapi import twitchapi
 
 
 # Test whether the configuration file is valid
@@ -19,11 +20,26 @@ class TestConfigFile(unittest.TestCase):
             self.assertEqual(first=len(config.readlines()) % 4, second=0, msg='Config file lines not multiple of 4')
 
 
-# Test whether we can reach the twitch api
+# Test the twitch API module
 class TestTwitchAPIModule(unittest.TestCase):
     def test_module_present(self):
         self.assertTrue(os.path.isdir(os.path.join(os.getcwd(), 'twitchapi')))
         self.assertTrue(os.path.isfile(os.path.join(os.getcwd(), 'twitchapi', 'twitchapi.py')))
+
+    def test_passing_no_game_names(self):
+        with self.assertRaises(twitchapi.IllegalArgumentError):
+            twitchapi.APIStreamsRequest()
+        with self.assertRaises(twitchapi.IllegalArgumentError):
+            twitchapi.APIStreamsRequest(game_proper_name='some game')
+        with self.assertRaises(twitchapi.IllegalArgumentError):
+            twitchapi.APIStreamsRequest(game_url_name='some%20game')
+
+    def test_initial_conditions(self):
+        api_request = twitchapi.APIStreamsRequest(game_url_name='Elite:%20Dangerous', game_proper_name='Elite: Dangerous')
+        self.assertEquals(first=api_request.last_status_code, second=0)
+        self.assertEquals(first=api_request.streams_data, second=[])
+        self.assertEquals(first=api_request.json_url, second='https://api.twitch.tv/kraken/streams')
+
 
 
 """
