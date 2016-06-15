@@ -23,9 +23,11 @@ class APIStreamsRequest:
         try:
             response = requests.get(url=url)
         except Exception as e:
+            self.print('Encountered an exception:')
             print(e)
             return None
         self.status_code = response.status_code
+        self.print('[INFO] Status code returned: {}'.format(self.status_code))
         self.streams_data = response.json()['streams']
 
     def get_streams_data(self):
