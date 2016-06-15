@@ -2,8 +2,9 @@ import requests
 
 
 class APIStreamsRequest:
-    def __init__(self, game_url_name, timeout=10, verbose=False):
+    def __init__(self, game_url_name, game_proper_name, timeout=10, verbose=False):
         self.game_url_name = game_url_name
+        self.game_proper_name = game_proper_name
         self.json_url = 'https://api.twitch.tv/kraken/streams'
         self.timeout = timeout
         self.last_status_code = 0
@@ -47,13 +48,23 @@ class APIStreamsRequest:
         print(len(self.streams_data))
         """
 
-    def get_streams_data(self):
+    def return_streams_data(self):
         return self.streams_data
+
+    def return_required_data(self):
+        if not self.streams_data:
+            self.print('[ERROR] No data is present. Have you requested the data yet?')
+        return [
+            (stream['channel']['name'],
+             stream['viewers'],
+             stream['channel']['followers'],
+             stream['channel']['partner']) for stream in self.streams_data if stream['game'] == self.game_proper_name]
 
 
 def main():
-    a = APIStreamsRequest(game_url_name='Elite:%20Dangerous', verbose=True)
+    a = APIStreamsRequest(game_url_name='Elite:%20Dangerous', game_proper_name='Elite: Dangerous', verbose=True)
     a.request_all_game_data()
+    print(a.return_required_data())
 
 if __name__ == '__main__':
     main()
