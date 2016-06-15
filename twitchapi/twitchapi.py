@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 
 
 class APIStreamsRequest:
@@ -54,11 +55,23 @@ class APIStreamsRequest:
     def return_required_data(self):
         if not self.streams_data:
             self.print('[ERROR] No data is present. Have you requested the data yet?')
-        return [
-            (stream['channel']['name'],
-             stream['viewers'],
-             stream['channel']['followers'],
-             stream['channel']['partner']) for stream in self.streams_data if stream['game'] == self.game_proper_name]
+        # create a timestamp string for now
+        timestamp = '{}-{}-{} {}:{}:{}'.format(
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+                datetime.now().hour,
+                datetime.now().minute,
+                datetime.now().second
+        )
+        return [(
+                    stream['channel']['name'],
+                    stream['viewers'],
+                    stream['channel']['followers'],
+                    1 if stream['channel']['partner'] else 0,  # 1 if true, 0 if false
+                    timestamp
+             ) for stream in self.streams_data if stream['game'] == self.game_proper_name
+        ]
 
 
 def main():
