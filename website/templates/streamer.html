@@ -2,8 +2,10 @@
 {% block css %}
     {% if app_info.debug %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -24,34 +26,68 @@
                 {% if streamer.overviews['ED'].partnership == 1 %}
                     <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
                 {% else %}
-                    <i class="material-icons mdl-list__item-icon">clear</i>
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
                 {% endif %}
             </h1>
         </div>
         <div class="mdl-cell mdl-cell--3-col center-text"></div>
     </div>
-    <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
-        <div class="mdl-cell mdl-cell--4-col data-text">
-            <h1>{{ streamer.overviews['ED'].game_full }}</h1>
-            <h2>Average Viewers: {{ streamer.overviews['ED'].viewers_average }}</h2>
-            <h2>Peak Viewers: {{ streamer.overviews['ED'].viewers_peak }}</h2>
-            <h2>Average Duration: {{ streamer.overviews['ED'].duration_average }} hours</h2>
-            <h2>Total Duration: {{ streamer.overviews['ED'].duration_total }} hours</h2>
+    {% if streamer.ED %}
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--4-col data-text">
+                <h1>{{ streamer.overviews['ED'].game_full }}</h1>
+                <h2>Average Viewers: {{ streamer.overviews['ED'].viewers_average }}</h2>
+                <h2>Peak Viewers: {{ streamer.overviews['ED'].viewers_peak }}</h2>
+                <h2>Average Duration: {{ streamer.overviews['ED'].duration_average }} hours</h2>
+                <h2>Total Duration: {{ streamer.overviews['ED'].duration_total }} hours</h2>
+            </div>
+
+            <div class="mdl-cell mdl-cell--5-col center-text"></div>
         </div>
-        <div class="mdl-cell mdl-cell--2-col center-text"></div>
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
-    </div>
-    <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
-        <div class="mdl-cell mdl-cell--4-col data-text">
-            <h1>{{ streamer.overviews['PC'].game_full }}</h1>
-            <h2>Average Viewers: {{ streamer.overviews['PC'].viewers_average }}</h2>
-            <h2>Peak Viewers: {{ streamer.overviews['PC'].viewers_peak }}</h2>
-            <h2>Average Duration: {{ streamer.overviews['PC'].duration_average }} hours</h2>
-            <h2>Total Duration: {{ streamer.overviews['PC'].duration_total }} hours</h2>
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--12-col">
+                <div class="game-card mdl-card mdl-shadow--2dp" id="elitedangerous-wide-card" style="width: 100%;">
+                    <div class="mdl-card__title mdl-card--expand"></div>
+                    <div class="mdl-card__actions">
+                        <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                            <i class="material-icons mdl-list__item-icon">face</i>
+                            <span class="game-card-image__filename">
+                                {{ streamer.name }}'s Elite: Dangerous streams
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mdl-cell mdl-cell--2-col center-text"></div>
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
-    </div>
+    {% endif %}
+    {% if streamer.PC %}
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--4-col data-text">
+                <h1>{{ streamer.overviews['PC'].game_full }}</h1>
+                <h2>Average Viewers: {{ streamer.overviews['PC'].viewers_average }}</h2>
+                <h2>Peak Viewers: {{ streamer.overviews['PC'].viewers_peak }}</h2>
+                <h2>Average Duration: {{ streamer.overviews['PC'].duration_average }} hours</h2>
+                <h2>Total Duration: {{ streamer.overviews['PC'].duration_total }} hours</h2>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col center-text"></div>
+            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        </div>
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--12-col">
+                <div class="game-card mdl-card mdl-shadow--2dp" id="planetcoaster-wide-card" style="width: 100%;">
+                    <div class="mdl-card__title mdl-card--expand"></div>
+                    <div class="mdl-card__actions">
+                        <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                            <i class="material-icons mdl-list__item-icon">face</i>
+                            <span class="game-card-image__filename">
+                                {{ streamer.name }}'s Planet Coaster streams
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

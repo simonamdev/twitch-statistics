@@ -2,9 +2,19 @@
 	background: url('../static/images/elitedangerous.jpg') center / cover;
 }
 
+#elitedangerous-wide-card {
+	background: url('../static/images/elitedangerous2.jpg') center / cover;
+}
+
+
 #planetcoaster-card {
 	background: url('../static/images/planetcoaster.jpg') center / cover;
 }
+
+#planetcoaster-wide-card {
+	background: url('../static/images/planetcoaster2.jpg') center / cover;
+}
+
 
 #streamer-card {
 	background: url('../static/images/faces.jpg') center / cover;

@@ -104,6 +104,8 @@ def streamers_list(game_url_name, page_number):
 def streamer(streamer_name):
     streamer_dict = {
         'name': streamer_name,
+        'ED': True,
+        'PC': False,
         'overviews': dict()
     }
     streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
