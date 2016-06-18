@@ -106,15 +106,13 @@ def streamer(streamer_name):
         'name': streamer_name,
         'overviews': dict()
     }
-    streamer_db = db_access.StreamerData(streamer_name=streamer_name)
-    streamer_db.run()
+    streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
+    streamer_global_db.run()
     # update the streamer dict with the overviews for each game
-    streamer_dict['overviews'] = streamer_db.get_all_overviews()
-    stream_overviews_list = streamer_db.get_stream_overviews()
-    from pprint import pprint
-    pprint(stream_overviews_list)
+    streamer_dict['overviews'] = streamer_global_db.get_all_overviews()
     return render_template('streamer.html',
                            app_info=app_info,
+                           game_names=game_names,
                            streamer=streamer_dict)
 
 
