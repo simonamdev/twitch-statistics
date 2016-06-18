@@ -3,7 +3,6 @@
 	top: 5%;
 	width: 100%;
 	font-size: 1000%;
-
 }
 
 .cover-image {
@@ -22,4 +21,8 @@
 
 .tier-text {
 	font-size: 200%;
+}
+
+#streamer-title {
+	background-color: #6441a5;
 }
