@@ -31,6 +31,11 @@ html, body {
 	background-color: white;
 }
 
+/* Change font size for data pages */
+.data-text h2 {
+	font-size: 200%;
+}
+
 /* Fix text sizes for paragraphs */
 .para-text {
 	font-size: 150%;

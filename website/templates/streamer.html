@@ -13,7 +13,45 @@
     <div class="mdl-grid dark-row">
         <!-- Content -->
         <div class="mdl-cell mdl-cell--12-col center-text">
-            <h1>Something</h1>
+            <h1>Global Data</h1>
         </div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <h1>
+                Partnered:
+                {% if streamer.overviews['ED'].partnership == 1 %}
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                {% else %}
+                    <i class="material-icons mdl-list__item-icon">clear</i>
+                {% endif %}
+            </h1>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--4-col data-text">
+            <h1>{{ streamer.overviews['ED'].game_full }}</h1>
+            <h2>Average Viewers: {{ streamer.overviews['ED'].viewers_average }}</h2>
+            <h2>Peak Viewers: {{ streamer.overviews['ED'].viewers_peak }}</h2>
+            <h2>Average Duration: {{ streamer.overviews['ED'].duration_average }} hours</h2>
+            <h2>Total Duration: {{ streamer.overviews['ED'].duration_total }} hours</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--2-col center-text"></div>
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--4-col data-text">
+            <h1>{{ streamer.overviews['PC'].game_full }}</h1>
+            <h2>Average Viewers: {{ streamer.overviews['PC'].viewers_average }}</h2>
+            <h2>Peak Viewers: {{ streamer.overviews['PC'].viewers_peak }}</h2>
+            <h2>Average Duration: {{ streamer.overviews['PC'].duration_average }} hours</h2>
+            <h2>Total Duration: {{ streamer.overviews['PC'].duration_total }} hours</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--2-col center-text"></div>
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
     </div>
 {% endblock %}
