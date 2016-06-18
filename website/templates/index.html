@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block css %}
-    {% if debug_mode %}
+    {% if app_info.debug %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
