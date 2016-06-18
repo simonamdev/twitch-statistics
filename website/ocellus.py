@@ -4,8 +4,10 @@ from minify import minify as minify_css
 
 app = Flask(__name__)
 
-debug_mode = True
-app_version = 'Alpha 0.1'
+app_info = {
+    'debug': True,
+    'version': 'Alpha 0.1'
+}
 game_names = [
     {
         'short': 'ED',
@@ -34,17 +36,17 @@ def return_name_dict(name):
 
 @app.route('/')
 def index():
-    return render_template('index.html', app_version=app_version, debug_mode=debug_mode)
+    return render_template('index.html', app_info=app_info)
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html', app_version=app_version, debug_mode=debug_mode)
+    return render_template('about.html', app_info=app_info)
 
 
 @app.route('/games')
 def games():
-    return render_template('games.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
+    return render_template('games.html', app_info=app_info, games=game_names)
 
 
 @app.route('/game/<game_name>')
@@ -52,15 +54,14 @@ def game(game_name):
     name_dict = return_name_dict(name=game_name)
     global_game_data = db_access.GlobalGameData(game_url_name=name_dict['url'])
     return render_template('game.html',
-                           app_version=app_version,
-                           debug_mode=debug_mode,
+                           app_info=app_info,
                            game_name=name_dict,
                            game_data=global_game_data.return_global_overview_dict())
 
 
 @app.route('/streamers')
 def streamers():
-    return render_template('streamers.html', app_version=app_version, debug_mode=debug_mode, games=game_names)
+    return render_template('streamers.html', app_info=app_info, games=game_names)
 
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
@@ -90,8 +91,7 @@ def streamers_list(game_url_name, page_number):
         'total': overview_access.get_page_count()
     }
     return render_template('streamer_list.html',
-                           app_version=app_version,
-                           debug_mode=debug_mode,
+                           app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
                            streamer_overviews=streamer_overview_dicts,
                            tier_bounds=tier_bounds,
@@ -105,11 +105,11 @@ def streamer(streamer_name):
     streamer_dict = {
         'name': streamer_name
     }
-    return render_template('streamer.html', app_version=app_version, debug_mode=debug_mode, streamer=streamer_dict)
+    return render_template('streamer.html', app_info=app_info, streamer=streamer_dict)
 
 
 if __name__ == '__main__':
-    if not debug_mode:
+    if not app_info['debug']:
         minify_css()
-    app.run(host='127.0.0.1', port=9000, debug=debug_mode)
+    app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
     # app.run(host='0.0.0.0', port=9000, debug=debug_mode)
