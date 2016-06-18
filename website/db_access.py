@@ -2,6 +2,7 @@ import os
 from math import ceil
 from neopysqlite.neopysqlite import Pysqlite
 from ocellus import convert_name
+from pprint import pprint
 
 
 def convert_to_hours(seconds):
@@ -20,52 +21,56 @@ def paginate(data_list, n):
 
 
 class StreamerOverviewsDataPagination:
-    def __init__(self, game_name, per_page):
+    def __init__(self, game_name, per_page=10):
         self.game_name = game_name
         self.page = 1
         self.per_page = per_page
         self.max_page = 0
-        self.data_list = []
+        self.data_list_length = 0
         self.pages = []
+        self.db = None
 
     def run(self):
-        # for all the streamers, get their last overview
-        overview_rows = []
-        streamers = get_streamer_names(game=self.game_name)
-        for streamer in streamers:
-            db_path = os.path.join(os.getcwd(), 'data', self.game_name, 'streamers', '{}.db'.format(streamer))
-            db = Pysqlite(database_name='{} Page DB'.format(self.game_name), database_file=db_path)
-            # get the latest overview row
-            row = db.get_specific_rows(table='overview', filter_string='id = (SELECT MAX(id) FROM overview)')
-            row = list(row[0])
-            # add the name to the end of the row
-            row.append(streamer)
-            overview_rows.append(row)
-        # point the data list to the overview rows
-        self.data_list = overview_rows
-        # split the data into pages according to the per page
-        self.pages = paginate(overview_rows, self.per_page)
+        # Open a DB connection
+        db_path = os.path.join(os.getcwd(), 'data', self.game_name, '{}_data.db'.format(self.game_name))
+        self.db = Pysqlite(database_name='{} Page DB'.format(self.game_name), database_file=db_path)
 
     def get_page(self, page_number):
-        # do - 1 to set it as a zero index
-        # print(self.pages[page_number - 1])
-        page_data_dicts = []
-        for page in self.pages[page_number - 1]:
-            page_dict = {
-                'name': page[8],
-                'last_update': page[1],
-                'viewers_average': page[2],
-                'viewers_peak': page[3],
-                'followers': page[4],
-                'duration_average': convert_to_hours(page[5]),
-                'duration_total': convert_to_hours(page[6]),
-                'partnership': page[7]
-            }
-            page_data_dicts.append(page_dict)
-        return page_data_dicts
+        # figure out which indices relate to that page
+        # page_number is NOT zero indexed, so we subtract 1 to make it zero indexed
+        # lower bound: (page_number - 1) * self.per_page
+        # upper bound: (page_number - 1) * self.per_page + (self.per_page - 1)
+        # EXAMPLE:
+        # I want page 2 (which is actually page 1, since -1) and I show 10 per page. Page 1's bounds are 10 -> 19, thus:
+        # (2 - 1) * 10 = 10 for the lower bound
+        # (2 - 1) * 10 + (10 - 1) = 10 + 9 = 19 for the upper bound
+        page_indices = {
+            'lower': (page_number - 1) * self.per_page,
+            'upper': (page_number - 1) * self.per_page + (self.per_page - 1)
+        }
+        # get the streamer overviews, ordered by average viewership
+        ordered_data = self.db.get_specific_rows(
+                table='streamers_data',
+                filter_string='id IS NOT NULL ORDER BY viewers_average DESC')
+        self.data_list_length = len(ordered_data)
+        page_data = ordered_data[page_indices['lower']:page_indices['upper']]
+        # map that data to dictionaries
+        streamer_dicts = [
+            {
+                'name': streamer[1],
+                'last_update': streamer[2],
+                'viewers_average': streamer[3],
+                'viewers_peak': streamer[4],
+                'followers': streamer[5],
+                'duration_average': convert_to_hours(streamer[7]),
+                'duration_total': convert_to_hours(streamer[8]),
+                'partnership': streamer[10]
+            } for streamer in page_data
+        ]
+        return streamer_dicts
 
     def get_page_count(self):
-        return int(ceil(len(self.data_list) / float(self.per_page)))
+        return int(ceil(self.data_list_length / float(self.per_page)))
 
     def has_previous_page(self):
         return self.page > 1
