@@ -100,6 +100,14 @@ def streamers_list(game_url_name, page_number):
                            page_data=page_data)
 
 
+@app.route('/streamer/<streamer_name>')
+def streamer(streamer_name):
+    streamer_dict = {
+        'name': streamer_name
+    }
+    return render_template('streamer.html', app_version=app_version, debug_mode=debug_mode, streamer=streamer_dict)
+
+
 if __name__ == '__main__':
     if not debug_mode:
         minify_css()
