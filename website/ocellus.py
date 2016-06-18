@@ -2,7 +2,6 @@ import db_access
 from flask import Flask, render_template
 from minify import minify as minify_css
 
-
 app = Flask(__name__)
 
 debug_mode = True
@@ -75,7 +74,7 @@ def streamers_list(game_url_name, page_number):
             per_page=10)
     overview_access.run()
     # get the overview data for that page
-    streamer_overview_dicts = overview_access.get_page(page_number)
+    streamer_overview_dicts = enumerate(overview_access.get_page(page_number))
     # get the game overview
     global_game_data = db_access.GlobalGameData(game_url_name=game_url_name)
     tier_bounds = global_game_data.return_tier_bounds()

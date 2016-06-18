@@ -31,7 +31,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        <!--
                         <th>Last Updated</th>
+                        -->
                         <th>Average Viewers</th>
                         <th>Peak Viewers</th>
                         <th>Followers</th>
@@ -40,12 +42,14 @@
                         <th>Partnered</th>
                     </tr>
                 </thead>
-                {% for data in streamer_overviews %}
+                {% for index, data in streamer_overviews %}
                     <tr>
-                        {% set streamer_id = loop.index + (page_data.per_page * (page_data.current - 1)) %}
+                        {% set streamer_id = index + (page_data.per_page * (page_data.current - 1)) %}
                         <td>{{ streamer_id }}</td>
                         <td>{{ data.name }}</td>
+                        <!--
                         <td>{{ data.last_update }}</td>
+                        -->
                         <td>{{ data.viewers_average }}</td>
                         <td>{{ data.viewers_peak }}</td>
                         <td>{{ data.followers }}</td>
