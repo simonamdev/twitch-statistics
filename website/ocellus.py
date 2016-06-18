@@ -105,6 +105,10 @@ def streamer(streamer_name):
     streamer_dict = {
         'name': streamer_name
     }
+    streamer_db = db_access.StreamerData(streamer_name=streamer_name)
+    streamer_db.run()
+    overviews = streamer_db.get_all_overviews()
+    print(overviews)
     return render_template('streamer.html', app_info=app_info, streamer=streamer_dict)
 
 
