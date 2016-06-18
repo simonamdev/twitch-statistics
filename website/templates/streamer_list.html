@@ -94,20 +94,33 @@
             <p>
                 Tiers help sort and visualise the distribution of streamers depending on their
                 average viewer count. The bounds are completely artifical and should not be used
-                as definitive "ranking" for a streamer.
+                as definitive "ranking" for any given streamer.
             </p>
         </div>
         <div class="mdl-cell mdl-cell--4-col center-text"></div>
     </div>
-    {% for bound in tier_bounds %}
     <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--4-col"></div>
-        <div class="mdl-cell mdl-cell--4-col center-text">
-            <h1 class="tier-text">Tier {{ bound.tier }}</h1>
-            <h1 class="tier-text">{{ bound.upper }} >= Average Viewer Count >= {{ bound.lower }}</h1>
-            <h1 class="tier-text">{{ tier_counts[loop.index - 1] }}</h1>
+        <div class="mdl-cell mdl-cell--2-col"></div>
+        <div class="mdl-cell mdl-cell--9-col center-text">
+            <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Tier Number</th>
+                        <th>Tier Upper Bound</th>
+                        <th>Tier Lower Bound</th>
+                        <th>Number of Streamers</th>
+                    </tr>
+                </thead>
+                {% for bound in tier_bounds %}
+                    <tr>
+                        <td>Tier {{ bound.tier }}</td>
+                        <td>{{ bound.upper }}</td>
+                        <td>{{ bound.lower }}</td>
+                        <td>{{ tier_counts[loop.index - 1] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
-        <div class="mdl-cell mdl-cell--4-col"></div>
+        <div class="mdl-cell mdl-cell--2-col"></div>
     </div>
-    {% endfor %}
 {% endblock %}
