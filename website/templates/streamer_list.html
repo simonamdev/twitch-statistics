@@ -74,14 +74,14 @@
             {% set next_page_number = page_data.current + 1 %}
             {% if not prev_page_number == 0 %}
                 <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=prev_page_number) }}">
-                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_rewind</i>
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_left</i>
                 </a>
             {% endif %}
         </div>
         <div class="mdl-cell mdl-cell--1-col center-text">
             {% if not next_page_number > page_data.total %}
                 <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=next_page_number) }}">
-                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">fast_forward</i>
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_right</i>
                 </a>
             {% endif %}
         </div>
