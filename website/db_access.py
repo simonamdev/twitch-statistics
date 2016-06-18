@@ -20,7 +20,7 @@ def paginate(data_list, n):
     return [data_list[i:i + n] for i in range(0, len(data_list), n)]
 
 
-class StreamerOverviewsDataPagination:
+class AllStreamerOverviewsDataPagination:
     def __init__(self, game_name, per_page=10):
         self.game_name = game_name
         self.page = 1
@@ -79,52 +79,7 @@ class StreamerOverviewsDataPagination:
         return self.page < self.get_page_count()
 
 
-class StreamerData:
-    def __init__(self, streamer_name):
-        self.streamer_name = streamer_name
-        self.stream_count = 0
-        self.db_connection_dict = dict()
-
-    def run(self):
-        # Open DB connections for a streamer for each game
-        for game in game_names:
-            self.open_db_connection(game_short_name=game['short'])
-
-    def open_db_connection(self, game_short_name):
-        db_path = os.path.join(os.getcwd(), 'data', game_short_name, 'streamers', '{}.db'.format(self.streamer_name))
-        if not os.path.isfile(db_path):
-            pass
-            # print('Streamer never streamed for: {}'.format(game_short_name))
-        else:
-            self.db_connection_dict[game_short_name] = Pysqlite(
-                                                            database_name='Streamer {} DB'.format(self.streamer_name),
-                                                            database_file=db_path)
-
-    def get_overview(self, game_short_name):
-        db_con = self.db_connection_dict[game_short_name]
-        latest_overview = db_con.get_specific_rows(table='overview', filter_string='id = (SELECT MAX(id) FROM overview)')
-        return latest_overview
-
-    def get_all_overviews(self):
-        overviews_dict = dict()
-        for game in game_names:
-            # if the streamer has never streamed that game, skip it
-            if game['short'] not in list(self.db_connection_dict.keys()):
-                continue
-            overview = list(self.get_overview(game['short'])[0])
-            overviews_dict[game['short']] = {
-                'last_update': overview[1],
-                'viewers_average': overview[2],
-                'viewers_peak': overview[3],
-                'followers': overview[4],
-                'duration_average': convert_to_hours(overview[5]),
-                'duration_total': convert_to_hours(overview[6]),
-                # 'partnership': overview[7]
-            }
-        return overviews_dict
-
-
-class GlobalGameData:
+class GameGlobalData:
     def __init__(self, game_url_name):
         self.game_url_name = game_url_name
         self.global_data_list = []

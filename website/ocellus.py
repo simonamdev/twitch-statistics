@@ -70,17 +70,17 @@ def streamers_list(game_url_name, page_number):
     if page_number < 1:
         page_number = 1
     # get access to the database through an object which will take care of pagination
-    overview_access = db_access.StreamerOverviewsDataPagination(
+    overview_access = db_access.AllStreamerOverviewsDataPagination(
             game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
             per_page=10)
     overview_access.run()
     # get the overview data for that page
     streamer_overview_dicts = enumerate(overview_access.get_page(page_number))
     # get the game overview
-    global_game_data = db_access.GlobalGameData(game_url_name=game_url_name)
-    tier_bounds = global_game_data.return_tier_bounds()
-    tier_counts = global_game_data.return_tier_counts()
-    tier_streamers = global_game_data.return_tier_streamers()
+    game_global_data = db_access.GameGlobalData(game_url_name=game_url_name)
+    tier_bounds = game_global_data.return_tier_bounds()
+    tier_counts = game_global_data.return_tier_counts()
+    tier_streamers = game_global_data.return_tier_streamers()
     # if the page number requested is greater than the last page number, then return the last page
     if page_number > overview_access.get_page_count():
         page_number = overview_access.get_page_count()
@@ -103,13 +103,19 @@ def streamers_list(game_url_name, page_number):
 @app.route('/streamer/<streamer_name>')
 def streamer(streamer_name):
     streamer_dict = {
-        'name': streamer_name
+        'name': streamer_name,
+        'overviews': dict()
     }
     streamer_db = db_access.StreamerData(streamer_name=streamer_name)
     streamer_db.run()
-    overviews = streamer_db.get_all_overviews()
-    print(overviews)
-    return render_template('streamer.html', app_info=app_info, streamer=streamer_dict)
+    # update the streamer dict with the overviews for each game
+    streamer_dict['overviews'] = streamer_db.get_all_overviews()
+    stream_overviews_list = streamer_db.get_stream_overviews()
+    from pprint import pprint
+    pprint(stream_overviews_list)
+    return render_template('streamer.html',
+                           app_info=app_info,
+                           streamer=streamer_dict)
 
 
 if __name__ == '__main__':
