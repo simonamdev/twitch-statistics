@@ -52,7 +52,7 @@ def games():
 @app.route('/game/<game_name>')
 def game(game_name):
     name_dict = return_name_dict(name=game_name)
-    global_game_data = db_access.GlobalGameData(game_url_name=name_dict['url'])
+    global_game_data = db_access.GameGlobalData(game_url_name=name_dict['url'])
     return render_template('game.html',
                            app_info=app_info,
                            game_name=name_dict,
@@ -102,12 +102,12 @@ def streamers_list(game_url_name, page_number):
 
 @app.route('/streamer/<streamer_name>')
 def streamer(streamer_name):
+    games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
     streamer_dict = {
         'name': streamer_name,
-        'ED': True,
-        'PC': False,
         'overviews': dict()
     }
+    streamer_dict.update(games_streamed_dict)
     streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
     streamer_global_db.run()
     # update the streamer dict with the overviews for each game

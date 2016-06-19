@@ -19,7 +19,6 @@ def paginate(data_list, n):
     n = max(1, n)
     return [data_list[i:i + n] for i in range(0, len(data_list), n)]
 
-
 class AllStreamerOverviewsDataPagination:
     def __init__(self, game_name, per_page=10):
         self.game_name = game_name
@@ -169,3 +168,15 @@ class StreamerGlobalData:
                 'partnership': overview[7]
             }
         return overviews_dict
+
+
+class DetermineIfStreamed:
+    def __init__(self, streamer_name):
+        self.streamer_name = streamer_name
+
+    def check_for_all_games(self):
+        game_exists_dict = dict()
+        for game in game_names:
+            db_path = os.path.join(os.getcwd(), 'data', game['short'], 'streamers', '{}.db'.format(self.streamer_name))
+            game_exists_dict[game['short']] = True if os.path.isfile(db_path) else False
+        return game_exists_dict
