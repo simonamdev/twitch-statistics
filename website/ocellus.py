@@ -8,6 +8,7 @@ app_info = {
     'debug': True,
     'version': 'Alpha 0.1'
 }
+
 game_names = [
     {
         'short': 'ED',
@@ -20,6 +21,11 @@ game_names = [
         'full': 'Planet Coaster'
     }
 ]
+
+game_names_dict = {
+    'ED': game_names[0],
+    'PC': game_names[1]
+}
 
 
 def convert_name(given_type, given_name, return_type):
@@ -112,10 +118,19 @@ def streamer(streamer_name):
     streamer_global_db.run()
     # update the streamer dict with the overviews for each game
     streamer_dict['overviews'] = streamer_global_db.get_all_overviews()
+    print(game_names)
     return render_template('streamer.html',
                            app_info=app_info,
-                           game_names=game_names,
+                           game_names=game_names_dict,
                            streamer=streamer_dict)
+
+
+@app.route('/streamer/<streamer_name>/<game_name>/streams')
+def streams(streamer_name, game_name):
+    return render_template('streams.html',
+                           streamer_name=streamer_name,
+                           game_name=game_name,
+                           app_info=app_info)
 
 
 if __name__ == '__main__':

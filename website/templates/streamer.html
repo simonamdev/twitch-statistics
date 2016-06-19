@@ -50,7 +50,7 @@
                 <div class="game-card mdl-card mdl-shadow--2dp" id="elitedangerous-wide-card" style="width: 100%;">
                     <div class="mdl-card__title mdl-card--expand"></div>
                     <div class="mdl-card__actions">
-                        <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                        <a href="{{ url_for('streams', streamer_name=streamer.name, game_name=game_names['ED'].url) }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
                             <i class="material-icons mdl-list__item-icon">face</i>
                             <span class="game-card-image__filename">
                                 {{ streamer.name }}'s Elite: Dangerous streams
@@ -79,7 +79,7 @@
                 <div class="game-card mdl-card mdl-shadow--2dp" id="planetcoaster-wide-card" style="width: 100%;">
                     <div class="mdl-card__title mdl-card--expand"></div>
                     <div class="mdl-card__actions">
-                        <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                        <a href="{{ url_for('streams', streamer_name=streamer.name, game_name=game_names['PC'].url) }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
                             <i class="material-icons mdl-list__item-icon">face</i>
                             <span class="game-card-image__filename">
                                 {{ streamer.name }}'s Planet Coaster streams
