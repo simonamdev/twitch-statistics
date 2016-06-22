@@ -1,4 +1,3 @@
-pynma
 requests
 tqdm
 neopysqlite
