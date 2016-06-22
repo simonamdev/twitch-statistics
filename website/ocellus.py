@@ -147,3 +147,9 @@ if __name__ == '__main__':
         minify_css()
     app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
     # app.run(host='0.0.0.0', port=9000, debug=debug_mode)
+
+"""
+Logging references:
+    https://stackoverflow.com/questions/3759981/get-ip-address-of-visitors-using-python-flask
+    https://gist.github.com/ibeex/3257877
+"""
