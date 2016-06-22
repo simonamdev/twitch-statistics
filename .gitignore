@@ -1,2 +1,4 @@
 cfg.py
 .idea/
+website/data
+__pycache__
