@@ -1,7 +1,5 @@
 import db_access
-import logging
-from logging.handlers import RotatingFileHandler
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from minify import minify as minify_css
 
 app = Flask(__name__)
@@ -110,7 +108,6 @@ def streamers_list(game_url_name, page_number):
 
 @app.route('/streamer/<streamer_name>')
 def streamer(streamer_name):
-    app.logger.info('[{}] accessed page for: {}'.format(request.environ['REMOTE_ADDR'], streamer_name))
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
     streamer_dict = {
         'name': streamer_name,
@@ -137,9 +134,6 @@ def streams(streamer_name, game_name):
 
 
 if __name__ == '__main__':
-    handler = RotatingFileHandler('application.log', maxBytes=100000, backupCount=1)
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
     if not app_info['debug']:
         minify_css()
     app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
