@@ -237,3 +237,32 @@ class StreamsDataPagination:
 
     def has_next_page(self):
         return self.page < self.get_page_count()
+
+
+class StreamData:
+    def __init__(self, streamer_name, game_name, stream_id):
+        self.streamer_name = streamer_name
+        self.game_name = game_name
+        self.stream_id = stream_id - 1  # Backend is zero indexed, frontend is not
+        self.db = None
+
+    def run(self):
+        # Open a DB connection
+        db_path = os.path.join(os.getcwd(), 'data', self.game_name, 'streamers', '{}.db'.format(self.streamer_name))
+        self.db = Pysqlite(database_name='{} {} DB'.format(self.game_name, self.streamer_name), database_file=db_path)
+
+    def get_stream_data(self):
+        # if the streamer has never streamed that game, skip it
+        stream_overview_row = self.db.get_specific_rows(
+            table='streams',
+            filter_string='id IS {}'.format(self.stream_id + 1))  # the db index is also not zero indexed... an oversight I know
+        stream_raw_rows = self.db.get_all_rows(table='stream_{}')
+        print(stream_overview_row)
+        print(stream_raw_rows)
+        stream_dict = {
+            'overview': {
+
+            },
+            'raw_data': []
+        }
+        return stream_dict
