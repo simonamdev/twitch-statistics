@@ -73,7 +73,7 @@ def streamers():
 
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
-def streamers_list(game_url_name, page_number):
+def streamers_list(game_url_name, page_number=1):
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
