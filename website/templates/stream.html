@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if app_info.debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/tables-min.css">
+{% endblock %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>{{ streamer_name }}'s {{ game_name.full }} stream ID #{{ stream_data.id }}</h1>
+        </div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--4-col data-text">
+            <h2>Time start: {{ stream_data.time_start }}</h2>
+            <h2>Duration: {{ stream_data.duration }} hours</h2>
+            <h2>Average Viewers: {{ stream_data.viewers_average }}</h2>
+            <h2>Peak Viewers: {{ stream_data.viewers_peak }}</h2>
+            <h2>Follower delta: {{ stream_data.follower_delta }}</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--5-col center-text"></div>
+    </div>
+{% endblock %}
