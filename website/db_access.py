@@ -19,6 +19,7 @@ def paginate(data_list, n):
     n = max(1, n)
     return [data_list[i:i + n] for i in range(0, len(data_list), n)]
 
+
 class AllStreamerOverviewsDataPagination:
     def __init__(self, game_name, per_page=10):
         self.game_name = game_name
