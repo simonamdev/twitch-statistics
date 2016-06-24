@@ -1,7 +1,7 @@
 import db_access
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from minify import minify as minify_css
 
 app = Flask(__name__)
@@ -110,6 +110,11 @@ def streamers_list(game_url_name, page_number=1):
                            tier_counts=tier_counts,
                            tier_streamers=tier_streamers,
                            page_data=page_data)
+
+
+@app.route('/streamer/')
+def streamer_no_name():
+    return redirect('streamers')
 
 
 @app.route('/streamer/<streamer_name>')
