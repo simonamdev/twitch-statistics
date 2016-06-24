@@ -260,7 +260,7 @@ class StreamData:
         stream_dict = {
             'id': self.stream_id + 1,
             'time_start': stream_overview_row[0][1],
-            'duration': stream_overview_row[0][2],
+            'duration': convert_to_hours(stream_overview_row[0][2]),
             'viewers_average': stream_overview_row[0][3],
             'viewers_peak': stream_overview_row[0][4],
             'follower_delta': stream_overview_row[0][5]
