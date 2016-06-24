@@ -175,6 +175,29 @@ def streams(streamer_name, game_url_name, page_number=1):
                            page_data=page_data)
 
 
+@app.route('/streamer/<streamer_name>/<game_url_name>/stream/')
+@app.route('/streamer/<streamer_name>/<game_url_name>/stream/<stream_id>')
+def stream(streamer_name, game_url_name, stream_id=1):
+    try:
+        stream_id = int(stream_id)
+    except ValueError:
+        stream_id = 1
+    # get the stream data from the database
+
+    stream_access = db_access.StreamData(
+        game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
+        streamer_name=streamer_name,
+        stream_id=stream_id)
+    stream_access.run()
+    # get the data for that stream
+    stream_data_dict = stream_access.get_stream_data()
+    return render_template('stream.html',
+                           app_info=app_info,
+                           game_name=return_name_dict(name=game_url_name),
+                           streamer_name=streamer_name,
+                           stream_data=stream_data_dict)
+
+
 if __name__ == '__main__':
     handler = RotatingFileHandler('application.log', maxBytes=100000, backupCount=1)
     handler.setLevel(logging.INFO)
