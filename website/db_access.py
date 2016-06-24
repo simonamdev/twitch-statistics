@@ -256,13 +256,13 @@ class StreamData:
         stream_overview_row = self.db.get_specific_rows(
             table='streams',
             filter_string='id IS {}'.format(self.stream_id + 1))  # the db index is also not zero indexed... an oversight I know
-        stream_raw_rows = self.db.get_all_rows(table='stream_{}'.format(self.stream_id))
-        print(stream_overview_row)
-        print(stream_raw_rows)
+        # stream_raw_rows = self.db.get_all_rows(table='stream_{}'.format(self.stream_id))
         stream_dict = {
-            'overview': {
-
-            },
-            'raw_data': []
+            'id': self.stream_id + 1,
+            'time_start': stream_overview_row[0][1],
+            'duration': stream_overview_row[0][2],
+            'viewers_average': stream_overview_row[0][3],
+            'viewers_peak': stream_overview_row[0][4],
+            'follower_delta': stream_overview_row[0][5]
         }
         return stream_dict
