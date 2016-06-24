@@ -1,4 +1,5 @@
 cfg.py
 .idea/
 website/data
+website/application.log
 __pycache__
