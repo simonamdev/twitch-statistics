@@ -213,7 +213,7 @@ class StreamsDataPagination:
         # get an ordered list of stream overviews
         ordered_data = self.db.get_specific_rows(
                 table='streams',
-                filter_string='id IS NOT NULL ORDER BY id DESC')
+                filter_string='id IS NOT NULL ORDER BY timestamp DESC')
         self.data_list_length = len(ordered_data)
         page_data = ordered_data[page_indices['lower']:page_indices['upper']]
         # map that data to dictionaries
