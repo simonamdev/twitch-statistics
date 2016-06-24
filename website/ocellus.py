@@ -198,6 +198,11 @@ def stream(streamer_name, game_url_name, stream_id=1):
                            stream_data=stream_data_dict)
 
 
+@app.route('/api/v1/raw_stream_data/<streamer_name>/<game_short_name>/<stream_id>')
+def api_raw_stream_data(streamer_name, game_short_name, stream_id):
+    pass
+
+
 if __name__ == '__main__':
     handler = RotatingFileHandler('application.log', maxBytes=100000, backupCount=1)
     handler.setLevel(logging.INFO)
