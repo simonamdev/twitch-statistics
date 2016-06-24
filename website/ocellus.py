@@ -162,10 +162,11 @@ def streams(streamer_name, game_url_name, page_number=1):
         'per_page': 10,
         'total': streams_access.get_page_count()
     }
-    return render_template('streamer_list.html',
+    return render_template('streams.html',
                            app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
-                           streamer_overviews=streams_overviews_dicts,
+                           streamer_name=streamer_name,
+                           streams_overviews=streams_overviews_dicts,
                            page_data=page_data)
 
 
