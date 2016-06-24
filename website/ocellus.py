@@ -131,12 +131,34 @@ def streamer(streamer_name):
                            streamer=streamer_dict)
 
 
-@app.route('/streamer/<streamer_name>/<game_name>/streams')
-def streams(streamer_name, game_name):
-    return render_template('streams.html',
-                           streamer_name=streamer_name,
-                           game_name=game_name,
-                           app_info=app_info)
+@app.route('/streamer/<streamer_name>/<game_url_name>/streams/')
+@app.route('/streamer/<streamer_name>/<game_url_name>/streams/<page_number>')
+def streams(streamer_name, game_url_name, page_number=1):
+    # id the page number requested is less than 1, then return 1
+    if page_number < 1:
+        page_number = 1
+    # get access to the database through an object which will take care of pagination
+    streams_access = db_access.StreamsDataPagination(
+        game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
+        streamer_name=streamer_name,
+        per_page=10)
+    streams_access.run()
+    # get the streams data for that page
+    streams_overviews_dicts = enumerate(streams_access.get_page(page_number))
+    # if the page number requested is greater than the last page number, then return the last page
+    if page_number > streams_access.get_page_count():
+        page_number = streams_access.get_page_count()
+    # put the page data in a dictionary
+    page_data = {
+        'current': page_number,
+        'per_page': 10,
+        'total': streams_access.get_page_count()
+    }
+    return render_template('streamer_list.html',
+                           app_info=app_info,
+                           game_name=return_name_dict(name=game_url_name),
+                           streamer_overviews=streams_overviews_dicts,
+                           page_data=page_data)
 
 
 if __name__ == '__main__':
