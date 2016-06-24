@@ -74,6 +74,10 @@ def streamers():
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
 def streamers_list(game_url_name, page_number=1):
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
@@ -134,6 +138,10 @@ def streamer(streamer_name):
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/')
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/<page_number>')
 def streams(streamer_name, game_url_name, page_number=1):
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
