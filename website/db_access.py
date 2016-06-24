@@ -181,3 +181,59 @@ class DetermineIfStreamed:
             db_path = os.path.join(os.getcwd(), 'data', game['short'], 'streamers', '{}.db'.format(self.streamer_name))
             game_exists_dict[game['short']] = True if os.path.isfile(db_path) else False
         return game_exists_dict
+
+
+class StreamsDataPagination:
+    def __init__(self, game_name, streamer_name, per_page=10):
+        self.game_name = game_name
+        self.streamer_name = streamer_name
+        self.page = 1
+        self.per_page = per_page
+        self.data_list_length = 0
+        self.db = None
+
+    def run(self):
+        # Open a DB connection
+        db_path = os.path.join(os.getcwd(), 'data', self.game_name, 'streamers', '{}.db'.format(self.streamer_name))
+        self.db = Pysqlite(database_name='{} {} DB'.format(self.game_name, self.streamer_name), database_file=db_path)
+
+    def get_page(self, page_number):
+        # figure out which indices relate to that page
+        # page_number is NOT zero indexed, so we subtract 1 to make it zero indexed
+        # lower bound: (page_number - 1) * self.per_page
+        # upper bound: (page_number - 1) * self.per_page + (self.per_page - 1)
+        # EXAMPLE:
+        # I want page 2 (which is actually page 1, since -1) and I show 10 per page. Page 1's bounds are 10 -> 19, thus:
+        # (2 - 1) * 10 = 10 for the lower bound
+        # (2 - 1) * 10 + (10 - 1) = 10 + 9 = 19 for the upper bound
+        page_indices = {
+            'lower': (page_number - 1) * self.per_page,
+            'upper': (page_number - 1) * self.per_page + (self.per_page - 1)
+        }
+        # get an ordered list of stream overviews
+        ordered_data = self.db.get_specific_rows(
+                table='streams',
+                filter_string='id IS NOT NULL ORDER BY id DESC')
+        self.data_list_length = len(ordered_data)
+        page_data = ordered_data[page_indices['lower']:page_indices['upper']]
+        # map that data to dictionaries
+        stream_dicts = [
+            {
+                'id': stream[0],
+                'start_time': stream[1],
+                'duration': convert_to_hours(stream[2]),
+                'viewers_average': stream[3],
+                'viewers_peak': stream[4],
+                'follower_delta': stream[5],
+            } for stream in page_data
+        ]
+        return stream_dicts
+
+    def get_page_count(self):
+        return int(ceil(self.data_list_length / float(self.per_page)))
+
+    def has_previous_page(self):
+        return self.page > 1
+
+    def has_next_page(self):
+        return self.page < self.get_page_count()
