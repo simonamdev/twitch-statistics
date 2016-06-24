@@ -40,7 +40,7 @@
                         <td>{{ data.viewers_peak }}</td>
                         <td>{{ data.follower_delta }}</td>
                         <td>
-                            <a href="{{ url_for('streamer', streamer_name=data.name) }}">
+                            <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=data.id) }}">
                                 <i class="material-icons mdl-list__item-icon">info</i>
                             </a>
                         </td>
