@@ -47,15 +47,19 @@
     {% set next_stream_id = stream_data.id + 1 %}
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--12-col center-text">
-            <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=prev_stream_id) }}" style="margin-right: 50px;">
-                <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_left</i>
-            </a>
+            {% if prev_stream_id > 1 %}
+                <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=prev_stream_id) }}" style="margin-right: 50px;">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_left</i>
+                </a>
+            {% endif %}
             <a href="{{ url_for('streams', streamer_name=streamer_name, game_url_name=game_name.url) }}">
                 <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">list</i>
             </a>
-            <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=next_stream_id) }}" style="margin-left: 50px;">
-                <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_right</i>
-            </a>
+            {% if next_stream_id <= stream_data.max_id %}
+                <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=next_stream_id) }}" style="margin-left: 50px;">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_right</i>
+                </a>
+            {% endif %}
         </div>
     </div>
     <script type="text/javascript" src="{{ url_for('static', filename='visualise_viewers.js') }}"></script>

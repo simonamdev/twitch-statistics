@@ -245,12 +245,15 @@ class StreamData:
         self.streamer_name = streamer_name
         self.game_name = game_name
         self.stream_id = int(stream_id) - 1  # Backend is zero indexed, frontend is not
+        self.max_stream_id = 0
         self.db = None
 
     def run(self):
         # Open a DB connection
         db_path = os.path.join(os.getcwd(), 'data', self.game_name, 'streamers', '{}.db'.format(self.streamer_name))
         self.db = Pysqlite(database_name='{} {} DB'.format(self.game_name, self.streamer_name), database_file=db_path)
+        # set the max stream id
+        self.max_stream_id = len(self.db.get_table_names()) - 3
 
     def get_stream_data(self):
         stream_overview_row = self.db.get_specific_rows(
@@ -258,6 +261,7 @@ class StreamData:
             filter_string='id IS {}'.format(self.stream_id + 1))  # the db index is also not zero indexed... an oversight I know
         stream_dict = {
             'id': self.stream_id + 1,
+            'max_id': self.max_stream_id,
             'time_start': stream_overview_row[0][1],
             'duration': convert_to_hours(stream_overview_row[0][2]),
             'viewers_average': stream_overview_row[0][3],
