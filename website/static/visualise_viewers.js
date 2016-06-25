@@ -17,31 +17,32 @@ var OCELLUS_VISUALISE = OCELLUS_VISUALISE || (function(){
             $.ajax({
 						    url: "/api/v1/raw_stream_data/" + _args[0] + "/" + _args[1] + "/" + _args[2],
 						    success: function(data){
-						        console.log(data);
+						        console.log("Received data");
+						        // Get a container to show the visualisation in
+				            var container = document.getElementById("visualisation-viewers");
+                    console.log("Created container");
+				            jsonData = JSON.parse(data);
+				            console.log("Parsing data");
+										// Create a new dataset with the received data
+										var dataset = new vis.DataSet(jsonData);
+										console.log("Created dataset");
+										// Set some options
+										console.log("Setting options");
+										var options = {
+												drawPoints: false,
+												dataAxis: {
+														'left': {
+																'title': {
+																		'text': 'Viewers'
+																}
+														}
+												}
+										}
+										console.log("Displaying graph");
+										// Create the graph and display it
+										var graph2d = new vis.Graph2d(container, dataset, options);
 						    }
 						});
-            // Get a container to show the visualisation in
-            var container = document.getElementById('visualisation-viewers');
-
-
         }
     };
 }());
-/*
-var container = document.getElementById('visualisation-viewers');
-var items = [
-    {x: '2014-06-11', y: 10},
-    {x: '2014-06-12', y: 25},
-    {x: '2014-06-13', y: 30},
-    {x: '2014-06-14', y: 10},
-    {x: '2014-06-15', y: 15},
-    {x: '2014-06-16', y: 30}
-];
-
-var dataset = new vis.DataSet(items);
-var options = {
-    start: '2014-06-10',
-    end: '2014-06-18'
-};
-var graph2d = new vis.Graph2d(container, dataset, options);
-*/
