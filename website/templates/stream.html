@@ -29,6 +29,7 @@
         <div class="mdl-cell mdl-cell--3-col data-text">
             <h2>Time start: {{ stream_data.time_start }}</h2>
             <h2>Duration: {{ stream_data.duration }} hours</h2>
+            <h2>Follower delta: {{ stream_data.follower_delta }}</h2>
         </div>
         <div class="mdl-cell mdl-cell--3-col data-text" style="text-align: right;">
             <h2>Average Viewers: {{ stream_data.viewers_average }}</h2>
@@ -40,13 +41,6 @@
         <div class="mdl-cell mdl-cell--3-col"></div>
         <div class="mdl-cell mdl-cell--6-col visualisation" id="visualisation-viewers"></div>
         <div class="mdl-cell mdl-cell--3-col"></div>
-    </div>
-        <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
-        <div class="mdl-cell mdl-cell--4-col data-text">
-            <h2>Follower delta: {{ stream_data.follower_delta }}</h2>
-        </div>
-        <div class="mdl-cell mdl-cell--5-col center-text"></div>
     </div>
     <script type="text/javascript" src="{{ url_for('static', filename='visualise_viewers.js') }}"></script>
     <script type="text/javascript">
