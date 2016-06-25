@@ -271,5 +271,6 @@ class StreamData:
         return raw_stream_data
 
     def get_stream_viewer_data_json(self):
+        # Timestamp in the X axis, viewer count in the Y axis
         data = [{'x': row[1], 'y': row[2]} for row in self.get_stream_raw_data()]
         return json.dumps(data)
