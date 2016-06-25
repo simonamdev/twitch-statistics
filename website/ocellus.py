@@ -43,25 +43,32 @@ def return_name_dict(name):
             return name_dict
 
 
+# Inject the application info into each template
+@app.context_processor
+def inject_app_info():
+    return dict(ocellus_debug=app_info['debug'], ocellus_version=app_info['version'])
+
+
 # Error handler route
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html', error_code=404), 404
 
+
 # Front facing routes
 @app.route('/')
 def index():
-    return render_template('index.html', app_info=app_info)
+    return render_template('index.html')
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html', app_info=app_info)
+    return render_template('about.html')
 
 
 @app.route('/games')
 def games():
-    return render_template('games.html', app_info=app_info, games=game_names)
+    return render_template('games.html', games=game_names)
 
 
 @app.route('/game/<game_name>')
@@ -76,7 +83,7 @@ def game(game_name):
 
 @app.route('/streamers')
 def streamers():
-    return render_template('streamers.html', app_info=app_info, games=game_names)
+    return render_template('streamers.html', games=game_names)
 
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
