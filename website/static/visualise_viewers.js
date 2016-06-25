@@ -10,6 +10,20 @@ var OCELLUS_VISUALISE = OCELLUS_VISUALISE || (function(){
         },
         displayArguments : function() {
             alert('Streamer Name: ' + _args[0] + '\nGame shorthand name: ' + _args[1] + '\nStream ID: ' + _args[2]);
+        },
+        visualiseViewers: function() {
+            console.log("Visualising viewers for " + _args[0] + "'s " + _args[1] + " #" + _args[2] + " stream.");
+            // Make an AJAX call to get the data
+            $.ajax({
+						    url: "/api/v1/raw_stream_data/" + _args[0] + "/" + _args[1] + "/" + _args[2],
+						    success: function(data){
+						        console.log(data);
+						    }
+						});
+            // Get a container to show the visualisation in
+            var container = document.getElementById('visualisation-viewers');
+
+
         }
     };
 }());

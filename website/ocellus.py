@@ -200,7 +200,7 @@ def stream(streamer_name, game_url_name, stream_id=1):
 
 @app.route('/api/v1/raw_stream_data/<streamer_name>/<game_short_name>/<stream_id>')
 def api_raw_stream_data(streamer_name, game_short_name, stream_id):
-    pass
+    return 'Data requested for: {} {} {}'.format(streamer_name, game_short_name, stream_id)
 
 
 if __name__ == '__main__':
