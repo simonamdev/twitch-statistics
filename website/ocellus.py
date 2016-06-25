@@ -45,9 +45,14 @@ def return_name_dict(name):
             return name_dict
 
 
-def log_page_visit(route_name='', parameters='none'):
-    app.logger.info('{}|{}|{}|{}'.format(
+def log_page_visit(route_name='', parameters='none', start_time=0):
+    if not start_time == 0:
+        time_delta = time.time() - start_time
+    else:
+        time_delta = 0
+    app.logger.info('{}|{}|{}|{}|{}'.format(
         int(time.time()),
+        time_delta,
         request.environ['REMOTE_ADDR'],
         route_name,
         parameters
@@ -88,9 +93,10 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
-    log_page_visit('game', game_name)
+    access_time = time.time()
     name_dict = return_name_dict(name=game_name)
     global_game_data = db_access.GameGlobalData(game_url_name=name_dict['url'])
+    log_page_visit('game', game_name, start_time=access_time)
     return render_template('game.html',
                            app_info=app_info,
                            game_name=name_dict,
@@ -105,11 +111,11 @@ def streamers():
 
 @app.route('/streamers/<game_url_name>/<int:page_number>')
 def streamers_list(game_url_name, page_number=1):
+    access_time = time.time()
     try:
         page_number = int(page_number)
     except ValueError:
         page_number = 1
-    log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number))
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
@@ -134,6 +140,7 @@ def streamers_list(game_url_name, page_number=1):
         'per_page': 10,
         'total': overview_access.get_page_count()
     }
+    log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number), start_time=access_time)
     return render_template('streamer_list.html',
                            app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
@@ -151,7 +158,7 @@ def streamer_no_name():
 
 @app.route('/streamer/<streamer_name>')
 def streamer(streamer_name):
-    log_page_visit('streamer', streamer_name)
+    access_time = time.time()
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
     streamer_dict = {
         'name': streamer_name,
@@ -162,7 +169,7 @@ def streamer(streamer_name):
     streamer_global_db.run()
     # update the streamer dict with the overviews for each game
     streamer_dict['overviews'] = streamer_global_db.get_all_overviews()
-    print(game_names)
+    log_page_visit('streamer', streamer_name, start_time=access_time)
     return render_template('streamer.html',
                            app_info=app_info,
                            game_names=game_names_dict,
@@ -172,11 +179,11 @@ def streamer(streamer_name):
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/')
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/<page_number>')
 def streams(streamer_name, game_url_name, page_number=1):
+    access_time = time.time()
     try:
         page_number = int(page_number)
     except ValueError:
         page_number = 1
-    log_page_visit('streams', '{},{},{}'.format(streamer_name, game_url_name, page_number))
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
@@ -197,6 +204,7 @@ def streams(streamer_name, game_url_name, page_number=1):
         'per_page': 10,
         'total': streams_access.get_page_count()
     }
+    log_page_visit('streams', '{},{},{}'.format(streamer_name, game_url_name, page_number), start_time=access_time)
     return render_template('streams.html',
                            app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
@@ -208,7 +216,7 @@ def streams(streamer_name, game_url_name, page_number=1):
 @app.route('/streamer/<streamer_name>/<game_url_name>/stream/')
 @app.route('/streamer/<streamer_name>/<game_url_name>/stream/<stream_id>')
 def stream(streamer_name, game_url_name, stream_id=1):
-    log_page_visit('stream', '{},{},{}'.format(streamer_name, game_url_name, stream_id))
+    access_time = time.time()
     try:
         stream_id = int(stream_id)
     except ValueError:
@@ -221,6 +229,7 @@ def stream(streamer_name, game_url_name, stream_id=1):
     stream_access.run()
     # get the data for that stream
     stream_data_dict = stream_access.get_stream_data()
+    log_page_visit('stream', '{},{},{}'.format(streamer_name, game_url_name, stream_id), start_time=access_time)
     return render_template('stream.html',
                            app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
@@ -230,10 +239,12 @@ def stream(streamer_name, game_url_name, stream_id=1):
 
 @app.route('/api/v1/raw_stream_data/<streamer_name>/<game_short_name>/<stream_id>')
 def api_raw_stream_data(streamer_name, game_short_name, stream_id):
-    log_page_visit('stream_api', '{},{},{}'.format(streamer_name, game_short_name, stream_id))
+    access_time = time.time()
     stream_db_access = db_access.StreamData(streamer_name=streamer_name, game_name=game_short_name, stream_id=stream_id)
     stream_db_access.run()
-    return stream_db_access.get_stream_viewer_data_json()
+    data = stream_db_access.get_stream_viewer_data_json()
+    log_page_visit('stream_api', '{},{},{}'.format(streamer_name, game_short_name, stream_id), start_time=access_time)
+    return data
 
 
 if __name__ == '__main__':
