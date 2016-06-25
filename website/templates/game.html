@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block css %}
-    {% if app_info.debug %}
+    {% if ocellus_debug %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
