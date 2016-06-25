@@ -1,8 +1,10 @@
 import db_access
 import logging
+import time
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect
 from minify import minify as minify_css
+from time import time as current_time_epoch
 
 app = Flask(__name__)
 
@@ -43,6 +45,15 @@ def return_name_dict(name):
             return name_dict
 
 
+def log_page_visit(route_name='', parameters='none'):
+    app.logger.info('{}|{}|{}|{}'.format(
+        int(time.time()),
+        request.environ['REMOTE_ADDR'],
+        route_name,
+        parameters
+    ))
+
+
 # Inject the application info into each template
 @app.context_processor
 def inject_app_info():
@@ -52,27 +63,32 @@ def inject_app_info():
 # Error handler route
 @app.errorhandler(404)
 def page_not_found(e):
+    log_page_visit('error', '404')
     return render_template('error.html', error_code=404), 404
 
 
 # Front facing routes
 @app.route('/')
 def index():
+    log_page_visit('index')
     return render_template('index.html')
 
 
 @app.route('/about')
 def about():
+    log_page_visit('about')
     return render_template('about.html')
 
 
 @app.route('/games')
 def games():
+    log_page_visit('games')
     return render_template('games.html', games=game_names)
 
 
 @app.route('/game/<game_name>')
 def game(game_name):
+    log_page_visit('game', game_name)
     name_dict = return_name_dict(name=game_name)
     global_game_data = db_access.GameGlobalData(game_url_name=name_dict['url'])
     return render_template('game.html',
@@ -83,6 +99,7 @@ def game(game_name):
 
 @app.route('/streamers')
 def streamers():
+    log_page_visit('streamers')
     return render_template('streamers.html', games=game_names)
 
 
@@ -92,6 +109,7 @@ def streamers_list(game_url_name, page_number=1):
         page_number = int(page_number)
     except ValueError:
         page_number = 1
+    log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number))
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
@@ -133,10 +151,7 @@ def streamer_no_name():
 
 @app.route('/streamer/<streamer_name>')
 def streamer(streamer_name):
-    app.logger.info('User with IP Address {} accessed streamer page for: {}'.format(
-        request.environ['REMOTE_ADDR'],
-        streamer_name
-    ))
+    log_page_visit('streamer', streamer_name)
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
     streamer_dict = {
         'name': streamer_name,
@@ -161,6 +176,7 @@ def streams(streamer_name, game_url_name, page_number=1):
         page_number = int(page_number)
     except ValueError:
         page_number = 1
+    log_page_visit('streams', '{},{},{}'.format(streamer_name, game_url_name, page_number))
     # id the page number requested is less than 1, then return 1
     if page_number < 1:
         page_number = 1
@@ -192,6 +208,7 @@ def streams(streamer_name, game_url_name, page_number=1):
 @app.route('/streamer/<streamer_name>/<game_url_name>/stream/')
 @app.route('/streamer/<streamer_name>/<game_url_name>/stream/<stream_id>')
 def stream(streamer_name, game_url_name, stream_id=1):
+    log_page_visit('stream', '{},{},{}'.format(streamer_name, game_url_name, stream_id))
     try:
         stream_id = int(stream_id)
     except ValueError:
@@ -213,6 +230,7 @@ def stream(streamer_name, game_url_name, stream_id=1):
 
 @app.route('/api/v1/raw_stream_data/<streamer_name>/<game_short_name>/<stream_id>')
 def api_raw_stream_data(streamer_name, game_short_name, stream_id):
+    log_page_visit('stream_api', '{},{},{}'.format(streamer_name, game_short_name, stream_id))
     stream_db_access = db_access.StreamData(streamer_name=streamer_name, game_name=game_short_name, stream_id=stream_id)
     stream_db_access.run()
     return stream_db_access.get_stream_viewer_data_json()
