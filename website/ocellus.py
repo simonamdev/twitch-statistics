@@ -30,6 +30,7 @@ game_names_dict = {
 }
 
 
+# Required methods to deal with the game names
 def convert_name(given_type, given_name, return_type):
     for name in game_names:
         if name[given_type] == given_name:
@@ -42,6 +43,12 @@ def return_name_dict(name):
             return name_dict
 
 
+# Error handler route
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html', error_code=404), 404
+
+# Front facing routes
 @app.route('/')
 def index():
     return render_template('index.html', app_info=app_info)

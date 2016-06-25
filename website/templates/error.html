@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>{{ error_code }} Error</h1>
+        </div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--4-col"></div>
+        <div class="mdl-cell mdl-cell--4-col">
+            <h4 class="center-text">Oops! Something went wrong!</h4>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col"></div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <p class="para-text justify-text">
+                It appears that something went wrong and an error occurred. This occurrence has been logged
+                and will be used to improve the Ocellus project in future. In the mean time, you can press
+                the "back" button on your browser to return to the last page you were on, or you going go
+                to the index page by clicking <a href="{{ url_for('index') }}">here</a>.
+            </p>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+{% endblock %}
