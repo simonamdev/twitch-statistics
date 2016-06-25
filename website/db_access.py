@@ -1,4 +1,5 @@
 import os
+import json
 from math import ceil
 from neopysqlite.neopysqlite import Pysqlite
 from ocellus import convert_name, return_name_dict, game_names
@@ -269,3 +270,7 @@ class StreamData:
     def get_stream_raw_data(self):
         raw_stream_data = self.db.get_all_rows(table='stream_{}'.format(self.stream_id))
         return raw_stream_data
+
+    def get_stream_viewer_data_json(self):
+        data = [(row[1], row[2]) for row in self.get_stream_raw_data()]
+        return json.dumps(data)

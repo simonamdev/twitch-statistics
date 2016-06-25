@@ -202,7 +202,7 @@ def stream(streamer_name, game_url_name, stream_id=1):
 def api_raw_stream_data(streamer_name, game_short_name, stream_id):
     stream_db_access = db_access.StreamData(streamer_name=streamer_name, game_name=game_short_name, stream_id=stream_id)
     stream_db_access.run()
-    return str(stream_db_access.get_stream_raw_data())
+    return stream_db_access.get_stream_viewer_data_json()
 
 
 if __name__ == '__main__':
