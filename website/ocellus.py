@@ -183,7 +183,6 @@ def stream(streamer_name, game_url_name, stream_id=1):
     except ValueError:
         stream_id = 1
     # get the stream data from the database
-
     stream_access = db_access.StreamData(
         game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
         streamer_name=streamer_name,
