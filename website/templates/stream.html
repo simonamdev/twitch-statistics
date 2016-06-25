@@ -12,8 +12,10 @@
 {% block js %}
     {% if app_info.debug %}
         <script src="{{ url_for('static', filename='vis.js') }}"></script>
+        <script   src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
     {% else %}
         <script src="{{ url_for('static', filename='vis.min.js') }}"></script>
+        <script   src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -41,6 +43,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='visualise_viewers.js') }}"></script>
     <script type="text/javascript">
         OCELLUS_VISUALISE.init(["{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}"]);
-        OCELLUS_VISUALISE.displayArguments();
+        OCELLUS_VISUALISE.visualiseViewers();
     </script>
 {% endblock %}
