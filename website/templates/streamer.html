@@ -23,10 +23,18 @@
         <div class="mdl-cell mdl-cell--6-col">
             <h1>
                 Partnered:
-                {% if streamer.overviews['ED'].partnership == 1 %}
-                    <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                {% if streamer.ED %}
+                    {% if streamer.overviews['ED'].partnership == 1 %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                    {% else %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
+                    {% endif %}
                 {% else %}
-                    <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
+                    {% if streamer.overviews['PC'].partnership == 1 %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                    {% else %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
+                    {% endif %}
                 {% endif %}
             </h1>
         </div>
