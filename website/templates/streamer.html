@@ -13,7 +13,7 @@
         <h1 class="game-title center-text">{{ streamer.name }}</h1>
     </div>
     <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
         <div class="mdl-cell mdl-cell--6-col">
             <h1>
                 Partnered:
@@ -32,7 +32,7 @@
                 {% endif %}
             </h1>
         </div>
-        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     {% if streamer.ED %}
         <div class="mdl-grid light-row">
@@ -41,14 +41,14 @@
             </div>
         </div>
         <div class="mdl-grid light-row">
-            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--3-col"></div>
             <div class="mdl-cell mdl-cell--4-col data-text">
                 <h2>Average Viewers: {{ streamer.overviews['ED'].viewers_average }}</h2>
                 <h2>Peak Viewers: {{ streamer.overviews['ED'].viewers_peak }}</h2>
                 <h2>Average Duration: {{ streamer.overviews['ED'].duration_average }} hours</h2>
                 <h2>Total Duration: {{ streamer.overviews['ED'].duration_total }} hours</h2>
             </div>
-            <div class="mdl-cell mdl-cell--5-col center-text"></div>
+            <div class="mdl-cell mdl-cell--5-col"></div>
         </div>
         <div class="mdl-grid light-row">
             <div class="mdl-cell mdl-cell--12-col">
@@ -68,21 +68,20 @@
     {% endif %}
     {% if streamer.PC %}
         <div class="mdl-grid dark-row">
-            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--3-col"></div>
             <div class="mdl-cell mdl-cell--9-col data-text">
                 <h1>{{ streamer.name }} overall {{ streamer.overviews['PC'].game_full }} statistics</h1>
             </div>
         </div>
         <div class="mdl-grid dark-row">
-            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--3-col"></div>
             <div class="mdl-cell mdl-cell--4-col data-text">
                 <h2>Average Viewers: {{ streamer.overviews['PC'].viewers_average }}</h2>
                 <h2>Peak Viewers: {{ streamer.overviews['PC'].viewers_peak }}</h2>
                 <h2>Average Duration: {{ streamer.overviews['PC'].duration_average }} hours</h2>
                 <h2>Total Duration: {{ streamer.overviews['PC'].duration_total }} hours</h2>
             </div>
-            <div class="mdl-cell mdl-cell--2-col center-text"></div>
-            <div class="mdl-cell mdl-cell--3-col center-text"></div>
+            <div class="mdl-cell mdl-cell--5-col"></div>
         </div>
         <div class="mdl-grid dark-row">
             <div class="mdl-cell mdl-cell--12-col">
