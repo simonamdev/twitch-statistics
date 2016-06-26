@@ -8,15 +8,15 @@
 .cover-image {
 	position: relative;
   background-size: cover;
-  height: 1024px;
+  height: 100%;
 }
 
 #elitedangerous-title {
-  background: url('../static/images/elitedangerous-cover.jpg') center top no-repeat;
+  background: url('../static/images/elitedangerous-cover.jpg') center no-repeat;
 }
 
 #planetcoaster-title {
-	background: url('../static/images/planetcoaster-cover.jpg') center top no-repeat;
+	background: url('../static/images/planetcoaster-cover.jpg') center no-repeat;
 }
 
 .tier-text {
