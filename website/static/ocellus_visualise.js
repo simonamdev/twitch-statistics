@@ -27,40 +27,44 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 				            jsonData = JSON.parse(data);
 				            var timeStamps = [];
 				            var dataPoints = [];
+
+										console.log("Parsing data");
 				            jsonData.forEach(function(point) {
-				                timeStamps.push(String(point['x']));
-				                dataPoints.push(parseInt(point['y']));
+				                timeStamps.push(String(point['time']));
+				                dataPoints.push(parseInt(point['viewers']));
 				            });
 
+										console.log("Forming chart data");
 	                  var lineChartData = {
 	                      labels: timeStamps,
 	                      datasets: [
 	                          {
-	                              strokeColor: "rgba(220,220,220,1)",
+	                              label: "Viewers",
+	                              borderColor: "rgba(0,0,255,1)",
+	                              strokeColor: "rgba(0,0,255,1)",
+	                              lineTension: 0.1,
+	                              pointRadius: 0,
+	                              borderWidth: 3,
+	                              fill: false,
 	                              data: dataPoints
 	                          }
 	                      ]
 	                  }
 
+										console.log("Drawing chart");
 										var ctx = document.getElementById("visualisation-viewers").getContext("2d");
 										var myLineChart = new Chart(ctx, {
 												type: 'line',
-												data: lineChartData
+												data: lineChartData,
+												options: {
+														height: '100%',
+														responsive: true,
+														title: {
+																display: true,
+																text: "Viewers over time"
+														}
+												}
 										});
-/*
-						        var myChart = new Chart(ctx, {
-						            type: 'line',
-						            //data: data,
-						            options: {
-						                scales: {
-						                    xAxes: [{
-						                        type: 'linear',
-						                        position: 'bottom'
-						                    }]
-						                }
-						            }
-						        });
-						        */
 						    }
 						});
         },
