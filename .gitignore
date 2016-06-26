@@ -1,1 +1,4 @@
 cfg.py
+data/
+.idea/
+website/__pycache__
