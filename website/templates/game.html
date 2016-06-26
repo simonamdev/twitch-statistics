@@ -11,14 +11,17 @@
         <h1 class="game-title center-text">{{ game_name.full }}</h1>
     </div>
     <div class="mdl-grid dark-row">
-        <!-- Content -->
-        <div class="mdl-cell mdl-cell--12-col center-text">
-            <h1>Total number of streamser: {{ game_data.streamer_count }}</h1>
-            <h1>Total number of streams: {{ game_data.stream_count }}</h1>
-            <h1>Total time streamed by all streamers: {{ game_data.stream_duration_total }} hours</h1>
-            <h1>Average stream duration: {{ game_data.stream_duration_average }} hours</h1>
-            <h1>Longest stream duration: {{ game_data.stream_duration_max }} hours</h1>
-            <h1>Last updated on: {{ game_data.last_updated }}</h1>
+        <div class="mdl-cell mdl-cell--1-col center-text"></div>
+        <div class="mdl-cell mdl-cell--5-col data-text">
+            <h2>Streamer count: {{ game_data.streamer_count }} unique streamers</h2>
+            <h2>Stream count: {{ game_data.stream_count }} unique streams</h2>
+            <h2>Total time streamed by all streamers: {{ game_data.stream_duration_total }} hours</h2>
         </div>
+        <div class="mdl-cell mdl-cell--5-col data-text" style="text-align: right;">
+            <h2>Average stream duration: {{ game_data.stream_duration_average }} hours</h2>
+            <h2>Longest stream duration: {{ game_data.stream_duration_max }} hours</h2>
+            <h2>Last updated on: {{ game_data.last_updated }}</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--1-col center-text"></div>
     </div>
 {% endblock %}
