@@ -179,6 +179,14 @@ def streamer(streamer_name):
                            streamer=streamer_dict)
 
 
+@app.route('/api/v1/streamer/<streamer_name>/<game_short_name>')
+def api_streamer_data(streamer_name, game_short_name):
+    # first check which games the streamer has streamed
+    games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
+
+    return ''
+
+
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/')
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/<page_number>')
 def streams(streamer_name, game_url_name, page_number=1):
