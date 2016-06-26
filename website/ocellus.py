@@ -181,9 +181,11 @@ def streamer(streamer_name):
 
 @app.route('/api/v1/streamer/<streamer_name>/<game_short_name>')
 def api_streamer_data(streamer_name, game_short_name):
+    access_time = time.time()
     # first check which games the streamer has streamed
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
 
+    log_page_visit('streamer_api', '{}_{}'.format(streamer_name, game_short_name), start_time=access_time)
     return ''
 
 
