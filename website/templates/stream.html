@@ -25,6 +25,11 @@
         </div>
     </div>
     <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col visualisation" id="visualisation-viewers"></div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+    <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--3-col center-text"></div>
         <div class="mdl-cell mdl-cell--3-col data-text">
             <h2>Time start: {{ stream_data.time_start }}</h2>
@@ -37,11 +42,7 @@
         </div>
         <div class="mdl-cell mdl-cell--3-col center-text"></div>
     </div>
-    <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col visualisation" id="visualisation-viewers"></div>
-        <div class="mdl-cell mdl-cell--3-col"></div>
-    </div>
+
     <!-- Navigation Part -->
     {% set prev_stream_id = stream_data.id - 1 %}
     {% set next_stream_id = stream_data.id + 1 %}
