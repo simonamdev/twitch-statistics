@@ -128,7 +128,6 @@ class GameGlobalData:
 class StreamerGlobalData:
     def __init__(self, streamer_name):
         self.streamer_name = streamer_name
-        self.stream_count = 0
         self.db_connection_dict = dict()
 
     def run(self):
@@ -151,14 +150,19 @@ class StreamerGlobalData:
         latest_overview = db_con.get_specific_rows(table='overview', filter_string='id = (SELECT MAX(id) FROM overview)')
         return latest_overview
 
+    def get_stream_count(self, game_short_name):
+        db_con = self.db_connection_dict[game_short_name]
+        return len(db_con.get_table_names()) - 3
+
     def get_all_overviews(self):
         overviews_dict = dict()
         for game in game_names:
             # if the streamer has never streamed that game, skip it
             if game['short'] not in list(self.db_connection_dict.keys()):
                 continue
-            overview = list(self.get_overview(game['short'])[0])
+            overview = list(self.get_overview(game_short_name=game['short'])[0])
             overviews_dict[game['short']] = {
+                'stream_count': self.get_stream_count(game_short_name=game['short']),
                 'game_short': game['short'],
                 'game_full': game['full'],
                 'last_update': overview[1],
