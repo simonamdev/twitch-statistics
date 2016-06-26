@@ -22,13 +22,7 @@
             <h1>{{ streamer_name }}'s {{ game_name.full }} stream ID #{{ stream_data.id }}</h1>
         </div>
     </div>
-    <div class="mdl-grid light-row">
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col visualisation">
-            <canvas id="visualisation-viewers" width="400" height="400"></canvas>
-        </div>
-        <div class="mdl-cell mdl-cell--3-col"></div>
-    </div>
+
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--3-col center-text"></div>
         <div class="mdl-cell mdl-cell--3-col data-text">
@@ -41,6 +35,13 @@
             <h2>Peak Viewers: {{ stream_data.viewers_peak }}</h2>
         </div>
         <div class="mdl-cell mdl-cell--3-col center-text"></div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col visualisation">
+            <canvas id="visualisation-viewers" width="400" height="200"></canvas>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     <!-- Navigation Part -->
     {% set prev_stream_id = stream_data.id - 1 %}
