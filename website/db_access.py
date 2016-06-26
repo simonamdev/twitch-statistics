@@ -145,7 +145,7 @@ class StreamerGlobalData:
                                                             database_name='Streamer {} DB'.format(self.streamer_name),
                                                             database_file=db_path)
 
-    def get_overview(self, game_short_name):
+    def get_last_overview(self, game_short_name):
         db_con = self.db_connection_dict[game_short_name]
         latest_overview = db_con.get_specific_rows(table='overview', filter_string='id = (SELECT MAX(id) FROM overview)')
         return latest_overview
@@ -154,13 +154,23 @@ class StreamerGlobalData:
         db_con = self.db_connection_dict[game_short_name]
         return len(db_con.get_table_names()) - 3
 
+    def get_follower_counts(self, game_short_name):
+        db_con = self.db_connection_dict[game_short_name]
+        overview_rows = db_con.get_all_rows(table='overview')
+        return [
+            {
+                'update_time': overview[1],
+                'followers': overview[5]
+            } for overview in overview_rows
+        ]
+
     def get_all_overviews(self):
         overviews_dict = dict()
         for game in game_names:
             # if the streamer has never streamed that game, skip it
             if game['short'] not in list(self.db_connection_dict.keys()):
                 continue
-            overview = list(self.get_overview(game_short_name=game['short'])[0])
+            overview = list(self.get_last_overview(game_short_name=game['short'])[0])
             overviews_dict[game['short']] = {
                 'stream_count': self.get_stream_count(game_short_name=game['short']),
                 'game_short': game['short'],
@@ -233,6 +243,31 @@ class StreamsDataPagination:
             } for stream in page_data
         ]
         return stream_dicts
+
+    def get_all_streams_dicts(self):
+        ordered_data = self.db.get_specific_rows(
+            table='streams',
+            filter_string='id IS NOT NULL ORDER BY timestamp DESC')
+        stream_dicts = [
+            {
+                'id': stream[0],
+                'start_time': stream[1],
+                'duration': convert_to_hours(stream[2]),
+                'viewers_average': stream[3],
+                'viewers_peak': stream[4],
+                'follower_delta': stream[5],
+            } for stream in ordered_data
+        ]
+        return stream_dicts
+
+    def get_average_viewer_count_dicts(self):
+        stream_dicts = self.get_all_streams_dicts()
+        return [
+            {
+                'start_time': stream['start_time'],
+                'viewers_average': stream['viewers_average']
+            } for stream in stream_dicts
+        ]
 
     def get_page_count(self):
         return int(ceil(self.data_list_length / float(self.per_page)))

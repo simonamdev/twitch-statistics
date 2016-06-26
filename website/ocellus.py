@@ -1,6 +1,7 @@
 import db_access
 import logging
 import time
+import json
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect
 from minify import minify as minify_css
@@ -182,11 +183,24 @@ def streamer(streamer_name):
 @app.route('/api/v1/streamer/<streamer_name>/<game_short_name>')
 def api_streamer_data(streamer_name, game_short_name):
     access_time = time.time()
-    # first check which games the streamer has streamed
+    # first check which games the streamer has streamed to avoid polling a database needlessly
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
-
+    # if the streamer has not streamed the game requested, then return empty data so that the JS script can stop here
+    if not games_streamed_dict[game_short_name]:
+        return ''
+    # get the overviews for the streamer (from both games will be returned)
+    streams_db = db_access.StreamsDataPagination(game_name=game_short_name, streamer_name=streamer_name)
+    streams_db.run()
+    average_viewer_dicts = streams_db.get_average_viewer_count_dicts()
+    streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
+    streamer_global_db.run()
+    follower_count_dicts = streamer_global_db.get_follower_counts(game_short_name=game_short_name)
+    streamer_graph_data = json.dumps({
+        'viewers_average': average_viewer_dicts,
+        'followers': follower_count_dicts
+    })
     log_page_visit('streamer_api', '{}_{}'.format(streamer_name, game_short_name), start_time=access_time)
-    return ''
+    return streamer_graph_data
 
 
 @app.route('/streamer/<streamer_name>/<game_url_name>/streams/')
