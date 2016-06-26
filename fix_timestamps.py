@@ -23,21 +23,20 @@ for game in games:
             table_names.append('streams')
             for table_name in table_names:
                 rows = db.get_all_rows(table=table_name)
-                for row in rows:
+                for row in tqdm(rows):
+                    # convert anything in DD_MM_YYYY HH:MM:SS to YYYY_MM_DD HH:MM:SS
                     old_timestamp = row[1]
                     split_string = old_timestamp.split(' ')
                     date_part = split_string[0].split('-')
                     time_part = split_string[1].split(':')
                     year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
                     hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-                    try:
-                        datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-                    except ValueError:
-                        year, month, day = int(date_part[2]), int(date_part[1]), int(date_part[0])
-                        datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-                        new_timestamp = '{}-{}-{} {}:{}:{}'.format(day, month, year, hour, minute, second)
+                    if day == 2016:
+                        day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                        new_timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, hour, minute, second)
                         # print(new_timestamp)
-                        db.dbcur.execute('UPDATE {} SET timestamp = ? WHERE timestamp = ?'.format(table_name), (new_timestamp, old_timestamp))
+                        db.dbcur.execute('UPDATE global_data SET timestamp = ? WHERE timestamp = ?',
+                                         (new_timestamp, old_timestamp))
             db.dbcon.commit()
             db.execute_sql('VACUUM')
             db.dbcon.commit()
@@ -47,38 +46,34 @@ for game in games:
         rows = db.get_all_rows(table='global_data')
         print('Processing timestamps for global data')
         for row in tqdm(rows):
+            # convert anything in DD_MM_YYYY HH:MM:SS to YYYY_MM_DD HH:MM:SS
             old_timestamp = row[1]
             split_string = old_timestamp.split(' ')
             date_part = split_string[0].split('-')
             time_part = split_string[1].split(':')
             year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
             hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-            try:
-                datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-            except ValueError:
-                year, month, day = int(date_part[2]), int(date_part[1]), int(date_part[0])
-                datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-                new_timestamp = '{}-{}-{} {}:{}:{}'.format(day, month, year, hour, minute, second)
+            if day == 2016:
+                day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                new_timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, hour, minute, second)
                 # print(new_timestamp)
                 db.dbcur.execute('UPDATE global_data SET timestamp = ? WHERE timestamp = ?',
                                  (new_timestamp, old_timestamp))
         print('Processing timestamps for streamers data')
         rows = db.get_all_rows(table='streamers_data')
         for row in tqdm(rows):
+            # convert anything in DD_MM_YYYY HH:MM:SS to YYYY_MM_DD HH:MM:SS
             old_timestamp = row[2]
             split_string = old_timestamp.split(' ')
             date_part = split_string[0].split('-')
             time_part = split_string[1].split(':')
             year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
             hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-            try:
-                datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-            except ValueError:
-                year, month, day = int(date_part[2]), int(date_part[1]), int(date_part[0])
-                datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-                new_timestamp = '{}-{}-{} {}:{}:{}'.format(day, month, year, hour, minute, second)
+            if day == 2016:
+                day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                new_timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, hour, minute, second)
                 # print(new_timestamp)
-                db.dbcur.execute('UPDATE streamers_data SET last_updated = ? WHERE last_updated = ?',
+                db.dbcur.execute('UPDATE global_data SET timestamp = ? WHERE timestamp = ?',
                                  (new_timestamp, old_timestamp))
         db.dbcon.commit()
         db.execute_sql('VACUUM')
