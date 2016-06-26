@@ -2,21 +2,19 @@
 {% block css %}
     {% if ocellus_debug %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vis.css') }}">
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vis.min.css') }}">
     {% endif %}
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/tables-min.css">
 {% endblock %}
 {% block js %}
     {% if app_info.debug %}
-        <script src="{{ url_for('static', filename='vis.js') }}"></script>
         <script   src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
     {% else %}
-        <script src="{{ url_for('static', filename='vis.min.js') }}"></script>
         <script   src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
     {% endif %}
+    <script src="{{ url_for('static', filename='Chart.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
 {% endblock %}
 {% block content %}
     <div class="mdl-grid dark-row">
@@ -26,7 +24,9 @@
     </div>
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col visualisation" id="visualisation-viewers"></div>
+        <div class="mdl-cell mdl-cell--6-col visualisation">
+            <canvas id="visualisation-viewers" width="400" height="400"></canvas>
+        </div>
         <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     <div class="mdl-grid light-row">
@@ -63,8 +63,8 @@
         </div>
     </div>
     <script type="text/javascript" src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
-    <script type="text/javascript">
-        OCELLUS_VISUALISE.initForStream(["{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}"]);
-        OCELLUS_VISUALISE.visualiseStreamViewers();
+    <script>
+        OCELLUS_CHARTS.initForStreamer(["{{ streamer_name }}", "ED", "{{ stream_data.id }}"]);
+        OCELLUS_CHARTS.visualiseStreamViewers();
     </script>
 {% endblock %}
