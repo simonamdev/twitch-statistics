@@ -165,6 +165,9 @@ def streamer(streamer_name):
         'overviews': dict()
     }
     streamer_dict.update(games_streamed_dict)
+    # If a streamer is listed, but there are no streams under the name, then redirect
+    if not streamer_dict['ED'] and not streamer_dict['PC']:
+        return redirect('page_not_found')
     streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
     streamer_global_db.run()
     # update the streamer dict with the overviews for each game
