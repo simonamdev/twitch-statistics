@@ -62,9 +62,9 @@
             {% endif %}
         </div>
     </div>
-    <script type="text/javascript" src="{{ url_for('static', filename='visualise_viewers.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
     <script type="text/javascript">
-        OCELLUS_VISUALISE.init(["{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}"]);
-        OCELLUS_VISUALISE.visualiseViewers();
+        OCELLUS_VISUALISE.initForStream(["{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}"]);
+        OCELLUS_VISUALISE.visualiseStreamViewers();
     </script>
 {% endblock %}
