@@ -73,7 +73,7 @@ for game in games:
                 day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
                 new_timestamp = '{}-{}-{} {}:{}:{}'.format(year, month, day, hour, minute, second)
                 # print(new_timestamp)
-                db.dbcur.execute('UPDATE streamers_data SET last_updated = ? WHERE timestamp = ?',
+                db.dbcur.execute('UPDATE streamers_data SET last_updated = ? WHERE last_updated = ?',
                                  (new_timestamp, old_timestamp))
         db.dbcon.commit()
         db.execute_sql('VACUUM')
