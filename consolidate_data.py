@@ -408,13 +408,10 @@ def convert_timestamp_to_datetime(timestamp):
     time_part = split_string[1].split(':')
     year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
     hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-    # sometimes the year and day are flipped. Flip them over if the exception occurs.
-    try:
-        time_datetime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
-    except ValueError as e:
-        # print(e)
-        time_datetime = datetime.datetime(year=day, month=month, day=year, hour=hour, minute=minute, second=second)
-    return time_datetime
+    # retain the format: YYYY-MM-DD HH-MM-SS
+    if day == 2016:
+        day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+    return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
 
 def calculate_time_delta(timestamp_one, timestamp_two):
