@@ -123,7 +123,7 @@ class StreamerDB:
         # ID, Date + start time, duration (seconds), average viewership, peak viewership, follower differential
         timestamp = stream_dict['start_timestamp']
         duration = stream_dict['duration']
-        viewers_list = [row[1] for row in stream_dict['raw_data']]
+        viewers_list = [int(row[1]) for row in stream_dict['raw_data']]
         viewers_average = calculate_average_from_list(viewers_list)
         viewers_peak = max(viewers_list)
         # last follower count - first follower count
@@ -148,10 +148,15 @@ class StreamerDB:
         total_average_viewers = calculate_average_from_list(average_viewers_list)
         peak_viewers_list = [int(field[4]) for field in data]
         try:
+            # only update the peak if it is larger than the previous amount
             highest_peak_viewers = max(peak_viewers_list)
+            last_viewer_peaks = [int(field[4]) for field in data]
+            last_peak = max(last_viewer_peaks)
+            if last_peak > highest_peak_viewers:
+                highest_peak_viewers = last_peak
         except ValueError:
             highest_peak_viewers = 0
-        # get the follower data from the latest stream table and not the overview data
+        # get the follower data + peak duration from the latest stream table and not the overview data
         data = self.db.get_all_rows('stream_{}'.format(self.last_stream_stored - 1))
         last_follower_count = data[-1][3]
         # get last partnership data from the latest stream table too
@@ -403,7 +408,13 @@ def convert_timestamp_to_datetime(timestamp):
     time_part = split_string[1].split(':')
     year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
     hour, minute, second = int(time_part[0]), int(time_part[1]), int(time_part[2])
-    return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+    # sometimes the year and day are flipped. Flip them over if the exception occurs.
+    try:
+        time_datetime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+    except ValueError as e:
+        # print(e)
+        time_datetime = datetime.datetime(year=day, month=month, day=year, hour=hour, minute=minute, second=second)
+    return time_datetime
 
 
 def calculate_time_delta(timestamp_one, timestamp_two):
@@ -544,7 +555,7 @@ def main():
             streamer_db_names = get_streamer_db_names(game=game)
             streamer_overviews = []
             time.sleep(0.1)
-            for streamer in tqdm(streamer_db_names):
+            for streamer in streamer_db_names:
                 s_db = StreamerDB(game=game, streamer_name=streamer, stream_dicts=None)
                 overview = list(s_db.return_last_overview())
                 if len(overview) == 0:
