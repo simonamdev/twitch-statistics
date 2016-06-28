@@ -1,5 +1,5 @@
 cfg.py
-data\
-website\data
-website\__pycache__
-.idea\
+data/
+website/data
+website/__pycache__
+.idea/
