@@ -37,7 +37,7 @@ for game in games:
                         # print(new_timestamp)
                         db.dbcur.execute('UPDATE {} SET timestamp = ? WHERE timestamp = ?'.format(table_name),
                                          (new_timestamp, old_timestamp))
-            db.dbcon.commit()
+                db.dbcon.commit()
             db.execute_sql('VACUUM')
             db.dbcon.commit()
     if fix_game_tables:
@@ -59,6 +59,7 @@ for game in games:
                 # print(new_timestamp)
                 db.dbcur.execute('UPDATE global_data SET timestamp = ? WHERE timestamp = ?',
                                  (new_timestamp, old_timestamp))
+        db.dbcon.commit()
         print('Processing timestamps for streamers data')
         rows = db.get_all_rows(table='streamers_data')
         for row in tqdm(rows):
