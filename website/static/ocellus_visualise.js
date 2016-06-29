@@ -76,19 +76,18 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 						    success: function(data){
 						        console.log("Received data");
 				            jsonData = JSON.parse(data);
-				            var viewersData = {'time': [], 'data': []};
 										console.log("Parsing viewers data");
+										var viewersData = {"time": [], "value": []};
 				            jsonData["viewers_average"].forEach(function(point) {
-				                viewersData["time"].push(String(point["start_time"]));
-				                viewersData["data"].push(parseInt(point["viewers_average"]));
+				                viewersData["time"].push(String(point["time"]));
+				                viewersData["value"].push(parseInt(point["value"]));
 				            });
-										var followersData = {"time": [], "data": []};
+										var followersData = {"time": [], "value": []};
 										console.log("Parsing followers data");
 				            jsonData["followers"].forEach(function(point) {
-				                followersData["time"].push(String(point["update_time"]));
-				                followersData["data"].push(parseInt(point["followers"]));
+				                followersData["time"].push(String(point["time"]));
+				                followersData["value"].push(parseInt(point["value"]));
 				            });
-
 										console.log("Forming viewers chart data");
 	                  var viewersLineChartData = {
 	                      labels: viewersData["time"],
@@ -101,7 +100,7 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 	                              pointRadius: 0,
 	                              borderWidth: 3,
 	                              fill: false,
-	                              data: viewersData["data"]
+	                              data: viewersData["value"]
 	                          }
 	                      ]
 	                  }
@@ -118,14 +117,13 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 	                              pointRadius: 0,
 	                              borderWidth: 3,
 	                              fill: false,
-	                              data: followersData["data"]
+	                              data: followersData["value"]
 	                          }
 	                      ]
 	                  }
 
 										console.log("Drawing charts");
 										var graph = _args[1] + "-average-viewers-graph";
-										console.log(graph);
 										var ctx = document.getElementById(graph).getContext("2d");
 										var viewersLineChart = new Chart(ctx, {
 												type: 'line',
