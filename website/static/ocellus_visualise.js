@@ -15,7 +15,7 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
             alert('Streamer Name: ' + _args[0] + '\nGame shorthand name: ' + _args[1] + '\nStream ID: ' + _args[2]);
         },
         displayStreamerArguments : function() {
-            alert('Streamer Name: ' + _args[0] + '\nGame shorthand name: ' + _args[1]);
+            alert('Streamer Name: ' + _args[0]);
         },
         visualiseStreamViewers: function() {
             console.log("Visualising viewers for " + _args[0] + "'s " + _args[1] + " #" + _args[2] + " stream.");
@@ -68,14 +68,16 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 						    }
 						});
         },
-        visualiseStreamerAverageViewers: function() {
-            console.log("Visualising viewers for " + _args[0] + "'s " + _args[1]);
+        visualiseStreamerData: function() {
+            console.log("Visualising viewers/followers for " + _args[0]);
             // Make an AJAX call to get the data
             $.ajax({
-						    url: "/api/v1/streamer/" + _args[0] + "/" + _args[1],
-						    success: function(data){
+						    url: "/api/v1/streamer/" + _args[0],
+						    success: function(data) {
 						        console.log("Received data");
 				            jsonData = JSON.parse(data);
+				            console.log(jsonData);
+				            /*
 										console.log("Parsing viewers data");
 										var viewersData = {"time": [], "value": []};
 				            jsonData["viewers_average"].forEach(function(point) {
@@ -151,6 +153,7 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 														}
 												}
 										});
+										*/
 						    }
 						});
         }
