@@ -251,31 +251,33 @@ def api_raw_stream_data(streamer_name, game_short_name, stream_id):
     return data
 
 
-@app.route('/api/v1/streamer/<streamer_name>/<game_short_name>')
-def api_streamer_data(streamer_name, game_short_name):
+@app.route('/api/v1/streamer/<streamer_name>/')
+def api_streamer_data(streamer_name):
     access_time = time.time()
     # first check which games the streamer has streamed to avoid polling a database needlessly
     games_streamed_dict = db_access.DetermineIfStreamed(streamer_name=streamer_name).check_for_all_games()
-    # if the streamer has not streamed the game requested, then return empty data so that the JS script can stop here
-    if not games_streamed_dict[game_short_name]:
-        return ''
-    # get the overviews for the streamer (from both games will be returned)
-    streams_db = db_access.StreamsDataPagination(game_name=game_short_name, streamer_name=streamer_name)
-    streams_db.run()
-    average_viewer_dicts = streams_db.get_average_viewer_count_dicts()
     streamer_global_db = db_access.StreamerGlobalData(streamer_name=streamer_name)
     streamer_global_db.run()
-    follower_count_dicts = streamer_global_db.get_follower_counts(game_short_name=game_short_name)
-    streamer_graph_data = json.dumps({
-        'viewers_average': [
-            {'time': row['start_time'], 'value': row['viewers_average']} for row in average_viewer_dicts
-        ],
-        'followers': [
-            {'time': row['update_time'], 'value': row['followers']} for row in follower_count_dicts
-        ]
-    })
+    streamer_graph_data = {}
+    # add defaults to the dict for each known game
+    for game in game_names:
+        streamer_graph_data[game['short']] = json.dumps([])
+    for game_short_name, streamed in games_streamed_dict.items():
+        if streamed:
+            streams_db = db_access.StreamsDataPagination(game_name=game_short_name, streamer_name=streamer_name)
+            streams_db.run()
+            average_viewer_dicts = streams_db.get_average_viewer_count_dicts()
+            follower_count_dicts = streamer_global_db.get_follower_counts(game_short_name=game_short_name)
+            streamer_graph_data[game_short_name] = {
+                'viewers_average': [
+                    {'time': row['start_time'], 'value': row['viewers_average']} for row in average_viewer_dicts
+                ],
+                'followers': [
+                    {'time': row['update_time'], 'value': row['followers']} for row in follower_count_dicts
+                ]
+            }
     log_page_visit('streamer_api', '{}_{}'.format(streamer_name, game_short_name), start_time=access_time)
-    return streamer_graph_data
+    return json.dumps(streamer_graph_data)
 
 
 if __name__ == '__main__':
