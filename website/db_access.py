@@ -160,7 +160,7 @@ class StreamerGlobalData:
         return [
             {
                 'update_time': overview[1],
-                'followers': overview[5]
+                'followers': overview[4]
             } for overview in overview_rows
         ]
 
