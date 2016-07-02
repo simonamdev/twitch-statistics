@@ -59,7 +59,7 @@
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_left</i>
                 </a>
             {% endif %}
-            <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=1) }}">
+            <a href="{{ url_for('streamer', streamer_name=streamer_name) }}">
                 <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">list</i>
             </a>
             {% if not next_page_number > page_data.total %}
