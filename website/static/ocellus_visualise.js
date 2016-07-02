@@ -84,85 +84,87 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 													} else {
 															console.log("Data for: " + key);
 															console.log(value);
+
+															var viewersData = {"time": [], "value": []};
+									            value["viewers_average"].forEach(function(point) {
+									                viewersData["time"].push(String(point["time"]));
+									                viewersData["value"].push(parseInt(point["value"]));
+									            });
+
+									            var followersData = {"time": [], "value": []};
+															console.log("Parsing followers data");
+									            value["followers"].forEach(function(point) {
+									                followersData["time"].push(String(point["time"]));
+									                followersData["value"].push(parseInt(point["value"]));
+									            });
+
+									            console.log("Forming viewers chart data");
+
+									            var viewersLineChartData = {
+						                      labels: viewersData["time"],
+						                      datasets: [
+						                          {
+						                              label: "Average Viewers",
+						                              borderColor: "rgba(0,0,255,1)",
+						                              strokeColor: "rgba(0,0,255,1)",
+						                              lineTension: 0.1,
+						                              pointRadius: 0,
+						                              borderWidth: 3,
+						                              fill: false,
+						                              data: viewersData["value"]
+						                          }
+						                      ]
+						                  }
+
+						                  console.log("Forming followers chart data");
+						                  var followersLineChartData = {
+						                      labels: followersData["time"],
+						                      datasets: [
+						                          {
+						                              label: "Followers",
+						                              borderColor: "rgba(0,0,255,1)",
+						                              strokeColor: "rgba(0,0,255,1)",
+						                              lineTension: 0.1,
+						                              pointRadius: 0,
+						                              borderWidth: 3,
+						                              fill: false,
+						                              data: followersData["value"]
+						                          }
+						                      ]
+						                  }
+
+															console.log("Drawing charts");
+
+															var graph = key + "-average-viewers-graph";
+															var ctx = document.getElementById(graph).getContext("2d");
+															var viewersLineChart = new Chart(ctx, {
+																	type: 'line',
+																	data: viewersLineChartData,
+																	options: {
+																			height: '100%',
+																			responsive: true,
+																			title: {
+																					display: true,
+																					text: "Average Viewers over time"
+																			}
+																	}
+															});
+															var graph = key + "-followers-graph";
+															ctx = document.getElementById(graph).getContext("2d");
+															var followersLineChart = new Chart(ctx, {
+																	type: 'line',
+																	data: followersLineChartData,
+																	options: {
+																			height: '100%',
+																			responsive: true,
+																			title: {
+																					display: true,
+																					text: "Followers over time"
+																			}
+																	}
+															});
 													}
 										});
-				            /*
-										console.log("Parsing viewers data");
-										var viewersData = {"time": [], "value": []};
-				            jsonData["viewers_average"].forEach(function(point) {
-				                viewersData["time"].push(String(point["time"]));
-				                viewersData["value"].push(parseInt(point["value"]));
-				            });
-										var followersData = {"time": [], "value": []};
-										console.log("Parsing followers data");
-				            jsonData["followers"].forEach(function(point) {
-				                followersData["time"].push(String(point["time"]));
-				                followersData["value"].push(parseInt(point["value"]));
-				            });
-										console.log("Forming viewers chart data");
-	                  var viewersLineChartData = {
-	                      labels: viewersData["time"],
-	                      datasets: [
-	                          {
-	                              label: "Average Viewers",
-	                              borderColor: "rgba(0,0,255,1)",
-	                              strokeColor: "rgba(0,0,255,1)",
-	                              lineTension: 0.1,
-	                              pointRadius: 0,
-	                              borderWidth: 3,
-	                              fill: false,
-	                              data: viewersData["value"]
-	                          }
-	                      ]
-	                  }
-
-	                  console.log("Forming followers chart data");
-	                  var followersLineChartData = {
-	                      labels: followersData["time"],
-	                      datasets: [
-	                          {
-	                              label: "Followers",
-	                              borderColor: "rgba(0,0,255,1)",
-	                              strokeColor: "rgba(0,0,255,1)",
-	                              lineTension: 0.1,
-	                              pointRadius: 0,
-	                              borderWidth: 3,
-	                              fill: false,
-	                              data: followersData["value"]
-	                          }
-	                      ]
-	                  }
-
-										console.log("Drawing charts");
-										var graph = _args[1] + "-average-viewers-graph";
-										var ctx = document.getElementById(graph).getContext("2d");
-										var viewersLineChart = new Chart(ctx, {
-												type: 'line',
-												data: viewersLineChartData,
-												options: {
-														height: '100%',
-														responsive: true,
-														title: {
-																display: true,
-																text: "Average Viewers over time"
-														}
-												}
-										});
-										var graph = _args[1] + "-followers-graph";
-										ctx = document.getElementById(graph).getContext("2d");
-										var followersLineChart = new Chart(ctx, {
-												type: 'line',
-												data: followersLineChartData,
-												options: {
-														height: '100%',
-														responsive: true,
-														title: {
-																display: true,
-																text: "Followers over time"
-														}
-												}
-										});
-										*/
 						    }
 						});
         }
