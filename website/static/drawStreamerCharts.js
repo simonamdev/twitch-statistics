@@ -1,6 +1,5 @@
 function convertToDate(timeStamp) {
 		var ts = String(timeStamp);
-		console.log(ts);
 		// Format: YYYY-MM-DD HH:MM:SS
 		var string_split = ts.split(" ");
 		var date_part = string_split[0].split("-");
