@@ -125,14 +125,5 @@
             </div>
         </div>
     {% endif %}
-    <script type="text/javascript" src="{{ url_for('static', filename='test_gc.js') }}">
-
-    </script>
-    <script type="text/javascript">
-        drawCharts('mahddogg');
-    </script>
-    <script type="text/javascript">
-        // OCELLUS_CHARTS.initForStreamer(["{{ streamer.name }}"]);
-        // OCELLUS_CHARTS.visualiseStreamerData();
-    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='drawStreamerCharts.js') }}"></script>
 {% endblock %}
