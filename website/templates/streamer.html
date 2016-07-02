@@ -3,21 +3,18 @@
     {% if ocellus_debug %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='visualise.css') }}">
     {% else %}
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='visualise.min.css') }}">
     {% endif %}
 {% endblock %}
 {% block js %}
     {% if app_info.debug %}
         <script src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
-        <script src="https://d3js.org/d3.v4.js"></script>
     {% else %}
         <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
-        <script src="https://d3js.org/d3.v4.min.js"></script>
     {% endif %}
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <!-- TODO: Adapt minify script to also consider JS files -->
     <script type="text/javascript" src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
 {% endblock %}
@@ -65,12 +62,8 @@
             <div class="mdl-cell mdl-cell--5-col"></div>
         </div>
         <div class="mdl-grid light-row">
-            <div class="mdl-cell mdl-cell--6-col visualisation" id="ED-average-viewers-graph">
-                <canvas  width="400" height="200"></canvas>
-            </div>
-            <div class="mdl-cell mdl-cell--6-col visualisation">
-                <canvas id="ED-followers-graph" width="400" height="200"></canvas>
-            </div>
+            <div class="mdl-cell mdl-cell--6-col visualisation" id="ED-average-viewers-graph"></div>
+            <div class="mdl-cell mdl-cell--6-col visualisation" id="ED-followers-graph"></div>
         </div>
         <div class="mdl-grid light-row">
             <div class="mdl-cell mdl-cell--12-col">
@@ -130,8 +123,11 @@
             </div>
         </div>
     {% endif %}
-    <script type="text/javascript" src="{{ url_for('static', filename='test_d3.js') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='test_gc.js') }}">
 
+    </script>
+    <script type="text/javascript">
+        drawLine('mahddogg');
     </script>
     <script type="text/javascript">
         // OCELLUS_CHARTS.initForStreamer(["{{ streamer.name }}"]);
