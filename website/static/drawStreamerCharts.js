@@ -8,12 +8,16 @@ function convertToDate(timeStamp) {
 }
 
 function drawViewersChart(rowData, gameShortName) {
+		var convertedData = [];
+		$.each(rowData, function( index, value ) {
+        convertedData.push([convertToDate(value[0]), value[1]]);
+		});
 		console.log("Drawing viewers chart for: " + gameShortName);
 		// Create the data table
 		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'name');
+		data.addColumn('date', 'timestamp');
 		data.addColumn('number', 'viewers');
-		data.addRows(rowData);
+		data.addRows(convertedData);
 		var columnWidth = $('#' + gameShortName + '-followers-graph').width();
 		// Set options
 		var options = {
@@ -28,12 +32,16 @@ function drawViewersChart(rowData, gameShortName) {
 }
 
 function drawFollowersChart(rowData, gameShortName) {
+		var convertedData = [];
+		$.each(rowData, function( index, value ) {
+        convertedData.push([convertToDate(value[0]), value[1]]);
+		});
 		console.log("Drawing followers chart for: " + gameShortName);
 		// Create the data table
 		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Topping');
+		data.addColumn('date', 'timestamp');
 		data.addColumn('number', 'followers');
-		data.addRows(rowData);
+		data.addRows(convertedData);
 		var columnWidth = $('#' + gameShortName + '-followers-graph').width();
 		// Set options
 			var options = {
