@@ -14,12 +14,12 @@ function drawViewersChart(rowData, gameShortName) {
 		data.addColumn('string', 'name');
 		data.addColumn('number', 'viewers');
 		data.addRows(rowData);
-
+		var columnWidth = $('#' + gameShortName + '-followers-graph').width();
 		// Set options
 		var options = {
 				title: 'Average Viewers over time',
-				width: 400,
-				height: 300
+				width: columnWidth,
+				height: 400
 		};
 
 		// Instantiate and draw the chart
@@ -34,12 +34,12 @@ function drawFollowersChart(rowData, gameShortName) {
 		data.addColumn('string', 'Topping');
 		data.addColumn('number', 'Slices');
 		data.addRows(rowData);
-
+		var columnWidth = $('#' + gameShortName + '-followers-graph').width();
 		// Set options
 			var options = {
 					title: 'Followers over time',
-					width: 400,
-					height: 300
+					width: columnWidth,
+					height: 400
 			};
 
 		// Instantiate and draw the chart
