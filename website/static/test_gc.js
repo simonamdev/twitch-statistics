@@ -23,14 +23,14 @@ function drawLine(chartJSONData) {
 		data.addColumn('date', 'timestamps');
 		data.addColumn('number', 'viewers');
 		data.addRows(convertedData);
-		data.sort([{column: 1}]);
+		data.sort([{column: 0}, {column: 1}]);
 
 		var options = {
 			  hAxis: {
-			     title: 'Time'
+			     title: 'Stream Times'
 			  },
 			  vAxis: {
-			      title: 'Popularity'
+			      title: 'Average Viewers'
 			  }
 		};
 
