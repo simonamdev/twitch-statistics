@@ -32,7 +32,7 @@ function drawFollowersChart(rowData, gameShortName) {
 		// Create the data table
 		var data = new google.visualization.DataTable();
 		data.addColumn('string', 'Topping');
-		data.addColumn('number', 'Slices');
+		data.addColumn('number', 'followers');
 		data.addRows(rowData);
 		var columnWidth = $('#' + gameShortName + '-followers-graph').width();
 		// Set options
