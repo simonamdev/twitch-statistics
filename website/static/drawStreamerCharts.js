@@ -10,19 +10,26 @@ function convertToDate(timeStamp) {
 // Load packages required
 google.charts.load('current', {'packages':['corechart', 'line']});
 
-// Make an AJAX call to get the data from the API
-$.ajax({
-		url: "/api/v1/streamer/mahddogg",
-		success: function(data) {
-				jsonData = JSON.parse(data);
-				console.log("Data received from API:");
-				console.log(jsonData);
-		}
-});
+// Draw all the charts
+function drawCharts() {
+		// Make an AJAX call to get the data from the API
+		$.ajax({
+				url: "/api/v1/streamer/mahddogg",
+				success: function(data) {
+						jsonData = JSON.parse(data);
+						console.log("Data received from API:");
+						console.log(jsonData);
+						drawViewersChart();
+						drawFollowersChart();
+				}
+		});
+}
+
 
 // Set Callbacks
-google.charts.setOnLoadCallback(drawViewersChart);
-google.charts.setOnLoadCallback(drawFollowersChart);
+google.charts.setOnLoadCallback(drawCharts);
+// google.charts.setOnLoadCallback(drawViewersChart);
+// google.charts.setOnLoadCallback(drawFollowersChart);
 
 function drawViewersChart() {
 		// Create the data table
