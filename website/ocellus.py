@@ -269,12 +269,14 @@ def api_streamer_data(streamer_name):
             average_viewer_dicts = streams_db.get_average_viewer_count_dicts()
             follower_count_dicts = streamer_global_db.get_follower_counts(game_short_name=game_short_name)
             streamer_graph_data[game_short_name] = {
-                'viewers_average': [
-                    {'time': row['start_time'], 'value': row['viewers_average']} for row in average_viewer_dicts
-                ],
-                'followers': [
-                    {'time': row['update_time'], 'value': row['followers']} for row in follower_count_dicts
-                ]
+                'viewers_average': {
+                    'times': [sub_dict['start_time'] for sub_dict in average_viewer_dicts],
+                    'values': [sub_dict['viewers_average'] for sub_dict in average_viewer_dicts]
+                },
+                'followers': {
+                    'times': [sub_dict['update_time'] for sub_dict in follower_count_dicts],
+                    'values': [sub_dict['followers'] for sub_dict in follower_count_dicts]
+                }
             }
     log_page_visit('streamer_api', streamer_name, start_time=access_time)
     return json.dumps(streamer_graph_data)
