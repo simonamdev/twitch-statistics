@@ -7,18 +7,13 @@ function convertToDate(timeStamp) {
 		return new Date(date_part[0], date_part[1], date_part[2], time_part[0], time_part[1], time_part[2]);
 }
 
-function drawViewersChart() {
+function drawViewersChart(rowData, gameShortName) {
+		console.log("Drawing viewers chart for: " + gameShortName);
 		// Create the data table
 		var data = new google.visualization.DataTable();
 		data.addColumn('string', 'name');
 		data.addColumn('number', 'viewers');
-		data.addRows([
-		  ['Mushrooms', 1],
-		  ['Onions', 1],
-		  ['Olives', 2],
-		  ['Zucchini', 2],
-		  ['Pepperoni', 1]
-		]);
+		data.addRows(rowData);
 
 		// Set options
 		var options = {
@@ -28,33 +23,28 @@ function drawViewersChart() {
 		};
 
 		// Instantiate and draw the chart
-		var chart = new google.visualization.LineChart(document.getElementById('ED-average-viewers-graph'));
+		var chart = new google.visualization.LineChart(document.getElementById(gameShortName + '-average-viewers-graph'));
 		chart.draw(data, options);
 }
 
-function drawFollowersChart() {
-  // Create the data table
-  var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Topping');
-  data.addColumn('number', 'Slices');
-  data.addRows([
-    ['Mushrooms', 2],
-    ['Onions', 2],
-    ['Olives', 2],
-    ['Zucchini', 0],
-    ['Pepperoni', 3]
-  ]);
+function drawFollowersChart(rowData, gameShortName) {
+		console.log("Drawing followers chart for: " + gameShortName);
+		// Create the data table
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Topping');
+		data.addColumn('number', 'Slices');
+		data.addRows(rowData);
 
-  // Set options
-		var options = {
-				title: 'Followers over time',
-				width: 400,
-				height: 300
-		};
+		// Set options
+			var options = {
+					title: 'Followers over time',
+					width: 400,
+					height: 300
+			};
 
-  // Instantiate and draw the chart
-  var chart = new google.visualization.LineChart(document.getElementById('ED-followers-graph'));
-  chart.draw(data, options);
+		// Instantiate and draw the chart
+		var chart = new google.visualization.LineChart(document.getElementById(gameShortName + '-followers-graph'));
+		chart.draw(data, options);
 }
 
 // Draw all the charts
@@ -66,8 +56,15 @@ function drawCharts(streamer_name) {
 						jsonData = JSON.parse(data);
 						console.log("Data received from API:");
 						console.log(jsonData);
-						drawViewersChart();
-						drawFollowersChart();
+						for (var key in jsonData) {
+								if (key == 'streamer_name') {
+										continue;
+								}
+								if (!$.isEmptyObject(jsonData[key])) {
+										drawViewersChart(jsonData[key]['viewers_average'], key);
+										drawFollowersChart(jsonData[key]['followers'], key);
+								}
+						}
 				}
 		});
 }
