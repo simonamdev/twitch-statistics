@@ -7,30 +7,6 @@ function convertToDate(timeStamp) {
 		return new Date(date_part[0], date_part[1], date_part[2], time_part[0], time_part[1], time_part[2]);
 }
 
-// Load packages required
-google.charts.load('current', {'packages':['corechart', 'line']});
-
-// Draw all the charts
-function drawCharts() {
-		// Make an AJAX call to get the data from the API
-		$.ajax({
-				url: "/api/v1/streamer/mahddogg",
-				success: function(data) {
-						jsonData = JSON.parse(data);
-						console.log("Data received from API:");
-						console.log(jsonData);
-						drawViewersChart();
-						drawFollowersChart();
-				}
-		});
-}
-
-
-// Set Callbacks
-google.charts.setOnLoadCallback(drawCharts);
-// google.charts.setOnLoadCallback(drawViewersChart);
-// google.charts.setOnLoadCallback(drawFollowersChart);
-
 function drawViewersChart() {
 		// Create the data table
 		var data = new google.visualization.DataTable();
@@ -79,4 +55,28 @@ function drawFollowersChart() {
   // Instantiate and draw the chart
   var chart = new google.visualization.LineChart(document.getElementById('ED-followers-graph'));
   chart.draw(data, options);
+}
+
+// Draw all the charts
+function drawCharts(streamer_name) {
+		// Make an AJAX call to get the data from the API
+		$.ajax({
+				url: "/api/v1/streamer/" + streamer_name,
+				success: function(data) {
+						jsonData = JSON.parse(data);
+						console.log("Data received from API:");
+						console.log(jsonData);
+						drawViewersChart();
+						drawFollowersChart();
+				}
+		});
+}
+
+function loadCharts(streamer_name) {
+		// Load packages required
+		google.charts.load('current', {'packages':['corechart', 'line']});
+		// Set Callbacks
+		google.charts.setOnLoadCallback(function() {
+				drawCharts(streamer_name);
+		});
 }

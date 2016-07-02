@@ -126,4 +126,7 @@
         </div>
     {% endif %}
     <script type="text/javascript" src="{{ url_for('static', filename='drawStreamerCharts.js') }}"></script>
+    <script type="text/javascript">
+        loadCharts("{{ streamer.name }}");
+    </script>
 {% endblock %}
