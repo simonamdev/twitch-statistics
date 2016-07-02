@@ -76,7 +76,16 @@ var OCELLUS_CHARTS = OCELLUS_CHARTS || (function(){
 						    success: function(data) {
 						        console.log("Received data");
 				            jsonData = JSON.parse(data);
-				            console.log(jsonData);
+										console.log("Parsing data for each game");
+										$.each(jsonData, function(key, value) {
+													console.log("Parsing data for: " + key);
+													if ($.isEmptyObject(value)) {
+															console.log("Streamer has no data for: " + key);
+													} else {
+															console.log("Data for: " + key);
+															console.log(value);
+													}
+										});
 				            /*
 										console.log("Parsing viewers data");
 										var viewersData = {"time": [], "value": []};
