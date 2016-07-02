@@ -261,7 +261,7 @@ def api_streamer_data(streamer_name):
     streamer_graph_data = {}
     # add defaults to the dict for each known game
     for game in game_names:
-        streamer_graph_data[game['short']] = json.dumps([])
+        streamer_graph_data[game['short']] = {}
     for game_short_name, streamed in games_streamed_dict.items():
         if streamed:
             streams_db = db_access.StreamsDataPagination(game_name=game_short_name, streamer_name=streamer_name)
@@ -276,7 +276,8 @@ def api_streamer_data(streamer_name):
                     {'time': row['update_time'], 'value': row['followers']} for row in follower_count_dicts
                 ]
             }
-    log_page_visit('streamer_api', '{}_{}'.format(streamer_name, game_short_name), start_time=access_time)
+    print(streamer_graph_data)
+    log_page_visit('streamer_api', streamer_name, start_time=access_time)
     return json.dumps(streamer_graph_data)
 
 
