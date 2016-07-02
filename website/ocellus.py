@@ -270,10 +270,10 @@ def api_streamer_data(streamer_name):
             follower_count_dicts = streamer_global_db.get_follower_counts(game_short_name=game_short_name)
             streamer_graph_data[game_short_name] = {
                 'viewers_average': [
-                    {'x': row['start_time'], 'y': row['viewers_average']} for row in average_viewer_dicts
+                    [row['start_time'], row['viewers_average']]for row in average_viewer_dicts
                 ],
                 'followers': [
-                    {'x': row['update_time'], 'y': row['followers']} for row in follower_count_dicts
+                    [row['update_time'], row['followers']] for row in follower_count_dicts
                 ]
             }
     log_page_visit('streamer_api', streamer_name, start_time=access_time)
