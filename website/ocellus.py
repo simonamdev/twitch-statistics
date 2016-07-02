@@ -276,7 +276,6 @@ def api_streamer_data(streamer_name):
                     {'time': row['update_time'], 'value': row['followers']} for row in follower_count_dicts
                 ]
             }
-    print(streamer_graph_data)
     log_page_visit('streamer_api', streamer_name, start_time=access_time)
     return json.dumps(streamer_graph_data)
 
