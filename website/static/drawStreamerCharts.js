@@ -7,44 +7,40 @@ function convertToDate(timeStamp) {
 		return new Date(date_part[0], date_part[1], date_part[2], time_part[0], time_part[1], time_part[2]);
 }
 
-// Load Charts and the corechart package.
+// Load packages required
 google.charts.load('current', {'packages':['corechart', 'line']});
 
-// Draw the pie chart for Sarah's pizza when Charts is loaded.
-google.charts.setOnLoadCallback(drawSarahChart);
+// Set Callbacks
+google.charts.setOnLoadCallback(drawViewersChart);
+google.charts.setOnLoadCallback(drawFollowersChart);
 
-// Draw the pie chart for the Anthony's pizza when Charts is loaded.
-google.charts.setOnLoadCallback(drawAnthonyChart);
+function drawViewersChart() {
+		// Create the data table
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'name');
+		data.addColumn('number', 'viewers');
+		data.addRows([
+		  ['Mushrooms', 1],
+		  ['Onions', 1],
+		  ['Olives', 2],
+		  ['Zucchini', 2],
+		  ['Pepperoni', 1]
+		]);
 
-// Callback that draws the pie chart for Sarah's pizza.
-function drawSarahChart() {
+		// Set options
+		var options = {
+				title: 'Average Viewers over time',
+				width: 400,
+				height: 300
+		};
 
-  // Create the data table for Sarah's pizza.
-  var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Topping');
-  data.addColumn('number', 'Slices');
-  data.addRows([
-    ['Mushrooms', 1],
-    ['Onions', 1],
-    ['Olives', 2],
-    ['Zucchini', 2],
-    ['Pepperoni', 1]
-  ]);
-
-  // Set options for Sarah's pie chart.
-  var options = {title:'How Much Pizza Sarah Ate Last Night',
-                 width:400,
-                 height:300};
-
-  // Instantiate and draw the chart for Sarah's pizza.
-  var chart = new google.visualization.PieChart(document.getElementById('Sarah_chart_div'));
-  chart.draw(data, options);
+		// Instantiate and draw the chart
+		var chart = new google.visualization.LineChart(document.getElementById('ED-average-viewers-graph'));
+		chart.draw(data, options);
 }
 
-// Callback that draws the pie chart for Anthony's pizza.
-function drawAnthonyChart() {
-
-  // Create the data table for Anthony's pizza.
+function drawFollowersChart() {
+  // Create the data table
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'Slices');
@@ -56,12 +52,14 @@ function drawAnthonyChart() {
     ['Pepperoni', 3]
   ]);
 
-  // Set options for Anthony's pie chart.
-  var options = {title:'How Much Pizza Anthony Ate Last Night',
-                 width:400,
-                 height:300};
+  // Set options
+		var options = {
+				title: 'Followers over time',
+				width: 400,
+				height: 300
+		};
 
-  // Instantiate and draw the chart for Anthony's pizza.
-  var chart = new google.visualization.PieChart(document.getElementById('Anthony_chart_div'));
+  // Instantiate and draw the chart
+  var chart = new google.visualization.LineChart(document.getElementById('ED-followers-graph'));
   chart.draw(data, options);
 }
