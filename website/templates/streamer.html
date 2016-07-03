@@ -14,9 +14,7 @@
     {% else %}
         <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
     {% endif %}
-      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <!-- TODO: Adapt minify script to also consider JS files -->
-    <script type="text/javascript" src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 {% endblock %}
 {% block content %}
     <div id="streamer-title" class="mdl-grid">
