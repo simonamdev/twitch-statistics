@@ -24,7 +24,7 @@ function drawViewersChart(rowData) {
 		// Set options
 		var columnWidth = $('#viewers-graph').width();
 		var options = {
-				title: 'Average Viewers over time',
+				title: 'Viewers over time',
 				width: columnWidth,
 				height: 400
 		};
