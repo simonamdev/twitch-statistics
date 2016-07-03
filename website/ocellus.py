@@ -96,6 +96,12 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/about/news')
+def news():
+    log_page_visit('news')
+    return render_template('news.html')
+
+
 @app.route('/games')
 def games():
     log_page_visit('games')
@@ -251,6 +257,7 @@ def stream(streamer_name, game_url_name, stream_id=1):
                            stream_data=stream_data_dict)
 
 
+# API Routes below here
 @app.route('/api/v1/raw_stream_data/<streamer_name>/<game_short_name>/<stream_id>')
 def api_raw_stream_data(streamer_name, game_short_name, stream_id):
     access_time = time.time()

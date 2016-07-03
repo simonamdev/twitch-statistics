@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if ocellus_debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>News</h1>
+        </div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <h2 class="center-text">Stuff</h2>
+            <p class="para-text justify-text">
+                Stuff
+            </p>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+{% endblock %}
