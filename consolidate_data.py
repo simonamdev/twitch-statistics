@@ -95,17 +95,25 @@ class StreamerDB:
             # create a table for each CSV
             self.create_stream_table()
             # CSV schema is NAME, VIEWERS, FOLLOWERS, PARTNERSHIP, TIMESTAMP
-            # DB schema is ID, TIMESTAMP, VIEWERS, FOLLOWERS, PARTNERSHIP
+            # DB schema is ID (taken care of by the DB), TIMESTAMP, VIEWERS, FOLLOWERS, PARTNERSHIP
             raw_data_list = stream_dict['raw_data']
             fixed_schema_list = [[row[4], row[1], row[2], row[3]] for row in raw_data_list]
-            """
-            self.db.insert_rows(
-                table='stream_{}'.format(self.next_stream_count),
-                row_string='(NULL, ?, ?, ?, ?)',
-                row_data_list=fixed_schema_list
-            )
-            """
-            for row in tqdm(fixed_schema_list):
+            # LIVE FIX: change all the timestamps to YYYY-MM-DD HH:MM:SS here
+            fixed_timestamp_list = []
+            for row in fixed_schema_list:
+                wrong_timestamp = row[0]
+                # The timestamp MIGHT be DD-MM-YYYY HH:MM:SS
+                split_string = wrong_timestamp.split(' ')
+                split_date = split_string[0].split('-')
+                time_part = split_string[1]  # no need to split time string, since it is always the same format
+                year, month, day = int(split_date[0]), int(split_date[1]), int(split_date[2])
+                # change the order, ONLY if the order is wrong
+                if day == 2016:
+                    day, month, year = int(split_date[0]), int(split_date[1]), int(split_date[2])
+                time_string = '{}-{}-{} {}'.format(year, month, day, time_part)
+                fixed_timestamp_list.append([time_string, row[1], row[2], row[3]])
+            # insert the CSV rows into the DB
+            for row in tqdm(fixed_timestamp_list):
                 self.db.insert_row(
                     table='stream_{}'.format(self.next_stream_count),
                     row_string='(NULL, ?, ?, ?, ?)',
