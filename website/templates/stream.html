@@ -9,12 +9,11 @@
 {% endblock %}
 {% block js %}
     {% if app_info.debug %}
-        <script   src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
     {% else %}
-        <script   src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
     {% endif %}
-    <script src="{{ url_for('static', filename='Chart.bundle.js') }}"></script>
-    <script src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 {% endblock %}
 {% block content %}
     <div class="mdl-grid dark-row">
@@ -38,9 +37,7 @@
     </div>
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col visualisation">
-            <canvas id="visualisation-viewers" width="400" height="200"></canvas>
-        </div>
+        <div class="mdl-cell mdl-cell--6-col visualisation" id="viewers-graph"></div>
         <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     <!-- Navigation Part -->
@@ -63,9 +60,8 @@
             {% endif %}
         </div>
     </div>
-    <script type="text/javascript" src="{{ url_for('static', filename='ocellus_visualise.js') }}"></script>
-    <script>
-        OCELLUS_CHARTS.initForStreamer(["{{ streamer_name }}", "ED", "{{ stream_data.id }}"]);
-        OCELLUS_CHARTS.visualiseStreamViewers();
+    <script type="text/javascript" src="{{ url_for('static', filename='drawStreamCharts.js') }}"></script>
+    <script type="text/javascript">
+        loadCharts("{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}");
     </script>
 {% endblock %}
