@@ -18,6 +18,10 @@
 	background: url('../static/images/faces.jpg') center / cover;
 }
 
+#news-card {
+	background: url('../static/images/ocellus1.jpg') center / cover;
+}
+
 .card-margin {
 	margin-top: 50px;
 }

@@ -117,8 +117,8 @@
     </div>
     <div class="mdl-grid dark-row">
         <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col">
+        <div class="mdl-cell mdl-cell--1-col"></div>
+        <div class="mdl-cell mdl-cell--5-col">
             <div class="game-card mdl-card mdl-shadow--2dp" id="streamer-card">
                 <div class="mdl-card__title mdl-card--expand"></div>
                 <div class="mdl-card__actions">
@@ -131,7 +131,20 @@
                 </div>
             </div>
         </div>
+        <div class="mdl-cell mdl-cell--5-col">
+            <div class="game-card mdl-card mdl-shadow--2dp" id="news-card">
+                <div class="mdl-card__title mdl-card--expand"></div>
+                <div class="mdl-card__actions">
+                    <a href="{{ url_for('streamers') }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
+                        <i class="material-icons mdl-list__item-icon">info_outline</i>
+                        <span class="game-card-image__filename">
+                            Ocellus Project News
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
         <!-- Spacer -->
-        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--1-col"></div>
     </div>
 {% endblock %}
