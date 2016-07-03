@@ -45,6 +45,17 @@ def return_name_dict(name):
             return name_dict
 
 
+"""
+Catch all method to log page visits
+Logs the following:
+    > current time in epoch format
+    > time taken to serve the page (in seconds). If the page does not have a DB request, then the delta is 0
+    > the remote IP Address
+    > the route name of the page
+    > any associated parameters with that route
+"""
+
+
 def log_page_visit(route_name='', parameters='none', start_time=0):
     if not start_time == 0:
         time_delta = time.time() - start_time
