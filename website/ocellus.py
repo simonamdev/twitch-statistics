@@ -5,7 +5,6 @@ import json
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect
 from minify import minify as minify_css
-from time import time as current_time_epoch
 
 app = Flask(__name__)
 
