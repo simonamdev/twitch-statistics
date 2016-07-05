@@ -98,8 +98,23 @@ def about():
 
 @app.route('/about/news')
 def news():
-    log_page_visit('news')
-    return render_template('news.html')
+    access_time = time.time()
+    # TODO: Get news from database instead of dummy files
+    news_articles = [
+        {
+            'title': 'The cat ate my source code',
+            'contents': 'fdgoijfdgoidfgjoijdfg',
+            'word_count': 50
+        },
+        {
+            'title': 'I like cats very much',
+            'contents': 'goijdofigjdofijoifdg',
+            'word_count': 30
+        }
+    ]
+    log_page_visit('news', start_time=access_time)
+    return render_template('news.html',
+                           news_articles=news_articles)
 
 
 @app.route('/games')

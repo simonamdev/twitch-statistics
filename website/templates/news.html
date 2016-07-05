@@ -12,14 +12,27 @@
             <h1>News</h1>
         </div>
     </div>
-    <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col">
-            <h2 class="center-text">Stuff</h2>
-            <p class="para-text justify-text">
-                Stuff
-            </p>
+    {% for article in news_articles %}
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--6-col">
+                <h2 class="center-text">{{ article.title }}</h2>
+            </div>
+            <div class="mdl-cell mdl-cell--3-col"></div>
         </div>
-        <div class="mdl-cell mdl-cell--3-col"></div>
-    </div>
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--6-col">
+                <p class="para-text justify-text">
+                    <!-- {{ article.contents }} -->
+                    This is a sample description. This is a sample description. This is a sample description.
+                    This is a sample description. This is a sample description. This is a sample description.
+                </p>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 100%;">
+                    Read more ({{ article.word_count }} words)
+                </button>
+            </div>
+            <div class="mdl-cell mdl-cell--3-col"></div>
+        </div>
+    {% endfor %}
 {% endblock %}
