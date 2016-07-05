@@ -40,11 +40,6 @@ class ApplicationLogParser:
 
     def parse_route_popularity(self):
         for line in self.split_rows:
-            route_dict = {
-                'name': line[3],
-                'params': line[4],
-                'count': 1
-            }
             try:
                 self.routes_dict[line[3]]
             except KeyError:
