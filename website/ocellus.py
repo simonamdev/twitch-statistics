@@ -2,6 +2,7 @@ import db_access
 import logging
 import time
 import json
+import os
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect
 from minify import minify as minify_css
@@ -345,7 +346,8 @@ def api_streamer_data(streamer_name):
 
 
 if __name__ == '__main__':
-    handler = RotatingFileHandler('application.log', maxBytes=100000, backupCount=1)
+    log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
+    handler = RotatingFileHandler('application.log', maxBytes=1000000, backupCount=10)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     if not app_info['debug']:
