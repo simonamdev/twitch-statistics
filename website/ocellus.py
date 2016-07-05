@@ -104,24 +104,14 @@ def news(page_number=1):
         page_number = int(page_number)
     except ValueError:
         page_number = 1
-    # TODO: Get news from database instead of dummy files
-    news_articles = [
-        {
-            'title': 'The cat ate my source code',
-            'contents': 'fdgoijfdgoidfgjoijdfg',
-            'word_count': 50
-        },
-        {
-            'title': 'I like cats very much',
-            'contents': 'goijdofigjdofijoifdg',
-            'word_count': 30
-        }
-    ]
+    news_db_access = db_access.NewsArticlesPagination()
+    news_db_access.run()
+    news_articles = news_db_access.get_page(page_number=page_number)
     # TODO: Get pagination data from the database
     page_data = {
         'current': page_number,
-        'per_page': 10,
-        'total': 3
+        'per_page': 3,
+        'total': news_db_access.get_page_count()
     }
     log_page_visit('news', start_time=access_time)
     return render_template('news.html',
