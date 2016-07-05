@@ -97,6 +97,7 @@ def about():
 
 
 @app.route('/about/news/')
+@app.route('/about/news/article/')
 @app.route('/about/news/<page_number>')
 def news(page_number=1):
     access_time = time.time()
