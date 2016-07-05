@@ -51,10 +51,12 @@ class ApplicationLogParser:
                     self.routes_dict[line[3]]['params_dict'][line[4]]
                 except KeyError:
                     self.routes_dict[line[3]]['params_dict'][line[4]] = {
-                        'count': 1
+                        'count': 1,
+                        'times': [line[0]]
                     }
                 else:
                     self.routes_dict[line[3]]['params_dict'][line[4]]['count'] += 1
+                    self.routes_dict[line[3]]['params_dict'][line[4]]['times'].append(line[0])
         pprint(self.routes_dict)
 
 
