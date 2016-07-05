@@ -96,6 +96,7 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/about/news')
 @app.route('/about/news/')
 @app.route('/about/news/<page_number>')
 def news(page_number=1):
@@ -120,7 +121,7 @@ def news(page_number=1):
 
 @app.route('/about/news/article/')
 def no_article():
-    return redirect('news')
+    return redirect('/about/news/')
 
 
 @app.route('/about/news/article/<article_number>')
