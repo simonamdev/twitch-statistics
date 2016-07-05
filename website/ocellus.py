@@ -97,6 +97,7 @@ def about():
 
 
 @app.route('/about/news')
+@app.route('/about/news/page_number')
 def news():
     access_time = time.time()
     # TODO: Get news from database instead of dummy files
@@ -112,9 +113,16 @@ def news():
             'word_count': 30
         }
     ]
+    # TODO: Get pagination data from the database
+    page_data = {
+        'current': 1,
+        'per_page': 10,
+        'total': 3
+    }
     log_page_visit('news', start_time=access_time)
     return render_template('news.html',
-                           news_articles=news_articles)
+                           news_articles=news_articles,
+                           page_data=page_data)
 
 
 @app.route('/games')
@@ -174,7 +182,7 @@ def streamers_list(game_url_name, page_number=1):
     }
     log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number), start_time=access_time)
     return render_template('streamer_list.html',
-                           app_info=app_info,
+                           app_info=app_info,  # TODO: REMOVE THIS
                            game_name=return_name_dict(name=game_url_name),
                            streamer_overviews=streamer_overview_dicts,
                            tier_bounds=tier_bounds,
