@@ -113,7 +113,7 @@ def news(page_number=1):
         'per_page': 3,
         'total': news_db_access.get_page_count()
     }
-    log_page_visit('news', start_time=access_time)
+    log_page_visit('news', start_time=access_time, parameters=str(page_number))
     return render_template('news.html',
                            news_articles=news_articles,
                            page_data=page_data)
