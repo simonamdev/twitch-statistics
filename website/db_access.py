@@ -319,3 +319,57 @@ class StreamData:
             [row[1], row[2]] for row in self.get_stream_raw_data()
         ]
         return json.dumps(data)
+
+
+class NewsArticlesPagination:
+    def __init__(self, per_page=3):
+        self.page = 1
+        self.per_page = per_page
+        self.data_list_length = 0
+        self.db = None
+
+    def run(self):
+        # Open a DB connection
+        db_path = os.path.join(os.getcwd(), 'meta', 'news.db')
+        self.db = Pysqlite(database_name='News DB', database_file=db_path)
+
+    def get_page(self, page_number):
+        # figure out which indices relate to that page
+        # page_number is NOT zero indexed, so we subtract 1 to make it zero indexed
+        # lower bound: (page_number - 1) * self.per_page
+        # upper bound: (page_number - 1) * self.per_page + (self.per_page - 1)
+        # EXAMPLE:
+        # I want page 2 (which is actually page 1, since -1) and I show 10 per page. Page 1's bounds are 10 -> 19, thus:
+        # (2 - 1) * 10 = 10 for the lower bound
+        # (2 - 1) * 10 + (10 - 1) = 10 + 9 = 19 for the upper bound
+        page_indices = {
+            'lower': (page_number - 1) * self.per_page,
+            'upper': (page_number - 1) * self.per_page + (self.per_page - 1)
+        }
+        # get an ordered list of stream overviews
+        ordered_data = self.db.get_specific_rows(
+                table='articles',
+                filter_string='id IS NOT NULL ORDER BY timestamp DESC')
+        self.data_list_length = len(ordered_data)
+        page_data = ordered_data[page_indices['lower']:page_indices['upper']]
+        # map that data to dictionaries
+        article_dicts = [
+            {
+                'id': article[0],
+                'date_written': article[1],
+                'title': article[2],
+                'contents': article[3],
+                'word_count': int(article[4]),
+                'published': True if int(article[5]) == 1 else 0
+            } for article in page_data
+        ]
+        return article_dicts
+
+    def get_page_count(self):
+        return int(ceil(self.data_list_length / float(self.per_page)))
+
+    def has_previous_page(self):
+        return self.page > 1
+
+    def has_next_page(self):
+        return self.page < self.get_page_count()
