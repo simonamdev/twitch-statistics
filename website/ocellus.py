@@ -119,6 +119,10 @@ def news(page_number=1):
 
 
 @app.route('/about/news/article/')
+def no_article():
+    return redirect('news')
+
+
 @app.route('/about/news/article/<article_number>')
 def article(article_number):
     access_time = time.time()
