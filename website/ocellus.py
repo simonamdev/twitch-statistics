@@ -353,7 +353,7 @@ if __name__ == '__main__':
     if not app_info['debug']:
         minify_css()
     app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
-    # app.run(host='0.0.0.0', port=9000, debug=debug_mode)
+    # app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
 
 """
 Logging references:
