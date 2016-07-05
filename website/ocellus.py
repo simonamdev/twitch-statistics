@@ -131,11 +131,10 @@ def article(article_number):
         article_number = int(article_number)
     except ValueError:
         article_number = 1
-    # TODO: Add article data
-    log_page_visit('news', start_time=access_time)
-    return render_template('news.html',
-                           news_articles=news_articles,
-                           page_data=page_data)
+    news_article = db_access.NewsArticle(article_number=article_number)
+    log_page_visit('news', start_time=access_time, parameters=str(article_number))
+    return render_template('news.html', news_article=news_article)
+
 
 @app.route('/games')
 def games():
