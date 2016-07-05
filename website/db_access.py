@@ -358,7 +358,7 @@ class NewsArticlesPagination:
                 'id': article[0],
                 'date_written': article[1],
                 'title': article[2],
-                'contents': article[3],
+                'contents': article[3][:150] + '...',  # truncate the contents string up to the first 150 characters
                 'word_count': int(article[4]),
                 'published': True if int(article[5]) == 1 else 0
             } for article in page_data
