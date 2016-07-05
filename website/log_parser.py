@@ -8,6 +8,8 @@ class ApplicationLogParser:
         self.split_rows = []
         self.log_data = []
         self.ip_addresses = []
+        self.access_list = []
+        self.unique_ip_count = 0
         self.serve_times = []
         self.max_serve_time = 0.0
         self.average_serve_time = 0.0
@@ -27,8 +29,13 @@ class ApplicationLogParser:
 
     def parse_ip_addresses(self):
         for line in self.split_rows:
+            self.access_list.append([int(line[0]), line[2]])
             if line[2] not in self.ip_addresses:
                 self.ip_addresses.append(line[2])
+        self.unique_ip_count = len(self.ip_addresses)
+        # pprint(self.ip_addresses)
+        # pprint(self.access_list)
+        # pprint(self.unique_ip_count)
 
     def parse_serve_times(self):
         for line in self.split_rows:
@@ -57,7 +64,7 @@ class ApplicationLogParser:
                 else:
                     self.routes_dict[line[3]]['params_dict'][line[4]]['count'] += 1
                     self.routes_dict[line[3]]['params_dict'][line[4]]['times'].append(line[0])
-        pprint(self.routes_dict)
+        # pprint(self.routes_dict)
 
 
 def main():
