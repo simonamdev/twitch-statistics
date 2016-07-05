@@ -193,7 +193,6 @@ def streamers_list(game_url_name, page_number=1):
     }
     log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number), start_time=access_time)
     return render_template('streamer_list.html',
-                           app_info=app_info,  # TODO: REMOVE THIS
                            game_name=return_name_dict(name=game_url_name),
                            streamer_overviews=streamer_overview_dicts,
                            tier_bounds=tier_bounds,
