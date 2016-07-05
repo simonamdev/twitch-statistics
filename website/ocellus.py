@@ -96,10 +96,14 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/about/news')
-@app.route('/about/news/page_number')
-def news():
+@app.route('/about/news/')
+@app.route('/about/news/<page_number>')
+def news(page_number=1):
     access_time = time.time()
+    try:
+        page_number = int(page_number)
+    except ValueError:
+        page_number = 1
     # TODO: Get news from database instead of dummy files
     news_articles = [
         {
@@ -115,7 +119,7 @@ def news():
     ]
     # TODO: Get pagination data from the database
     page_data = {
-        'current': 1,
+        'current': page_number,
         'per_page': 10,
         'total': 3
     }
