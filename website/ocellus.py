@@ -205,8 +205,14 @@ def streamers_list(game_url_name, page_number=1):
 @app.route('/streamers/search/', methods=['POST'])
 def streamer_search():
     streamer_name = request.form.get('streamerNameInput', None)
-    # search for the streamer
-    return redirect('streamers/')
+    # TODO: Add server side check for symbols
+    # for every game, check whether the streamer has a database
+    games_streamed_count = db_access.DetermineIfStreamed(streamer_name=streamer_name).get_games_streamed_count()
+    # if the streamed has streamed at least one game
+    if games_streamed_count > 0:
+        return redirect('/streamer/{}'.format(streamer_name.lower()))
+    # TODO: Add flashed messages and use to inform about a streamer not being present
+    return redirect('/streamers/')
 
 
 @app.route('/streamer/')

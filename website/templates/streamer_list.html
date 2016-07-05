@@ -86,9 +86,9 @@
         <div class="mdl-cell mdl-cell--6-col center-text">
             <form method="post" action="{{ url_for('streamer_search') }}" id="streamerNameForm">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9]*" name="streamerNameInput">
-                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Search for streamer</label>
-                    <span class="mdl-textfield__error">Letters and numbers only</span>
+                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9,_,-]*" name="streamerNameInput">
+                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Click here to search for a streamer</label>
+                    <span class="mdl-textfield__error">Only letters, underscores, dashes and numbers allowed</span>
                 </div>
             </form>
         </div>

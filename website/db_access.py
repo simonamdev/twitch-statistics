@@ -197,6 +197,9 @@ class DetermineIfStreamed:
             game_exists_dict[game['short']] = True if os.path.isfile(db_path) else False
         return game_exists_dict
 
+    def get_games_streamed_count(self):
+        return len(self.check_for_all_games())
+
 
 class StreamsDataPagination:
     def __init__(self, game_name, streamer_name, per_page=10):
