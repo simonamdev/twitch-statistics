@@ -127,6 +127,10 @@ def no_article():
 @app.route('/about/news/article/<article_number>')
 def article(article_number):
     access_time = time.time()
+    try:
+        article_number = int(article_number)
+    except ValueError:
+        article_number = 1
     # TODO: Add article data
     log_page_visit('news', start_time=access_time)
     return render_template('news.html',
