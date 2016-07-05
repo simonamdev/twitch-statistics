@@ -86,8 +86,9 @@
         <div class="mdl-cell mdl-cell--6-col center-text">
             <form action="#">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="streamerNameInput">
+                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9]*">
                     <label class="mdl-textfield__label" for="streamerNameInput"  style="color: white;">Search for streamer</label>
+                    <span class="mdl-textfield__error">Letters and numbers only</span>
                 </div>
             </form>
         </div>
