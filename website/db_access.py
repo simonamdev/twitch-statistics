@@ -356,7 +356,7 @@ class NewsArticlesPagination:
         article_dicts = [
             {
                 'id': article[0],
-                'date_written': article[1],
+                'date_written': article[1].split(' ')[0],  # pass only the date part and not the time
                 'title': article[2],
                 'contents': article[3][:150] + '...',  # truncate the contents string up to the first 150 characters
                 'word_count': int(article[4]),
