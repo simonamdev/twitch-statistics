@@ -104,7 +104,7 @@ def news(page_number=1):
         page_number = int(page_number)
     except ValueError:
         page_number = 1
-    news_db_access = db_access.NewsArticlesPagination()
+    news_db_access = db_access.NewsArticlesPagination(per_page=4)
     news_db_access.run()
     news_articles = news_db_access.get_page(page_number=page_number)
     # TODO: Get pagination data from the database

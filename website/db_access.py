@@ -322,7 +322,7 @@ class StreamData:
 
 
 class NewsArticlesPagination:
-    def __init__(self, per_page=3):
+    def __init__(self, per_page=4):
         self.page = 1
         self.per_page = per_page
         self.data_list_length = 0
