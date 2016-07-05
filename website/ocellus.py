@@ -107,7 +107,6 @@ def news(page_number=1):
     news_db_access = db_access.NewsArticlesPagination(per_page=4)
     news_db_access.run()
     news_articles = news_db_access.get_page(page_number=page_number)
-    # TODO: Get pagination data from the database
     page_data = {
         'current': page_number,
         'per_page': 3,
@@ -118,6 +117,16 @@ def news(page_number=1):
                            news_articles=news_articles,
                            page_data=page_data)
 
+
+@app.route('/about/news/article/')
+@app.route('/about/news/article/<article_number>')
+def article(article_number):
+    access_time = time.time()
+    # TODO: Add article data
+    log_page_visit('news', start_time=access_time)
+    return render_template('news.html',
+                           news_articles=news_articles,
+                           page_data=page_data)
 
 @app.route('/games')
 def games():
