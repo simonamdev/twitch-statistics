@@ -12,6 +12,13 @@
             <h1>Ocellus Project News</h1>
         </div>
     </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <h2>Page {{ page_data.current }} of {{ page_data.total }}</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
     {% for article in news_articles %}
         <div class="mdl-grid dark-row">
             <div class="mdl-cell mdl-cell--3-col"></div>
