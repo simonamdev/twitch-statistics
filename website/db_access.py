@@ -360,6 +360,7 @@ class NewsArticlesPagination:
                 'title': article[2],
                 'contents': article[3][:150] + '...',  # truncate the contents string up to the first 150 characters
                 'word_count': int(article[4]),
+                # TODO: Implement not showing the article if it is not marked as published
                 'published': True if int(article[5]) == 1 else 0
             } for article in page_data
         ]
@@ -373,3 +374,28 @@ class NewsArticlesPagination:
 
     def has_next_page(self):
         return self.page < self.get_page_count()
+
+
+class NewsArticle:
+    def __init__(self, article_number=1):
+        self.article_number = article_number
+        self.db_path = os.path.join(os.getcwd(), 'meta', 'news.db')
+        self.db = Pysqlite(database_name='News DB', database_file=self.db_path)
+
+    def get_article(self):
+        # get the article data by the ID
+        article = self.db.get_specific_rows(
+                table='articles',
+                filter_string='id IS NOT NULL WHERE id IS {}'.format(self.article_number))
+        # map that data to dictionaries
+        article_dict = {
+                'id': article[0],
+                'date_written': article[1].split(' ')[0],  # pass only the date part and not the time
+                'title': article[2],
+                'contents': article[3],
+                'word_count': int(article[4]),
+                # TODO: Implement not showing the article if it is not marked as published
+                'published': True if int(article[5]) == 1 else 0
+            }
+        return article_dict
+
