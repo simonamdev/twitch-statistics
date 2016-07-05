@@ -84,10 +84,10 @@
     <div class="mdl-grid dark-row">
         <div class="mdl-cell mdl-cell--3-col"></div>
         <div class="mdl-cell mdl-cell--6-col center-text">
-            <form action="#">
+            <form method="post" action="{{ url_for('streamer_search') }}" id="streamerNameForm">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9]*">
-                    <label class="mdl-textfield__label" for="streamerNameInput"  style="color: white;">Search for streamer</label>
+                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9]*" name="streamerNameInput">
+                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Search for streamer</label>
                     <span class="mdl-textfield__error">Letters and numbers only</span>
                 </div>
             </form>

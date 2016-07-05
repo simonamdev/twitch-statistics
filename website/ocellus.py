@@ -155,6 +155,7 @@ def game(game_name):
 
 
 @app.route('/streamers')
+@app.route('/streamers/')
 def streamers():
     log_page_visit('streamers')
     return render_template('streamers.html', games=game_names)
@@ -199,6 +200,13 @@ def streamers_list(game_url_name, page_number=1):
                            tier_counts=tier_counts,
                            tier_streamers=tier_streamers,
                            page_data=page_data)
+
+
+@app.route('/streamers/search/', methods=['POST'])
+def streamer_search():
+    streamer_name = request.form.get('streamerNameInput', None)
+    # search for the streamer
+    return redirect('streamers/')
 
 
 @app.route('/streamer/')
