@@ -131,9 +131,9 @@ def article(article_number):
         article_number = int(article_number)
     except ValueError:
         article_number = 1
-    news_article = db_access.NewsArticle(article_number=article_number)
+    news_article = db_access.NewsArticle(article_number=article_number).get_article()
     log_page_visit('news', start_time=access_time, parameters=str(article_number))
-    return render_template('news.html', news_article=news_article)
+    return render_template('news_article.html', article=news_article)
 
 
 @app.route('/games')
