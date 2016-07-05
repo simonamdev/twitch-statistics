@@ -41,14 +41,14 @@
             {% set prev_page_number = page_data.current - 1 %}
             {% set next_page_number = page_data.current + 1 %}
             {% if not prev_page_number == 0 %}
-                <a href="#">
+                <a href="{{ url_for('news', page_number=prev_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_left</i>
                 </a>
             {% endif %}
         </div>
         <div class="mdl-cell mdl-cell--1-col center-text">
             {% if not next_page_number > page_data.total %}
-                <a href="#">
+                <a href="{{ url_for('news', page_number=next_page_number) }}">
                     <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_right</i>
                 </a>
             {% endif %}
