@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 app_info = {
     'debug': True,
-    'version': 'Alpha 0.3'
+    'version': 'Alpha 0.4'
 }
 
 game_names = [
