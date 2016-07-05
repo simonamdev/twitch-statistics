@@ -4,7 +4,7 @@ from neopysqlite.neopysqlite import Pysqlite
 from tqdm import tqdm
 
 
-fix_stream_tables = False
+fix_stream_tables = True
 fix_game_tables = True
 
 games = ['ED',  'PC']
