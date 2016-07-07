@@ -6,6 +6,7 @@ from shutil import move as move_file
 from time import sleep
 from cfg import SCP_COMMAND, EMAIL_COMMAND
 from consolidate_data import consolidate_all_data
+from collection import twitchapi
 
 # Global values
 cycle_delay = 30  # seconds
@@ -25,10 +26,10 @@ def get_config_values():
     dicts_list = []
     for i in range(0, len(data) // 4):
         return_dict = {
-            'url_name': data.pop(0),
-            'name': data.pop(0),
-            'game_names': data.pop(0).split(','),
-            'shorthand_name': data.pop(0)
+            'url': data.pop(0),
+            'full': data.pop(0),
+            'possible_full': data.pop(0).split(','),
+            'short': data.pop(0)
         }
         dicts_list.append(return_dict)
     return dicts_list
@@ -150,7 +151,6 @@ def main():
     previous_day = datetime.now().day
     previous_date_string = get_current_date_string()
     while True:
-
         # check if a day has passed
         day = datetime.now().day
         current_date_string = get_current_date_string()
@@ -163,7 +163,9 @@ def main():
             # update the date string
             previous_date_string = current_date_string
         # for each game, get the data
-        for game in games:
+        for game_name in games:
+            print(game_name)
+            """
             json_url_streams = r'https://api.twitch.tv/kraken/streams?game={}'.format(game['url_name'])
             # initial api ping to get the first set of streamers
             try:
@@ -209,6 +211,7 @@ def main():
                             data_rows=current_stream_data,
                             verbose=True)
                     api_offset_count += 90
+                            """
         pause(cycle_delay)
 
 if __name__ == '__main__':
