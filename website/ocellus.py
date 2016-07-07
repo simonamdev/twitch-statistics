@@ -96,6 +96,12 @@ def page_not_found(e):
     return render_template('error.html', error_code=404), 404
 
 
+@app.errorhandler(500)
+def server_overloaded(e):
+    log_page_visit('error', '500')
+    return render_template('error.html', error_code=500), 500
+
+
 # Front facing routes
 @app.route('/')
 def index():

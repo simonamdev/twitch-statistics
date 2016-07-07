@@ -3,14 +3,13 @@
     <div class="mdl-grid dark-row">
         <div class="mdl-cell mdl-cell--12-col center-text">
             <h1>{{ error_code }} Error</h1>
-        </div>
-    </div>
-    <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--4-col"></div>
-        <div class="mdl-cell mdl-cell--4-col">
             <h4 class="center-text">Oops! Something went wrong!</h4>
+            {% if error_code == 404 %}
+                <h4 class="center-text">PAGE NOT FOUND</h4>
+            {% elif error_code == 500 %}
+                <h4 class="center-text">SERVER OVERLOADED</h4>
+            {% endif %}
         </div>
-        <div class="mdl-cell mdl-cell--4-col"></div>
     </div>
     <div class="mdl-grid dark-row">
         <div class="mdl-cell mdl-cell--3-col"></div>
