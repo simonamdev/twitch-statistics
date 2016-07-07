@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if ocellus_debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
+{% endblock %}
+{% block js %}
+    {% if app_info.debug %}
+        <script src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
+    {% else %}
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
+    {% endif %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+{% block content %}
+    <div id="streamer-title" class="mdl-grid">
+        <h1 class="game-title center-text">{{ streamer.name }}</h1>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <h1>
+                Partnered:
+                {% if streamer.ED %}
+                    {% if streamer.overviews['ED'].partnership == 1 %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                    {% else %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
+                    {% endif %}
+                {% else %}
+                    {% if streamer.overviews['PC'].partnership == 1 %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
+                    {% else %}
+                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
+                    {% endif %}
+                {% endif %}
+            </h1>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+    {% if streamer.ED %}
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--12-col center-text">
+                <h1>{{ streamer.name }} overall {{ streamer.overviews['ED'].game_full }} statistics</h1>
+            </div>
+        </div>
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--4-col data-text">
+                <h2>Average Viewers: {{ streamer.overviews['ED'].viewers_average }}</h2>
+                <h2>Peak Viewers: {{ streamer.overviews['ED'].viewers_peak }}</h2>
+                <h2>Average Duration: {{ streamer.overviews['ED'].duration_average }} hours</h2>
+                <h2>Total Duration: {{ streamer.overviews['ED'].duration_total }} hours</h2>
+                <h2>Stream Count: {{ streamer.overviews['ED'].stream_count }}</h2>
+            </div>
+            <div class="mdl-cell mdl-cell--5-col"></div>
+        </div>
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--1-col"></div>
+            <div class="mdl-cell mdl-cell--5-col visualisation" id="ED-average-viewers-graph"></div>
+            <div class="mdl-cell mdl-cell--5-col visualisation" id="ED-followers-graph"></div>
+            <div class="mdl-cell mdl-cell--1-col"></div>
+        </div>
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--12-col">
+                <div class="game-card mdl-card mdl-shadow--2dp" id="elitedangerous-wide-card" style="width: 100%;">
+                    <div class="mdl-card__title mdl-card--expand"></div>
+                    <div class="mdl-card__actions">
+                        <a href="{{ url_for('streams', streamer_name=streamer.name, game_url_name=game_names['ED'].url) }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                            <i class="material-icons mdl-list__item-icon">face</i>
+                            <span class="game-card-image__filename">
+                                {{ streamer.name }}'s Elite: Dangerous streams
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if streamer.PC %}
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--9-col data-text">
+                <h1>{{ streamer.name }} overall {{ streamer.overviews['PC'].game_full }} statistics</h1>
+            </div>
+        </div>
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--4-col data-text">
+                <h2>Average Viewers: {{ streamer.overviews['PC'].viewers_average }}</h2>
+                <h2>Peak Viewers: {{ streamer.overviews['PC'].viewers_peak }}</h2>
+                <h2>Average Duration: {{ streamer.overviews['PC'].duration_average }} hours</h2>
+                <h2>Total Duration: {{ streamer.overviews['PC'].duration_total }} hours</h2>
+                <h2>Stream Count: {{ streamer.overviews['PC'].stream_count }}</h2>
+            </div>
+            <div class="mdl-cell mdl-cell--5-col"></div>
+        </div>
+        <div class="mdl-grid light-row">
+            <div class="mdl-cell mdl-cell--1-col"></div>
+            <div class="mdl-cell mdl-cell--5-col visualisation" id="PC-average-viewers-graph"></div>
+            <div class="mdl-cell mdl-cell--5-col visualisation" id="PC-followers-graph"></div>
+            <div class="mdl-cell mdl-cell--1-col"></div>
+        </div>
+        <div class="mdl-grid dark-row">
+            <div class="mdl-cell mdl-cell--12-col">
+                <div class="game-card mdl-card mdl-shadow--2dp" id="planetcoaster-wide-card" style="width: 100%;">
+                    <div class="mdl-card__title mdl-card--expand"></div>
+                    <div class="mdl-card__actions">
+                        <a href="{{ url_for('streams', streamer_name=streamer.name, game_url_name=game_names['PC'].url) }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button" style="width: 97%; padding: 2em;">
+                            <i class="material-icons mdl-list__item-icon">face</i>
+                            <span class="game-card-image__filename">
+                                {{ streamer.name }}'s Planet Coaster streams
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <script type="text/javascript" src="{{ url_for('static', filename='drawStreamerCharts.js') }}"></script>
+    <script type="text/javascript">
+        loadCharts("{{ streamer.name }}");
+    </script>
+{% endblock %}

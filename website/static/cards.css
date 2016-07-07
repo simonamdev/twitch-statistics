@@ -1,0 +1,71 @@
+#elitedangerous-card {
+	background: url('../static/images/elitedangerous.jpg') center / cover;
+}
+
+#elitedangerous-wide-card {
+	background: url('../static/images/elitedangerous2.jpg') center / cover;
+}
+
+#planetcoaster-card {
+	background: url('../static/images/planetcoaster.jpg') center / cover;
+}
+
+#planetcoaster-wide-card {
+	background: url('../static/images/planetcoaster2.jpg') center / cover;
+}
+
+#streamer-card {
+	background: url('../static/images/faces.jpg') center / cover;
+}
+
+#news-card {
+	background: url('../static/images/ocellus1.jpg') center / cover;
+}
+
+#performance-card {
+	background: url('../static/images/performance_cover.jpg') center / cover;
+}
+
+.card-margin {
+	margin-top: 50px;
+}
+
+.game-card.mdl-card {
+  width: 100%;
+  height: 256px;
+}
+.game-card-image > .mdl-card__actions {
+  height: 52px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.game-card-image__filename {
+  color: #fff;
+  font-size: 100%;
+}
+
+.blue-button {
+	background-color: #0D47A1;
+	padding: 1em;
+}
+
+.github-card-wide.mdl-card {
+  width: 100%;
+}
+
+.github-card-wide > .mdl-card__title {
+  height: 176px;
+	color: white;
+	background: url('../static/images/github.jpg') center / cover;
+}
+
+/* Can be folded into one width class for all cards */
+.mdl-link-card-wide.mdl-card {
+  width: 100%;
+}
+
+.mdl-link-card-wide > .mdl-card__title {
+  height: 176px;
+	color: white;
+	background: url('../static/images/mdl.jpg') center / cover;
+}

@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if ocellus_debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>About</h1>
+        </div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <p class="para-text justify-text">
+                The Ocellus project started around around February 2016 when I begun to dig into
+                Twitch.tv's public API. I wanted to further my skills in software, required
+                a project to start and I was interested in using technology to bring some sort of
+                valuable insight to streamers to help them become more data driven, whether they
+                stream as a hobby or professionally.
+            </p>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--4-col"></div>
+        <div class="mdl-cell mdl-cell--4-col">
+            <h4 class="center-text">Ocellus Project News</h4>
+            <div class="game-card mdl-card mdl-shadow--2dp" id="news-card">
+                <div class="mdl-card__title mdl-card--expand"></div>
+                <div class="mdl-card__actions">
+                    <a href="{{ url_for('news') }}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
+                        <i class="material-icons mdl-list__item-icon">info_outline</i>
+                        <span class="game-card-image__filename">
+                            Click here
+                        </span>
+                    </a>
+                </div>
+            </div>
+            <h4 class="center-text">The Ocellus Project is available on GitHub</h4>
+            <div class="github-card-wide mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"></h2>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="https://github.com/purrcat259/twitch-statistics" target="_blank">
+                        Click Here
+                    </a>
+                </div>
+            </div>
+            <h4 class="center-text card-margin">Styled using Google's Material Design Lite CSS Framework</h4>
+            <div class="mdl-link-card-wide mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"></h2>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="https://getmdl.io/" target="_blank">
+                        Click Here
+                    </a>
+                </div>
+            </div>
+            <h4 class="center-text">Website Performance</h4>
+            <div class="game-card mdl-card mdl-shadow--2dp" id="performance-card">
+                <div class="mdl-card__title mdl-card--expand"></div>
+                <div class="mdl-card__actions">
+                    <a href="#" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect blue-button">
+                        <i class="material-icons mdl-list__item-icon">info_outline</i>
+                        <span class="game-card-image__filename">
+                            COMING SOON
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col"></div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col">
+            <h2 class="center-text">Disclaimer regarding asset use</h2>
+            <p class="para-text justify-text">
+                This website was created using assets and imagery from Elite: Dangerous,
+                with the permission of Frontier Developments plc, for non-commercial purposes.
+                It is not endorsed by nor reflects the views or opinions of Frontier Developments
+                and no employee of Frontier Developments was involved in the making of it.
+            </p>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+{% endblock %}

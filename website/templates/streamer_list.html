@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if ocellus_debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='titles.min.css') }}">
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/tables-min.css">
+{% endblock %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div  class="mdl-cell mdl-cell--12-col center-text">
+            <h1>{{ game_name.full }} Streamer Data</h1>
+        </div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--2-col"></div>
+        <!-- Content -->
+        <div class="mdl-cell mdl-cell--8-col">
+            <!-- TODO: Move inline styles to a css sheet -->
+            <h1 style="font-size: 200%;">Page {{ page_data.current }} of {{ page_data.total }}</h1>
+            <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Average Viewers</th>
+                        <th>Peak Viewers</th>
+                        <th>Followers</th>
+                        <th>Average Duration (hours)</th>
+                        <th>Total Duration (hours)</th>
+                        <th>Partnered</th>
+                        <th>Info</th>
+                    </tr>
+                </thead>
+                {% for index, data in streamer_overviews %}
+                    <tr>
+                        {% set streamer_id = index + (page_data.per_page * (page_data.current - 1)) %}
+                        <td>{{ streamer_id }}</td>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.viewers_average }}</td>
+                        <td>{{ data.viewers_peak }}</td>
+                        <td>{{ data.followers }}</td>
+                        <td>{{ data.duration_average }}</td>
+                        <td>{{ data.duration_total }}</td>
+                        <td>
+                            {% if data.partnership == 1 %}
+                                <!-- 1 = Is partnered -->
+                                <i class="material-icons mdl-list__item-icon">done</i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('streamer', streamer_name=data.name) }}">
+                                <i class="material-icons mdl-list__item-icon">info</i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="mdl-cell mdl-cell--2-col"></div>
+    </div>
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--5-col"></div>
+        <div class="mdl-cell mdl-cell--1-col">
+            {% set prev_page_number = page_data.current - 1 %}
+            {% set next_page_number = page_data.current + 1 %}
+            {% if not prev_page_number == 0 %}
+                <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=prev_page_number) }}">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_left</i>
+                </a>
+            {% endif %}
+        </div>
+        <div class="mdl-cell mdl-cell--1-col center-text">
+            {% if not next_page_number > page_data.total %}
+                <a href="{{ url_for('streamers_list', game_url_name=game_name.url, page_number=next_page_number) }}">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%">keyboard_arrow_right</i>
+                </a>
+            {% endif %}
+        </div>
+        <div class="mdl-cell mdl-cell--5-col"></div>
+    </div>
+    <!-- Search bar -->
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col center-text">
+            <form method="post" action="{{ url_for('streamer_search') }}" id="streamerNameForm">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9,_,-]*" name="streamerNameInput">
+                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Click here to search for a streamer</label>
+                    <span class="mdl-textfield__error">Only letters, underscores, dashes and numbers allowed</span>
+                </div>
+                <button class="mdl-button mdl-button--raised mdl-button--colored">Search</button>
+            </form>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--4-col center-text"></div>
+        <div class="mdl-cell mdl-cell--4-col center-text">
+            <h1>Tiers</h1>
+            <p>
+                Tiers help sort and visualise the distribution of streamers depending on their
+                average viewer count. The bounds are completely artifical and should not be used
+                as definitive "ranking" for any given streamer.
+            </p>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col center-text"></div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--2-col"></div>
+        <div class="mdl-cell mdl-cell--8-col center-text">
+            <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Tier Number</th>
+                        <th>Tier Upper Bound</th>
+                        <th>Tier Lower Bound</th>
+                        <th>Number of Streamers</th>
+                    </tr>
+                </thead>
+                {% for bound in tier_bounds %}
+                    <tr>
+                        <td>Tier {{ bound.tier }}</td>
+                        <td>{{ bound.upper }}</td>
+                        <td>{{ bound.lower }}</td>
+                        <td>{{ tier_counts[loop.index - 1] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="mdl-cell mdl-cell--2-col"></div>
+    </div>
+{% endblock %}

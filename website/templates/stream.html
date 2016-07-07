@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block css %}
+    {% if ocellus_debug %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.css') }}">
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cards.min.css') }}">
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.6.0/tables-min.css">
+{% endblock %}
+{% block js %}
+    {% if app_info.debug %}
+        <script src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>
+    {% else %}
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
+    {% endif %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+{% block content %}
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1>{{ streamer_name }}'s {{ game_name.full }} stream ID #{{ stream_data.id }}</h1>
+        </div>
+    </div>
+
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+        <div class="mdl-cell mdl-cell--3-col data-text">
+            <h2>Time start: {{ stream_data.time_start }}</h2>
+            <h2>Duration: {{ stream_data.duration }} hours</h2>
+            <h2>Follower delta: {{ stream_data.follower_delta }}</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col data-text" style="text-align: right;">
+            <h2>Average Viewers: {{ stream_data.viewers_average }}</h2>
+            <h2>Peak Viewers: {{ stream_data.viewers_peak }}</h2>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col center-text"></div>
+    </div>
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col visualisation" id="viewers-graph"></div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
+    <!-- Navigation Part -->
+    {% set prev_stream_id = stream_data.id - 1 %}
+    {% set next_stream_id = stream_data.id + 1 %}
+    <div class="mdl-grid light-row">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            {% if prev_stream_id >= 1 %}
+                <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=prev_stream_id) }}" style="margin-right: 50px;">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_left</i>
+                </a>
+            {% endif %}
+            <a href="{{ url_for('streams', streamer_name=streamer_name, game_url_name=game_name.url) }}">
+                <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">list</i>
+            </a>
+            {% if next_stream_id <= stream_data.max_id %}
+                <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=next_stream_id) }}" style="margin-left: 50px;">
+                    <i class="material-icons mdl-list__item-icon" style="font-size: 500%;">keyboard_arrow_right</i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='drawStreamCharts.js') }}"></script>
+    <script type="text/javascript">
+        loadCharts("{{ streamer_name }}", "{{ game_name.short }}", "{{ stream_data.id }}");
+    </script>
+{% endblock %}

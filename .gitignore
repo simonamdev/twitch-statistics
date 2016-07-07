@@ -1,4 +1,8 @@
 cfg.py
 data/
 .idea/
-website/__pycache__
+__pycache__/
+website/__pycache__/
+data/
+website/data/
+website/application.log
