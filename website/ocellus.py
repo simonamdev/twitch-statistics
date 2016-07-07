@@ -315,10 +315,21 @@ def streams(streamer_name, game_url_name, page_number=1):
 @app.route('/streamer/<streamer_name>/<game_url_name>/stream/<stream_id>')
 def stream(streamer_name, game_url_name, stream_id=1):
     access_time = time.time()
+    # validate the streamer name
+    stream_determine_access = db_access.DetermineIfStreamed(streamer_name=streamer_name)
+    streamer_exists = stream_determine_access.check_streamed_anything()
+    if not streamer_exists:
+        abort(404)
+    # validate the game name
+    if game_url_name not in games_url_names:
+        abort(404)
+    # validate the stream ID
     try:
         stream_id = int(stream_id)
     except ValueError:
         stream_id = 1
+    else:
+        stream_id = 1 if stream_id < 1 else stream_id
     # get the stream data from the database
     stream_access = db_access.StreamData(
         game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
