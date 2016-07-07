@@ -26,12 +26,16 @@ class TestRequestGameData:
             game_proper_name='Elite: Dangerous',
             verbose=True)
         api.request_all_game_data()
+        # check that the data is not empty
         assert len(api.return_streams_data()) > 0
+        # Check the timestamp
         data = api.return_required_data()
         now_timestamp = data[0][4]  # get the first timestamp
         # split the timestamp up
         date_part = now_timestamp.split(' ')[0].split('-')
         day_array = [int(date_part[0]), int(date_part[1]), int(date_part[2])]
         assert day_array == [datetime.now().year, datetime.now().month, datetime.now().day]
-
+        # check clearing the data
+        api.clear_streams_data()
+        assert api.return_required_data() is None
 
