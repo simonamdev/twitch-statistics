@@ -72,9 +72,9 @@ class APIStreamsRequest:
             return None
         # create a timestamp string for now
         timestamp = '{}-{}-{} {}:{}:{}'.format(
-                datetime.now().day,
-                datetime.now().month,
                 datetime.now().year,
+                datetime.now().month,
+                datetime.now().day,
                 datetime.now().hour,
                 datetime.now().minute,
                 datetime.now().second
