@@ -27,6 +27,18 @@ game_names = [
     }
 ]
 
+games_short_names = [
+    name['short'] for name in game_names
+]
+
+games_url_names = [
+    name['url'] for name in game_names
+]
+
+games_full_names = [
+    name['full'] for name in game_names
+]
+
 game_names_dict = {
     'ED': game_names[0],
     'PC': game_names[1]
