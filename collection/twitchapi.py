@@ -56,6 +56,8 @@ class APIStreamsRequest:
     def request_all_game_data(self):
         url = self.json_url + '?game=' + self.game_url_name
         response_data = self.make_request(url=url)
+        if response_data is None:
+            raise Exception
         streams_data = response_data['streams']
         link_to_next = response_data['_links']['next']
         while not len(streams_data) == 0:
