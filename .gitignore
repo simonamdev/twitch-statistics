@@ -2,7 +2,5 @@ cfg.py
 data/
 .idea/
 __pycache__/
-website/__pycache__/
-data/
-website/data/
-website/application.log
+logs/
+collection/.cache
