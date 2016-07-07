@@ -385,7 +385,7 @@ def api_streamer_data(streamer_name):
     log_page_visit('streamer_api', streamer_name, start_time=access_time)
     return json.dumps(streamer_graph_data)
 
-
+"""
 # API Routes below here
 @app.route('/api/v1/stream_start_times/<game_short_name>/')
 def api_game_start_times(game_short_name):
@@ -394,7 +394,7 @@ def api_game_start_times(game_short_name):
     stream_times = streams_access.get_stream_start_times()
     log_page_visit('game_start_api', game_short_name, start_time=access_time)
     return json.dumps(stream_times)
-
+"""
 
 if __name__ == '__main__':
     log_path = os.path.join(os.getcwd(), 'logs', 'application.log')

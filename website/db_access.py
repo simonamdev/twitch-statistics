@@ -289,7 +289,7 @@ class StreamsDataPagination:
     def has_next_page(self):
         return self.page < self.get_page_count()
 
-
+"""
 class StreamsData:
     def __init__(self, game_short_name):
         self.game_short_name = game_short_name
@@ -303,13 +303,12 @@ class StreamsData:
         start_times = []
         streamer_db_names = os.listdir(self.db_base_path)
         streamer_db_names.remove('base')
-        from tqdm import tqdm
-        for streamer_db in tqdm(streamer_db_names):
+        for streamer_db in streamer_db_names:
             db = self.open_streamer_db(streamer_name=streamer_db.replace('.db', ''))
             stream_rows = db.get_all_rows('streams')
             start_times.extend([row[1] for row in stream_rows])
         return json.dumps(start_times)
-
+"""
 
 class StreamData:
     def __init__(self, streamer_name, game_name, stream_id):
