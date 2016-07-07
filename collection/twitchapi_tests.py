@@ -1,5 +1,6 @@
 import pytest
 import twitchapi  # ignore PyCharm error here
+from datetime import datetime
 
 
 class TestIllegalArguments:
@@ -26,4 +27,11 @@ class TestRequestGameData:
             verbose=True)
         api.request_all_game_data()
         assert len(api.return_streams_data()) > 0
+        data = api.return_required_data()
+        now_timestamp = data[0][4]  # get the first timestamp
+        # split the timestamp up
+        date_part = now_timestamp.split(' ')[0].split('-')
+        day_array = [int(date_part[0]), int(date_part[1]), int(date_part[2])]
+        assert day_array == [datetime.now().year, datetime.now().month, datetime.now().day]
+
 
