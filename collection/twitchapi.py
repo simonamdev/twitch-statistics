@@ -43,6 +43,9 @@ class APIStreamsRequest:
         self.print('[INFO] Status code returned: {}'.format(self.last_status_code))
         return response.json()
 
+    def last_request_successful(self):
+        return self.last_status_code == 200
+
     def request_all_game_data(self):
         url = self.json_url + '?game=' + self.game_url_name
         response_data = self.make_request(url=url)
