@@ -157,7 +157,7 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
-    if game_names not in games_url_names:
+    if game_name not in games_url_names:
         return abort(404)
     access_time = time.time()
     name_dict = return_name_dict(name=game_name)
