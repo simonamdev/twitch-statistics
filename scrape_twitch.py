@@ -1,20 +1,22 @@
 import csv
 import os
+import time
 from datetime import datetime
 from shutil import move as move_file
-from time import sleep
 from cfg import SCP_COMMAND, EMAIL_COMMAND
 from consolidate_data import consolidate_all_data
 from collection import twitchapi
+from logging import FileHandler
 
 # Global values
 cycle_delay = 30  # seconds
+downtime_log_path = os.path.join(os.getcwd(), 'logs', 'downtime.log')
 
 
 def pause(amount=5):
-    for time in range(amount, 0, -1):
-        print('[+] Paused for {} seconds   '.format(time), end='\r')
-        sleep(1)
+    for pause_tick in range(amount, 0, -1):
+        print('[+] Paused for {} seconds   '.format(pause_tick), end='\r')
+        time.sleep(1)
     print('                                    ', end='\r')
 
 
@@ -136,7 +138,9 @@ def process_streamer_data(data_list=None):
 
 
 def log_downtime():
-    pass
+    handler = FileHandler(downtime_log_path, mode='a')
+    handler.emit('downtime|{}'.format(time.time()))
+    handler.close()
 
 
 def main():
