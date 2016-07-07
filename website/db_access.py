@@ -190,6 +190,13 @@ class DetermineIfStreamed:
     def __init__(self, streamer_name):
         self.streamer_name = streamer_name
 
+    def check_streamed_anything(self):
+        for game in game_names:
+            db_path = os.path.join(os.getcwd(), 'data', game['short'], 'streamers', '{}.db'.format(self.streamer_name))
+            if os.path.isabs(db_path):
+                return True
+        return False
+
     def check_for_all_games(self):
         game_exists_dict = dict()
         for game in game_names:
