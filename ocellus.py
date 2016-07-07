@@ -1,11 +1,12 @@
+import json
 import db_access
 import logging
-import time
-import json
 import os
+import time
+from minify import minify as minify_css
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, abort
-from minify import minify as minify_css
+
 
 app = Flask(__name__)
 
