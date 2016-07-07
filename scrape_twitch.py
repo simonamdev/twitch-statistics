@@ -159,12 +159,14 @@ def main():
                 log_downtime()
             returned_data = api.return_required_data()
             # if any returned data is available, then write to to the CSV
-            if len(returned_data) > 0:
+            if not returned_data is None and len(returned_data) > 0:
                 file_name = game_name['short'] + '_' + current_date_string
                 insert_data_rows_into_csv(
                     file_name=file_name,
                     data_rows=returned_data,
                     verbose=True)
+            else:
+                print('[-] No rows written for: {}'.format(game_name['full']))
         pause(cycle_delay)
 
 if __name__ == '__main__':
