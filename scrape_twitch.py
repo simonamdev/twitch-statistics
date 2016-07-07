@@ -164,10 +164,17 @@ def main():
             print('Starting cycle for: {}'.format(game_name['full']))
             # Get the data for the current game by invoking the twitchapi module
             api = twitchapi.APIStreamsRequest(game_url_name=game_name['url'], game_proper_name=game_name['full'], verbose=True)
-            api.request_all_game_data()
+            try:
+                api.request_all_game_data()
+            except Exception as e:
+                print(e)
+                time.sleep(10)
+                # move onto the next game
+                continue
             # if the last request was not successful, log to the error log
             if not api.last_request_successful():
                 log_downtime()
+            print(api.return_required_data())
             """
             json_url_streams = r'https://api.twitch.tv/kraken/streams?game={}'.format(game['url_name'])
             # initial api ping to get the first set of streamers
