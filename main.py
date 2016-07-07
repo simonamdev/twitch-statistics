@@ -1,12 +1,13 @@
-import requests
 import csv
 import os
-from cfg import SCP_COMMAND, EMAIL_COMMAND
 from datetime import datetime
-from time import sleep
 from shutil import move as move_file
-from consolidation.get_info import TwitchStatisticsOutput
-from consolidation.consolidate_data import consolidate_all_data
+from time import sleep
+
+import requests
+
+from cfg import SCP_COMMAND, EMAIL_COMMAND
+from consolidate_data import consolidate_all_data
 
 # Global values
 cycle_delay = 30  # seconds
