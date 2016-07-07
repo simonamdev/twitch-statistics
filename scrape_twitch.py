@@ -135,11 +135,12 @@ def main():
                 print(e)
                 time.sleep(10)
                 # move onto the next game
-                continue
+                break
             # if the last request was not successful, log to the error log
             if not api.last_request_successful():
                 log_downtime()
             returned_data = api.return_required_data()
+            # if any returned data is available, then write to to the CSV
             if len(returned_data) > 0:
                 file_name = game_name['short'] + '_' + current_date_string
                 insert_data_rows_into_csv(
