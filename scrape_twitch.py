@@ -135,14 +135,8 @@ def process_streamer_data(data_list=None):
     return return_data
 
 
-def write_tick_timestamp():
-    with open('tick_timestamps.txt', mode='a') as textfile:
-        textfile.write('{} {}:{}:{}\n'.format(
-                get_current_date_string().replace('_', '-'),
-                datetime.now().hour,
-                datetime.now().minute,
-                datetime.now().second
-        ))
+def log_downtime():
+    pass
 
 
 def main():
@@ -167,7 +161,9 @@ def main():
             # Get the data for the current game by invoking the twitchapi module
             api = twitchapi.APIStreamsRequest(game_url_name=game_name['url'], game_proper_name=game_name['full'], verbose=True)
             api.request_all_game_data()
-
+            # if the last request was not successful, log to the error log
+            if not api.last_request_successful():
+                log_downtime()
             """
             json_url_streams = r'https://api.twitch.tv/kraken/streams?game={}'.format(game['url_name'])
             # initial api ping to get the first set of streamers
