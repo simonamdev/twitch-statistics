@@ -164,7 +164,11 @@ def main():
             previous_date_string = current_date_string
         # for each game, get the data
         for game_name in games:
-            print(game_name)
+            print('Starting cycle for: {}'.format(game_name['full']))
+            # Get the data for the current game by invoking the twitchapi module
+            api = twitchapi.APIStreamsRequest(game_url_name=game_name['url'], game_proper_name=game_name['full'], verbose=True)
+            api.request_all_game_data()
+            
             """
             json_url_streams = r'https://api.twitch.tv/kraken/streams?game={}'.format(game['url_name'])
             # initial api ping to get the first set of streamers
