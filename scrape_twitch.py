@@ -9,9 +9,9 @@ from collection import twitchapi
 from logging import FileHandler
 
 # Global values
-perform_backup = True
-perform_db_consolidation = True
-send_notification_email = True
+perform_backup = False
+perform_db_consolidation = False
+send_notification_email = False
 cycle_delay = 30  # seconds
 downtime_log_path = os.path.join(os.getcwd(), 'logs', 'downtime.log')
 
@@ -63,22 +63,32 @@ def consolidate_data(game_dicts, previous_date_string):
     game_shorthands = []
     for game in game_dicts:
         game_shorthands.append(game['shorthand_name'])
+        file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
         try:
             # gather information for the backup notification
-            file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
             file_size = os.path.getsize(file_name)
             file_size = round(file_size / (1024 * 1024), 2)
             notification_string += '{}: {}MB. '.format(game['name'], file_size)
             if perform_backup:
                 print('[!] Running backup command')
                 os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
+            else:
+                print('[!] Not running backup command')
             # move the file to its respective data directory for consolidation
             data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'], 'csv')
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
             notification_string += 'NOT FINISHED. '
+        if not perform_db_consolidation:
+            print('[!] Not running db consolidation')
+            print('[!] Moving CSVs to complete folder')
+            move_file(
+                src=os.path.join(os.getcwd(), 'data', game['short'], 'csv', file_name),
+                dst=os.path.join(os.getcwd(), 'completed', file_name)
+            )
     if perform_db_consolidation:
+        print('[!] Starting Database consolidation')
         try:
             consolidate_all_data(game_shorthands=game_shorthands)
             notification_string += '\nConsolidation of files completed successfully'
@@ -86,7 +96,11 @@ def consolidate_data(game_dicts, previous_date_string):
             print('[-] Consolidation error: {}'.format(e))
             notification_string += '\nConsolidation of files did not complete successfully'
     if send_notification_email:
+        print('[!] Sending notification email')
         os.system(EMAIL_COMMAND.format(notification_string))
+    else:
+        print('[!] Not sending notification email. Notification string:')
+        print(notification_string)
     pause(2)
     """
     from consolidation import get_info
