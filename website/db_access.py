@@ -193,7 +193,7 @@ class DetermineIfStreamed:
     def check_streamed_anything(self):
         for game in game_names:
             db_path = os.path.join(os.getcwd(), 'data', game['short'], 'streamers', '{}.db'.format(self.streamer_name))
-            if os.path.isabs(db_path):
+            if os.path.isfile(db_path):
                 return True
         return False
 
