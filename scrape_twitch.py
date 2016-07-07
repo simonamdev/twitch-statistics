@@ -1,11 +1,9 @@
 import csv
 import os
+import requests
 from datetime import datetime
 from shutil import move as move_file
 from time import sleep
-
-import requests
-
 from cfg import SCP_COMMAND, EMAIL_COMMAND
 from consolidate_data import consolidate_all_data
 
