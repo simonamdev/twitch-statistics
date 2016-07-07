@@ -22,6 +22,10 @@
 	background: url('../static/images/ocellus1.jpg') center / cover;
 }
 
+#performance-card {
+	background: url('../static/images/performance_cover.jpg') center / cover;
+}
+
 .card-margin {
 	margin-top: 50px;
 }
