@@ -55,7 +55,6 @@ def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
 
 
 def consolidate_data(game_dicts, previous_date_string):
-    # get the pynma object
     print('[+] Starting consolidation procedure')
     notification_string = ''
     game_shorthands = []
@@ -126,9 +125,9 @@ def main():
             previous_date_string = current_date_string
         # for each game, get the data
         for game_name in games:
-            print('Starting cycle for: {}'.format(game_name['full']))
+            print('[+] Starting cycle for: {}'.format(game_name['full']))
             # Get the data for the current game by invoking the twitchapi module
-            api = twitchapi.APIStreamsRequest(game_url_name=game_name['url'], game_proper_name=game_name['full'], verbose=True)
+            api = twitchapi.APIStreamsRequest(game_url_name=game_name['url'], game_proper_name=game_name['full'])
             try:
                 api.request_all_game_data()
             except Exception as e:
