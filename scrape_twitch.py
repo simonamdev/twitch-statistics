@@ -9,6 +9,9 @@ from collection import twitchapi
 from logging import FileHandler
 
 # Global values
+perform_backup = True
+perform_db_consolidation = True
+send_notification_email = True
 cycle_delay = 30  # seconds
 downtime_log_path = os.path.join(os.getcwd(), 'logs', 'downtime.log')
 
@@ -66,23 +69,24 @@ def consolidate_data(game_dicts, previous_date_string):
             file_size = os.path.getsize(file_name)
             file_size = round(file_size / (1024 * 1024), 2)
             notification_string += '{}: {}MB. '.format(game['name'], file_size)
-            # run the backup command
-            os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
+            if perform_backup:
+                print('[!] Running backup command')
+                os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
             # move the file to its respective data directory for consolidation
             data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'], 'csv')
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
             notification_string += 'NOT FINISHED. '
-    # perform consolidation into DB
-    try:
-        consolidate_all_data(game_shorthands=game_shorthands)
-        notification_string += '\nConsolidation of files completed successfully'
-    except Exception as e:
-        print('[-] Consolidation error: {}'.format(e))
-        notification_string += '\nConsolidation of files did not complete successfully'
-    os.system(EMAIL_COMMAND.format(notification_string))
-    # hold for two seconds
+    if perform_db_consolidation:
+        try:
+            consolidate_all_data(game_shorthands=game_shorthands)
+            notification_string += '\nConsolidation of files completed successfully'
+        except Exception as e:
+            print('[-] Consolidation error: {}'.format(e))
+            notification_string += '\nConsolidation of files did not complete successfully'
+    if send_notification_email:
+        os.system(EMAIL_COMMAND.format(notification_string))
     pause(2)
     """
     # run the get info object
