@@ -107,7 +107,7 @@ def get_current_date_string():
 
 def log_downtime():
     handler = FileHandler(downtime_log_path, mode='a')
-    handler.emit('downtime|{}'.format(time.time()))
+    handler.emit('downtime|{}\n'.format(time.time()))
     handler.close()
 
 
