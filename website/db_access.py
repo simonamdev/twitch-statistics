@@ -310,6 +310,7 @@ class StreamsData:
         return json.dumps(start_times)
 """
 
+
 class StreamData:
     def __init__(self, streamer_name, game_name, stream_id):
         self.streamer_name = streamer_name
