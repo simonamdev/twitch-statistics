@@ -405,7 +405,7 @@ def api_game_start_times(game_short_name):
 
 if __name__ == '__main__':
     log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
-    handler = RotatingFileHandler('application.log', maxBytes=1000000, backupCount=10)
+    handler = RotatingFileHandler(log_path, maxBytes=1000000, backupCount=10)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     if not app_info['debug']:
