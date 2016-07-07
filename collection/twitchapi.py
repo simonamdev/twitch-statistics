@@ -41,7 +41,14 @@ class APIStreamsRequest:
             return None
         self.last_status_code = response.status_code
         self.print('[INFO] Status code returned: {}'.format(self.last_status_code))
-        return response.json()
+        # try to parse the JSON
+        try:
+            json_data = response.json()
+        except Exception as e:
+            self.print('Unable to parse JSON:')
+            print(e)
+            return None
+        return json_data
 
     def last_request_successful(self):
         return self.last_status_code == 200
