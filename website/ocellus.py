@@ -4,7 +4,7 @@ import time
 import json
 import os
 from logging.handlers import RotatingFileHandler
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, abort
 from minify import minify as minify_css
 
 app = Flask(__name__)
@@ -157,6 +157,8 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
+    if game_names not in games_url_names:
+        return abort(404)
     access_time = time.time()
     name_dict = return_name_dict(name=game_name)
     global_game_data = db_access.GameGlobalData(game_url_name=name_dict['url'])
