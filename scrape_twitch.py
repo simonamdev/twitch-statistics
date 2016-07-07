@@ -89,10 +89,11 @@ def consolidate_data(game_dicts, previous_date_string):
         os.system(EMAIL_COMMAND.format(notification_string))
     pause(2)
     """
+    from consolidation import get_info
     # run the get info object
     # CURRENTLY DISABLED DUE TO LACK OF VPS RESOURCES
     for game in game_dicts:
-        output = TwitchStatisticsOutput(game_name=game['name'],
+        output = get_info.TwitchStatisticsOutput(game_name=game['name'],
                                         game_shorthand=game['shorthand_name'],
                                         db_mid_directory='',
                                         verbose=True)
