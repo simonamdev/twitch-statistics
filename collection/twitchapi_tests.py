@@ -28,6 +28,8 @@ class TestRequestGameData:
         api.request_all_game_data()
         # check that the data is not empty
         assert len(api.return_streams_data()) > 0
+        # Check if last request returns as successful
+        assert api.last_request_successful() is True
         # Check the timestamp
         data = api.return_required_data()
         now_timestamp = data[0][4]  # get the first timestamp
