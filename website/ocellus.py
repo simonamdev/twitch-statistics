@@ -157,6 +157,7 @@ def games():
 
 @app.route('/game/<game_name>')
 def game(game_name):
+    # validate the game name
     if game_name not in games_url_names:
         return abort(404)
     access_time = time.time()
@@ -179,6 +180,10 @@ def streamers():
 @app.route('/streamers/<game_url_name>/<int:page_number>')
 def streamers_list(game_url_name, page_number=1):
     access_time = time.time()
+    # validate the game name
+    if game_url_name not in games_url_names:
+        return abort(404)
+    # validate the page name
     try:
         page_number = int(page_number)
     except ValueError:
