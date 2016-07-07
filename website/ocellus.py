@@ -386,6 +386,15 @@ def api_streamer_data(streamer_name):
     return json.dumps(streamer_graph_data)
 
 
+# API Routes below here
+@app.route('/api/v1/stream_start_times/<game_short_name>/')
+def api_game_start_times(game_short_name):
+    access_time = time.time()
+
+    log_page_visit('game_start_api', game_short_name, start_time=access_time)
+    return json.dumps([])
+
+
 if __name__ == '__main__':
     log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
     handler = RotatingFileHandler('application.log', maxBytes=1000000, backupCount=10)
