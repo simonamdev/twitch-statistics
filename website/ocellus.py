@@ -390,9 +390,10 @@ def api_streamer_data(streamer_name):
 @app.route('/api/v1/stream_start_times/<game_short_name>/')
 def api_game_start_times(game_short_name):
     access_time = time.time()
-
+    streams_access = db_access.StreamsData(game_short_name=game_short_name)
+    stream_times = streams_access.get_stream_start_times()
     log_page_visit('game_start_api', game_short_name, start_time=access_time)
-    return json.dumps([])
+    return json.dumps(stream_times)
 
 
 if __name__ == '__main__':
