@@ -1,5 +1,5 @@
 import pytest
-import twitchapi
+import twitchapi  # ignore PyCharm error here
 
 
 # content of test_sample.py
