@@ -9,10 +9,17 @@ from flask import Flask, render_template, request, redirect, abort
 
 
 app = Flask(__name__)
+log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
+# create logger
+logger = logging.getLogger(log_path)
+handler = RotatingFileHandler(log_path, maxBytes=1000000, backupCount=10)
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)
+
 
 app_info = {
-    'debug': True,
-    'version': 'Alpha 0.5'
+    'debug': False,
+    'version': 'Private Alpha 0.5.1'
 }
 
 game_names = [
@@ -75,10 +82,12 @@ def log_page_visit(route_name='', parameters='none', start_time=0):
         time_delta = time.time() - start_time
     else:
         time_delta = 0
-    app.logger.info('{}|{}|{}|{}|{}'.format(
+    global logger
+    logger.info('{}|{}|{}|{}|{}'.format(
         int(time.time()),
         time_delta,
-        request.environ['REMOTE_ADDR'],
+        request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+        #request.environ['REMOTE_ADDR'],
         route_name,
         parameters
     ))
@@ -108,6 +117,17 @@ def server_overloaded(e):
 def index():
     log_page_visit('index')
     return render_template('index.html')
+
+
+first_start = True
+
+
+@app.route('/startlogging')
+def start_logging():
+    global first_start
+    if first_start:
+        first_start = False
+    return redirect('/')
 
 
 @app.route('/about')
@@ -404,14 +424,16 @@ def api_game_start_times(game_short_name):
 """
 
 if __name__ == '__main__':
+    """
     log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
     handler = RotatingFileHandler(log_path, maxBytes=1000000, backupCount=10)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    if not app_info['debug']:
-        minify_css()
-    app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
-    # app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
+    # if not app_info['debug']:
+    #    minify_css()
+    # app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
+    """
+    app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
 
 """
 Logging references:
