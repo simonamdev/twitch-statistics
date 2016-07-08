@@ -60,10 +60,8 @@ def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
 def consolidate_data(game_dicts, previous_date_string):
     print('[+] Starting consolidation procedure')
     notification_string = ''
-    game_shorthands = []
     for game in game_dicts:
-        game_shorthands.append(game['shorthand_name'])
-        file_name = game['shorthand_name'] + '_' + previous_date_string + '.csv'
+        file_name = game['short'] + '_' + previous_date_string + '.csv'
         try:
             # gather information for the backup notification
             file_size = os.path.getsize(file_name)
@@ -71,11 +69,11 @@ def consolidate_data(game_dicts, previous_date_string):
             notification_string += '{}: {}MB. '.format(game['name'], file_size)
             if perform_backup:
                 print('[!] Running backup command')
-                os.system(SCP_COMMAND.format(file_name, game['shorthand_name']))
+                os.system(SCP_COMMAND.format(file_name, game['short']))
             else:
                 print('[!] Not running backup command')
             # move the file to its respective data directory for consolidation
-            data_folder = os.path.join(os.getcwd(), 'data', game['shorthand_name'], 'csv')
+            data_folder = os.path.join(os.getcwd(), 'data', game['short'], 'csv')
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
@@ -90,7 +88,7 @@ def consolidate_data(game_dicts, previous_date_string):
     if perform_db_consolidation:
         print('[!] Starting Database consolidation')
         try:
-            consolidate_all_data(game_shorthands=game_shorthands)
+            consolidate_all_data(game_shorthands=[game['short'] for game in game_dicts])
             notification_string += '\nConsolidation of files completed successfully'
         except Exception as e:
             print('[-] Consolidation error: {}'.format(e))
@@ -108,7 +106,7 @@ def consolidate_data(game_dicts, previous_date_string):
     # CURRENTLY DISABLED DUE TO LACK OF VPS RESOURCES
     for game in game_dicts:
         output = get_info.TwitchStatisticsOutput(game_name=game['name'],
-                                        game_shorthand=game['shorthand_name'],
+                                        game_shorthand=game['short'],
                                         db_mid_directory='',
                                         verbose=True)
         output.run()
