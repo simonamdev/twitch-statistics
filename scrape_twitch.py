@@ -157,7 +157,7 @@ def main():
                 log_downtime()
             returned_data = api.return_required_data()
             # if any returned data is available, then write to to the CSV
-            if not returned_data is None and len(returned_data) > 0:
+            if returned_data is not None and len(returned_data) > 0:
                 file_name = game_name['short'] + '_' + current_date_string
                 insert_data_rows_into_csv(
                     file_name=file_name,
