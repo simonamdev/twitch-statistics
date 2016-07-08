@@ -7,7 +7,8 @@ url = 'https://cssminifier.com/raw'
 def minify():
     css_files = [
         'main.css',
-        'cards.css'
+        'cards.css',
+        'titles.css'
     ]
     for css_file in css_files:
         print('Minifying: {}'.format(css_file))
