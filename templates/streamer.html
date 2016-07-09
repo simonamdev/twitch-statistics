@@ -18,25 +18,31 @@
 {% endblock %}
 {% block content %}
     <div class="mdl-grid center-text twitch-background">
-        <h1 class="game-title">{{ streamer.name }}</h1>
-    </div>
-    <div class="mdl-grid twitch-background">
         <div class="mdl-cell mdl-cell--12-col center-text">
+            <h1 class="game-title">{{ streamer.name }}</h1>
             {% if streamer.ED %}
                 {% if streamer.overviews['ED'].partnership == 1 %}
                     <p style="font-size: 200%;">Twitch Partner</p>
                 {% endif %}
             {% else %}
                 {% if streamer.overviews['PC'].partnership == 1 %}
-                    <p>Twitch Partner</p>
+                    <p style="font-size: 200%;">Twitch Partner</p>
                 {% endif %}
             {% endif %}
+        </div>
+    </div>
+    <div class="mdl-grid twitch-background center-text">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                      Watch {{ streamer.name }} on twitch here
+                </button>
+            </a>
         </div>
     </div>
     {% if streamer.ED %}
         <div class="mdl-grid light-row">
             <div class="mdl-cell mdl-cell--12-col center-text">
-                <h1>{{ streamer.name }} overall {{ streamer.overviews['ED'].game_full }} statistics</h1>
+                <h1>{{ streamer.overviews['ED'].game_full }} statistics for {{ streamer.name }}</h1>
             </div>
         </div>
         <div class="mdl-grid light-row">
