@@ -3,6 +3,7 @@ import db_access
 import logging
 import os
 import time
+import datetime
 from minify import minify as minify_css
 from flask import Flask, render_template, request, redirect, abort
 
@@ -99,7 +100,11 @@ def log_page_visit(route_name='', parameters='none', start_time=0):
 # Inject the application info into each template
 @app.context_processor
 def inject_app_info():
-    return dict(ocellus_debug=app_info['debug'], ocellus_version=app_info['version'])
+    consolidation_period = False
+    hour, minute = datetime.datetime.now().hour, datetime.datetime.now().minute
+    if hour == 0 and minute < 15:
+        consolidation_period = True
+    return dict(ocellus_debug=app_info['debug'], ocellus_version=app_info['version'], consolidation=consolidation_period)
 
 
 # Error handler route

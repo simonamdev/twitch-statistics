@@ -58,9 +58,31 @@
                 </div>
                 {% endblock %}
                 <main class="mdl-layout__content">
-                    <div class="page-content">
-                        {% block content %}
-                        {% endblock %}
+                    <div class="page-content light-row" style="min-height: 100%">
+                        {% if consolidation %}
+                            <div class="mdl-grid center-text">
+                                <div class="mdl-cell mdl-cell--12-col center-text">
+                                    <h5>Ocellus Project</h5>
+                                    <h1>Data consolidation under way!</h1>
+                                </div>
+                            </div>
+                            <div class="mdl-grid center-text">
+                                <div class="mdl-cell mdl-cell--4-col"></div>
+                                <div class="mdl-cell mdl-cell--4-col">
+                                    <p class="justify-text para-text">
+                                        The Ocellus Project databases are updated once daily at midnight in the CET/CEST timezone.
+                                        This process takes less than 15 minutes to complete, however it means that the databases
+                                        are unavailable for querying. If you are seeing this message, stand up, go for a short walk,
+                                        go have a wee or maybe make a cup of tea. By the time you get back, the website will operational
+                                        again!
+                                    </p>
+                                </div>
+                                <div class="mdl-cell mdl-cell--4-col"></div>
+                            </div>
+                        {% else %}
+                            {% block content %}
+                            {% endblock %}
+                        {% endif %}
                     </div>
                     {% block footer %}
                         <footer class="mdl-mini-footer">
