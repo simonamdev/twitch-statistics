@@ -6,6 +6,7 @@ import time
 import datetime
 from minify import minify as minify_css
 from flask import Flask, render_template, request, redirect, abort
+from ocellus_config import *
 
 
 app = Flask(__name__)
@@ -16,59 +17,9 @@ handler = logging.FileHandler(log_path, 'a')
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-
-app_info = {
-    'debug': True,
-    'version': 'Private Alpha 0.5.1'
-}
-
 # Minify the static folder CSS and JS files on start up if we are in production mode
-if not app_info['debug']:
+if not ocellus_debug:
     minify_css()
-
-game_names = [
-    {
-        'short': 'ED',
-        'url': 'elitedangerous',
-        'full': 'Elite: Dangerous'
-    },
-    {
-        'short': 'PC',
-        'url': 'planetcoaster',
-        'full': 'Planet Coaster'
-    }
-]
-
-games_short_names = [
-    name['short'] for name in game_names
-]
-
-games_url_names = [
-    name['url'] for name in game_names
-]
-
-games_full_names = [
-    name['full'] for name in game_names
-]
-
-game_names_dict = {
-    'ED': game_names[0],
-    'PC': game_names[1]
-}
-
-
-# Required methods to deal with the game names
-def convert_name(given_type, given_name, return_type):
-    for name in game_names:
-        if name[given_type] == given_name:
-            return name[return_type]
-
-
-def return_name_dict(name):
-    for name_dict in game_names:
-        if name in list(name_dict.values()):
-            return name_dict
-
 
 """
 Catch all method to log page visits
@@ -104,7 +55,7 @@ def inject_app_info():
     hour, minute = datetime.datetime.now().hour, datetime.datetime.now().minute
     if hour == 0 and minute < 15:
         consolidation_period = True
-    return dict(ocellus_debug=app_info['debug'], ocellus_version=app_info['version'], consolidation=consolidation_period)
+    return dict(ocellus_debug=ocellus_debug, ocellus_version=ocellus_version, consolidation=consolidation_period)
 
 
 # Error handler route
@@ -200,7 +151,6 @@ def game(game_name):
     global_game_data = db_access.GameGlobalData(game_url_name=name_dict['url'])
     log_page_visit('game', game_name, start_time=access_time)
     return render_template('game.html',
-                           app_info=app_info,
                            game_name=name_dict,
                            game_data=global_game_data.return_global_overview_dict())
 
@@ -296,7 +246,6 @@ def streamer(streamer_name):
     streamer_dict['overviews'] = streamer_global_db.get_all_overviews()
     log_page_visit('streamer', streamer_name, start_time=access_time)
     return render_template('streamer.html',
-                           app_info=app_info,
                            game_names=game_names_dict,
                            streamer=streamer_dict)
 
@@ -340,7 +289,6 @@ def streams(streamer_name, game_url_name, page_number=1):
     }
     log_page_visit('streams', '{},{},{}'.format(streamer_name, game_url_name, page_number), start_time=access_time)
     return render_template('streams.html',
-                           app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
                            streamer_name=streamer_name,
                            streams_overviews=streams_overviews_dicts,
@@ -376,7 +324,6 @@ def stream(streamer_name, game_url_name, stream_id=1):
     stream_data_dict = stream_access.get_stream_data()
     log_page_visit('stream', '{},{},{}'.format(streamer_name, game_url_name, stream_id), start_time=access_time)
     return render_template('stream.html',
-                           app_info=app_info,
                            game_name=return_name_dict(name=game_url_name),
                            streamer_name=streamer_name,
                            stream_data=stream_data_dict)
@@ -433,10 +380,10 @@ def api_game_start_times(game_short_name):
 """
 
 if __name__ == '__main__':
-    if app_info['debug']:
-        app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
+    if ocellus_debug:
+        app.run(host='127.0.0.1', port=9000, debug=True)
     else:
-        app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
+        app.run(host='0.0.0.0', port=9000, debug=False)
 
 """
 Logging references:

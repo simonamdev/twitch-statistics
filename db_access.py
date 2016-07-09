@@ -2,25 +2,8 @@ import os
 import json
 from math import ceil
 from neopysqlite.neopysqlite import Pysqlite
-from pprint import pprint
+from ocellus_config import *
 
-game_names = [
-    {
-        'short': 'ED',
-        'url': 'elitedangerous',
-        'full': 'Elite: Dangerous'
-    },
-    {
-        'short': 'PC',
-        'url': 'planetcoaster',
-        'full': 'Planet Coaster'
-    }
-]
-
-def convert_name(given_type, given_name, return_type):
-    for name in game_names:
-        if name[given_type] == given_name:
-            return name[return_type]
 
 def convert_to_hours(seconds):
     return round(seconds / (60 * 60), 2)
