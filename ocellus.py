@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 
 
 app_info = {
-    'debug': False,
+    'debug': True,
     'version': 'Private Alpha 0.5.1'
 }
 
@@ -210,6 +210,7 @@ def streamers():
 @app.route('/streamers/<game_url_name>/<int:page_number>')
 def streamers_list(game_url_name, page_number=1):
     access_time = time.time()
+    per_page = 20 + 1
     # validate the game name
     if game_url_name not in games_url_names:
         return abort(404)
@@ -224,7 +225,7 @@ def streamers_list(game_url_name, page_number=1):
     # get access to the database through an object which will take care of pagination
     overview_access = db_access.AllStreamerOverviewsDataPagination(
             game_name=convert_name(given_type='url', given_name=game_url_name, return_type='short'),
-            per_page=10)
+            per_page=per_page)
     overview_access.run()
     # get the overview data for that page
     streamer_overview_dicts = enumerate(overview_access.get_page(page_number))
@@ -239,7 +240,7 @@ def streamers_list(game_url_name, page_number=1):
     # put the page data in a dictionary
     page_data = {
         'current': page_number,
-        'per_page': 10,
+        'per_page': per_page,
         'total': overview_access.get_page_count()
     }
     log_page_visit('streamers_list', '{},{}'.format(game_url_name, page_number), start_time=access_time)
@@ -427,9 +428,10 @@ def api_game_start_times(game_short_name):
 """
 
 if __name__ == '__main__':
-
-    # app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
-    app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
+    if app_info['debug']:
+        app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
+    else:
+        app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
 
 """
 Logging references:
