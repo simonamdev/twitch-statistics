@@ -36,7 +36,7 @@
             <h1 style="font-size: 200%;">Page {{ page_data.current }} of {{ page_data.total }}</h1>
             <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
                 <thead>
-                    <tr>
+                    <tr class="center-text">
                         <th>Rank</th>
                         <th>Name</th>
                         <th>Average Viewers</th>
@@ -48,7 +48,7 @@
                     </tr>
                 </thead>
                 {% for index, data in streamer_overviews %}
-                    <tr>
+                    <tr class="center-text">
                         {% set streamer_id = index + (page_data.per_page * (page_data.current - 1)) %}
                         <td>{{ streamer_id }}</td>
                         <td>
