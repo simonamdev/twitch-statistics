@@ -30,7 +30,6 @@
                         <th>Average Duration (hours)</th>
                         <th>Total Duration (hours)</th>
                         <th>Partnered</th>
-                        <th>Info</th>
                     </tr>
                 </thead>
                 {% for index, data in streamer_overviews %}
@@ -54,11 +53,6 @@
                                 <!-- 1 = Is partnered -->
                                 <i class="material-icons mdl-list__item-icon">done</i>
                             {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('streamer', streamer_name=data.name) }}">
-                                <i class="material-icons mdl-list__item-icon">info</i>
-                            </a>
                         </td>
                     </tr>
                 {% endfor %}
