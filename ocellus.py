@@ -17,8 +17,12 @@ handler = logging.FileHandler(log_path, 'a')
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-# Minify the static folder CSS and JS files on start up if we are in production mode
 if not ocellus_debug:
+    # Print a clear notice that the application is starting in production mode
+    print('--------------------------------------------------------')
+    print('---- OCELLUS PROJECT STARTING UP IN PRODUCTION MODE! ---')
+    print('--------------------------------------------------------')
+    # Minify the static folder CSS and JS files on start up if we are in production mode
     minify_css()
 
 """
