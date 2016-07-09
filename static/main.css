@@ -4,6 +4,10 @@ html, body {
     font-family: 'Roboto', sans-serif;
 }
 
+.fill-page {
+    min-height: 95vh;
+}
+
 /* Change Icon colours to white */
 .mdl-list__item-icon.material-icons {
 	color: white;
@@ -15,7 +19,7 @@ html, body {
 }
 
 .justify-text {
-	text-align: justify;
+    text-align: justify;
 }
 
 /* Background colours for rows */
