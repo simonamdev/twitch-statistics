@@ -21,6 +21,10 @@ app_info = {
     'version': 'Private Alpha 0.5.1'
 }
 
+# Minify the static folder CSS and JS files on start up if we are in production mode
+if not app_info['debug']:
+    minify_css()
+
 game_names = [
     {
         'short': 'ED',
@@ -423,15 +427,8 @@ def api_game_start_times(game_short_name):
 """
 
 if __name__ == '__main__':
-    """
-    log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
-    handler = RotatingFileHandler(log_path, maxBytes=1000000, backupCount=10)
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
-    # if not app_info['debug']:
-    #    minify_css()
+
     # app.run(host='127.0.0.1', port=9000, debug=app_info['debug'])
-    """
     app.run(host='0.0.0.0', port=9000, debug=app_info['debug'])
 
 """
