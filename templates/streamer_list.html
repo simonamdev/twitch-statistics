@@ -37,7 +37,13 @@
                     <tr>
                         {% set streamer_id = index + (page_data.per_page * (page_data.current - 1)) %}
                         <td>{{ streamer_id }}</td>
-                        <td>{{ data.name }}</td>
+                        <td>
+                            <a href="{{ url_for('streamer', streamer_name=data.name) }}">
+                                <button class="mdl-button mdl-js-button mdl-js-ripple-effect" style="color: white;">
+                                    {{ data.name }}
+                                </button>
+                            </a>
+                        </td>
                         <td>{{ data.viewers_average }}</td>
                         <td>{{ data.viewers_peak }}</td>
                         <td>{{ data.followers }}</td>
