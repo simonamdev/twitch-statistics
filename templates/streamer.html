@@ -17,30 +17,21 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 {% endblock %}
 {% block content %}
-    <div id="streamer-title" class="mdl-grid">
-        <h1 class="game-title center-text">{{ streamer.name }}</h1>
+    <div class="mdl-grid center-text twitch-background">
+        <h1 class="game-title">{{ streamer.name }}</h1>
     </div>
-    <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col">
-            <h1>
-                Partnered:
-                {% if streamer.ED %}
-                    {% if streamer.overviews['ED'].partnership == 1 %}
-                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
-                    {% else %}
-                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
-                    {% endif %}
-                {% else %}
-                    {% if streamer.overviews['PC'].partnership == 1 %}
-                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">done</i>
-                    {% else %}
-                        <i class="material-icons mdl-list__item-icon" style="font-size: 90%">clear</i>
-                    {% endif %}
+    <div class="mdl-grid twitch-background">
+        <div class="mdl-cell mdl-cell--12-col center-text">
+            {% if streamer.ED %}
+                {% if streamer.overviews['ED'].partnership == 1 %}
+                    <p style="font-size: 200%;">Twitch Partner</p>
                 {% endif %}
-            </h1>
+            {% else %}
+                {% if streamer.overviews['PC'].partnership == 1 %}
+                    <p>Twitch Partner</p>
+                {% endif %}
+            {% endif %}
         </div>
-        <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     {% if streamer.ED %}
         <div class="mdl-grid light-row">
