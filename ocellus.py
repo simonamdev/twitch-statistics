@@ -4,17 +4,16 @@ import logging
 import os
 import time
 from minify import minify as minify_css
-from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, abort
 
 
 app = Flask(__name__)
 log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
 # create logger
-logger = logging.getLogger(log_path)
-handler = RotatingFileHandler(log_path, maxBytes=1000000, backupCount=10)
-handler.setLevel(logging.INFO)
+logger = logging.getLogger('application')
+handler = logging.FileHandler(log_path, 'a')
 logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 
 app_info = {
