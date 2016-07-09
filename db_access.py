@@ -79,6 +79,8 @@ class AllStreamerOverviewsDataPagination:
                 'viewers_average': streamer[3],
                 'viewers_peak': streamer[4],
                 'followers': streamer[5],
+                'stream_count': streamer[6],
+                'viewer_reach': int(streamer[3] * convert_to_hours(streamer[8])),
                 'duration_average': convert_to_hours(streamer[7]),
                 'duration_total': convert_to_hours(streamer[8]),
                 'partnership': streamer[10]
