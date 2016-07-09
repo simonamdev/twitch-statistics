@@ -34,6 +34,9 @@
         <div class="mdl-cell mdl-cell--8-col">
             <!-- TODO: Move inline styles to a css sheet -->
             <h1 style="font-size: 200%;">Page {{ page_data.current }} of {{ page_data.total }}</h1>
+            <!-- Reduce 1 from the per page counter -->
+            {% set per_page = page_data.per_page - 1%}
+            <h1 style="font-size: 150%;">{{ per_page }} rows per page</h1>
             <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
                 <thead>
                     <tr class="center-text">
