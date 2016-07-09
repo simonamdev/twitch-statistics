@@ -13,6 +13,21 @@
             <h1>{{ game_name.full }} Streamer Data</h1>
         </div>
     </div>
+    <!-- Search bar -->
+    <div class="mdl-grid dark-row">
+        <div class="mdl-cell mdl-cell--3-col"></div>
+        <div class="mdl-cell mdl-cell--6-col center-text">
+            <form method="post" action="{{ url_for('streamer_search') }}" id="streamerNameForm">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9,_,-]*" name="streamerNameInput">
+                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Click here to search for a streamer</label>
+                    <span class="mdl-textfield__error">Only letters, underscores, dashes and numbers allowed</span>
+                </div>
+                <button class="mdl-button mdl-button--raised mdl-button--colored">Search</button>
+            </form>
+        </div>
+        <div class="mdl-cell mdl-cell--3-col"></div>
+    </div>
     <div class="mdl-grid dark-row">
         <div class="mdl-cell mdl-cell--2-col"></div>
         <!-- Content -->
@@ -79,21 +94,6 @@
             {% endif %}
         </div>
         <div class="mdl-cell mdl-cell--5-col"></div>
-    </div>
-    <!-- Search bar -->
-    <div class="mdl-grid dark-row">
-        <div class="mdl-cell mdl-cell--3-col"></div>
-        <div class="mdl-cell mdl-cell--6-col center-text">
-            <form method="post" action="{{ url_for('streamer_search') }}" id="streamerNameForm">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="streamerNameInput" pattern="[A-Z,a-z,0-9,_,-]*" name="streamerNameInput">
-                    <label class="mdl-textfield__label" for="streamerNameInput" style="color: white;">Click here to search for a streamer</label>
-                    <span class="mdl-textfield__error">Only letters, underscores, dashes and numbers allowed</span>
-                </div>
-                <button class="mdl-button mdl-button--raised mdl-button--colored">Search</button>
-            </form>
-        </div>
-        <div class="mdl-cell mdl-cell--3-col"></div>
     </div>
     <div class="mdl-grid light-row">
         <div class="mdl-cell mdl-cell--4-col center-text"></div>
