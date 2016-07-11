@@ -50,7 +50,7 @@ class ApplicationLogParser:
             if not line[1] == '0' or line[1] == '0.0':
                 self.serve_times.append(round(float(line[1]), 4))
         self.max_serve_time = max(self.serve_times)
-        self.average_serve_time = sum(self.serve_times) / len(self.serve_times)
+        self.average_serve_time = round(sum(self.serve_times) / len(self.serve_times), 4)
         self.print('Max serve time: {}s Average serve time: {}s'.format(self.max_serve_time, self.average_serve_time))
 
     def get_serve_time_dict(self):
