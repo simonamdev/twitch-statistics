@@ -6,6 +6,7 @@ def is_production():
         return True
     return False
 
+ocellus_version = 'Public Alpha 0.5.3'
 ocellus_debug = is_production()
 
 game_names = [
