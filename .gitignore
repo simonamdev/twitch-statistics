@@ -3,4 +3,5 @@ data/
 .idea/
 __pycache__/
 logs/
+meta/
 collection/.cache
