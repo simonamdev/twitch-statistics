@@ -48,7 +48,7 @@ class ApplicationLogParser:
         for line in self.split_rows:
             # ignore "instant" pages (pages without database polls)
             if not line[1] == '0' or line[1] == '0.0':
-                self.serve_times.append(float(line[1]))
+                self.serve_times.append(round(float(line[1]), 4))
         self.max_serve_time = max(self.serve_times)
         self.average_serve_time = sum(self.serve_times) / len(self.serve_times)
         self.print('Max serve time: {}s Average serve time: {}s'.format(self.max_serve_time, self.average_serve_time))
