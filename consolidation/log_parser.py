@@ -88,6 +88,9 @@ class ApplicationLogParser:
                     self.routes_dict[line[3]]['params_dict'][line[4]]['times'].append(line[0])
         # pprint(self.routes_dict)
 
+    def get_route_popularity_dict(self):
+        return self.routes_dict
+
 
 def main():
     parser = ApplicationLogParser(os.path.join(os.getcwd(), 'logs', 'application.log'))

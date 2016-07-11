@@ -605,7 +605,20 @@ def main():
             db.insert_row(table='unique_visitors', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
                           row_data=(parser.get_unique_ip_count(),))
         if process_downtime_logs:
+            print('Processing downtime logs')
             pass
+        if process_page_popularity_logs:
+            print('Processing page popularity logs')
+            routes_dict = parser.get_route_popularity_dict()
+            for route_name, params_dict in tqdm(routes_dict.items()):
+                for param_string, count_and_time_dict in params_dict['params_dict'].items():
+                    use_count = count_and_time_dict['count']
+                    time_string = count_and_time_dict['times'].pop(0)
+                    for epoch_time in count_and_time_dict['times']:
+                        time_string += ',{}'.format(epoch_time)
+                    db.insert_row(table='pages_accessed',
+                                  row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
+                                  row_data=(route_name, param_string, int(use_count), time_string))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
