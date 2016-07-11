@@ -1,0 +1,28 @@
+.game-title {
+	position: relative;
+	top: 5%;
+	width: 100%;
+	font-size: 1000%;
+}
+
+.cover-image {
+	position: relative;
+  background-size: cover;
+  height: 100%;
+}
+
+#elitedangerous-title {
+  background: url('../static/images/elitedangerous-cover.jpg') center no-repeat;
+}
+
+#planetcoaster-title {
+	background: url('../static/images/planetcoaster-cover.jpg') center no-repeat;
+}
+
+.tier-text {
+	font-size: 200%;
+}
+
+.twitch-background {
+	background-color: #6441a5;
+}
