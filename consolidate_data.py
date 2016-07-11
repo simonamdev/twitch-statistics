@@ -477,6 +477,11 @@ def main():
     process_streamer_data = False
     process_global_data = False
     process_logs = True
+    process_raw_logs = True
+    process_performance_logs = True
+    process_downtime_logs = True
+    process_page_popularity_logs = True
+    process_unique_visitor_logs = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # for each game,
@@ -588,6 +593,7 @@ def main():
                           serve_time_dict['serve_time_max'],
                           serve_time_dict['serve_time_median']
                       ])
+
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
