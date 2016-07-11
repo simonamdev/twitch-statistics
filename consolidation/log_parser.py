@@ -47,6 +47,9 @@ class ApplicationLogParser:
         self.unique_ip_count = len(self.ip_addresses)
         self.print('{} unique IP addresses found'.format(self.unique_ip_count))
 
+    def get_unique_ip_count(self):
+        return self.unique_ip_count
+
     def parse_serve_times(self):
         for line in self.split_rows:
             # ignore "instant" pages (pages without database polls)
