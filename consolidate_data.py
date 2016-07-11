@@ -478,7 +478,7 @@ def main():
     process_global_data = False
     process_logs = True
     process_raw_logs = True
-    process_performance_logs = True
+    process_performance_logs = False
     process_downtime_logs = True
     process_page_popularity_logs = True
     process_unique_visitor_logs = True
@@ -586,13 +586,21 @@ def main():
         db = Pysqlite(database_name='Performance DB', database_file=os.path.join(os.getcwd(), 'meta', 'performance.db'))
         log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
         parser = log_parser.ApplicationLogParser(file_path=log_path, verbose=True)
-        serve_time_dict = parser.get_serve_time_dict()
-        db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?)',
-                      row_data=[
-                          serve_time_dict['serve_time_average'],
-                          serve_time_dict['serve_time_max'],
-                          serve_time_dict['serve_time_median']
-                      ])
+        if process_raw_logs:
+            print('Processing raw logs')
+            raw_split_rows = parser.get_data_rows()
+            pprint(raw_split_rows)
+            #db.insert_row(table='access_log', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
+            #              row_data=[])
+        if process_performance_logs:
+            print('Processing performance logs')
+            serve_time_dict = parser.get_serve_time_dict()
+            db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?)',
+                          row_data=[
+                              serve_time_dict['serve_time_average'],
+                              serve_time_dict['serve_time_max'],
+                              serve_time_dict['serve_time_median']
+                          ])
 
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
