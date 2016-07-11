@@ -19,31 +19,32 @@
         <div class="mdl-cell mdl-cell--8-col">
             <!-- TODO: Move inline styles to a css sheet -->
             <h1 style="font-size: 200%;">Page {{ page_data.current }} of {{ page_data.total }}</h1>
+            <p>Click on any of the left most buttons to access more data about a stream</p>
             <table class="pure-table pure-table-bordered dark-row" style="width: 100%;">
                 <thead>
                     <tr>
-                        <th>Stream ID</th>
+                        <th>ID</th>
                         <th>Start Time</th>
                         <th>Duration (Hours)</th>
                         <th>Average Viewers</th>
                         <th>Peak Viewers</th>
                         <th>Follower Delta</th>
-                        <th>Data</th>
                     </tr>
                 </thead>
                 {% for index, data in streams_overviews %}
                     <tr>
-                        <td>{{ data.id }}</td>
+                        <td>
+                            <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=data.id) }}">
+                                <button class="mdl-button mdl-js-button mdl-js-ripple-effect" style="color: white;">
+                                    Stream #{{ data.id }}
+                                </button>
+                            </a>
+                        </td>
                         <td>{{ data.start_time }}</td>
                         <td>{{ data.duration }}</td>
                         <td>{{ data.viewers_average }}</td>
                         <td>{{ data.viewers_peak }}</td>
                         <td>{{ data.follower_delta }}</td>
-                        <td>
-                            <a href="{{ url_for('stream', streamer_name=streamer_name, game_url_name=game_name.url, stream_id=data.id) }}">
-                                <i class="material-icons mdl-list__item-icon">info</i>
-                            </a>
-                        </td>
                     </tr>
                 {% endfor %}
             </table>
