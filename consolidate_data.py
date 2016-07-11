@@ -477,11 +477,11 @@ def main():
     process_streamer_data = False
     process_global_data = False
     process_logs = True
-    process_raw_logs = False
-    process_performance_logs = False
+    process_raw_logs = True
+    process_performance_logs = True
     process_downtime_logs = True
     process_page_popularity_logs = True
-    process_unique_visitor_logs = False
+    process_unique_visitor_logs = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # for each game,
@@ -619,6 +619,10 @@ def main():
                     db.insert_row(table='pages_accessed',
                                   row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
                                   row_data=(route_name, param_string, int(use_count), time_string))
+        # always move the log to the old folder, regardless of what you do
+        os.rename(
+            src=os.path.join(os.getcwd(), 'logs', 'application.log'),
+            dst=os.path.join(os.getcwd(), 'logs', 'old', 'applications.log'))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
