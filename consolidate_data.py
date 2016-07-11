@@ -6,6 +6,7 @@ from tqdm import tqdm
 from pprint import pprint
 from shutil import copy2 as copy_file
 from neopysqlite.neopysqlite import Pysqlite
+from consolidation import log_parser
 
 # For each game
 games = [
@@ -473,8 +474,9 @@ def get_streamer_db_names(game):
 
 
 def main():
-    process_streamer_data = True
-    process_global_data = True
+    process_streamer_data = False
+    process_global_data = False
+    process_logs = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # for each game,
@@ -575,6 +577,17 @@ def main():
             # initialise GameDB
             game_db = GameDB(game=game, streamer_dicts=streamer_dicts)
             game_db.run()
+    if process_logs:
+        db = Pysqlite(database_name='Performance DB', database_file=os.path.join(os.getcwd(), 'meta', 'performance.db'))
+        log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
+        parser = log_parser.ApplicationLogParser(file_path=log_path, verbose=True)
+        serve_time_dict = parser.get_serve_time_dict()
+        db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?)',
+                      row_data=[
+                          serve_time_dict['serve_time_average'],
+                          serve_time_dict['serve_time_max'],
+                          serve_time_dict['serve_time_median']
+                      ])
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
