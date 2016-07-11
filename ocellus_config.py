@@ -6,7 +6,6 @@ def is_production():
         return True
     return False
 
-ocellus_version = 'Private Alpha 0.5.2'
 ocellus_debug = is_production()
 
 game_names = [
