@@ -589,9 +589,8 @@ def main():
         if process_raw_logs:
             print('Processing raw logs')
             raw_split_rows = parser.get_data_rows()
-            pprint(raw_split_rows)
-            #db.insert_row(table='access_log', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
-            #              row_data=[])
+            db.insert_rows(table='access_log', row_string='(NULL, ?, ?, ?, ?, ?)',
+                           row_data_list=raw_split_rows)
         if process_performance_logs:
             print('Processing performance logs')
             serve_time_dict = parser.get_serve_time_dict()
@@ -601,7 +600,6 @@ def main():
                               serve_time_dict['serve_time_max'],
                               serve_time_dict['serve_time_median']
                           ])
-
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
