@@ -622,7 +622,7 @@ def main():
         # always move the log to the old folder, regardless of what you do
         os.rename(
             src=os.path.join(os.getcwd(), 'logs', 'application.log'),
-            dst=os.path.join(os.getcwd(), 'logs', 'old', 'applications.log'))
+            dst=os.path.join(os.getcwd(), 'logs', 'old', 'application.log'))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
