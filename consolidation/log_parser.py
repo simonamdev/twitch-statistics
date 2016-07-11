@@ -3,7 +3,7 @@ from pprint import pprint
 
 
 class ApplicationLogParser:
-    def __init__(self, file_path=''):
+    def __init__(self, file_path='', verbose=False):
         self.file_path = file_path
         self.split_rows = []
         self.log_data = []
@@ -14,15 +14,24 @@ class ApplicationLogParser:
         self.max_serve_time = 0.0
         self.average_serve_time = 0.0
         self.routes_dict = {}
+        self.verbose = verbose
+        # Get the data from the log file and parse it
+        self.get_data_rows()
+        self.parse_data_rows()
+
+    def print(self, print_string=''):
+        if self.verbose and not print_string == '':
+            print('[LOG] {}'.format(print_string))
 
     def get_data_rows(self):
+        self.print('Retrieving data parse')
         with open(self.file_path, 'r') as log_file:
             # strip the new lines from every row
             for line in log_file:
                 self.split_rows.append(line.strip().split('|'))
+        self.print('{} rows recovered'.format(len(self.split_rows)))
 
     def parse_data_rows(self):
-        pprint(self.split_rows)
         self.parse_ip_addresses()
         self.parse_serve_times()
         self.parse_route_popularity()
@@ -33,9 +42,7 @@ class ApplicationLogParser:
             if line[2] not in self.ip_addresses:
                 self.ip_addresses.append(line[2])
         self.unique_ip_count = len(self.ip_addresses)
-        # pprint(self.ip_addresses)
-        # pprint(self.access_list)
-        # pprint(self.unique_ip_count)
+        self.print('{} unique IP addresses found'.format(self.unique_ip_count))
 
     def parse_serve_times(self):
         for line in self.split_rows:
@@ -43,7 +50,8 @@ class ApplicationLogParser:
             if not line[1] == '0' or line[1] == '0.0':
                 self.serve_times.append(float(line[1]))
         self.max_serve_time = max(self.serve_times)
-        self.average_serve_time = sum(self.serve_times) / len(self.serve_times)
+        self.average_serve_time = sum(self.serve_times) / len(self.serve_times)#
+        self.print('Max serve time: {}s Average serve time: {}s'.format(self.max_serve_time, self.average_serve_time))
 
     def parse_route_popularity(self):
         for line in self.split_rows:
@@ -69,8 +77,6 @@ class ApplicationLogParser:
 
 def main():
     parser = ApplicationLogParser(os.path.join(os.getcwd(), 'logs', 'application.log'))
-    parser.get_data_rows()
-    parser.parse_data_rows()
 
 if __name__ == '__main__':
     main()
