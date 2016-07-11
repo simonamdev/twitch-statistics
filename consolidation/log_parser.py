@@ -24,7 +24,7 @@ class ApplicationLogParser:
             print('[LOG] {}'.format(print_string))
 
     def get_data_rows(self):
-        self.print('Retrieving data parse')
+        self.print('Retrieving data for parsing')
         with open(self.file_path, 'r') as log_file:
             # strip the new lines from every row
             for line in log_file:
@@ -50,8 +50,16 @@ class ApplicationLogParser:
             if not line[1] == '0' or line[1] == '0.0':
                 self.serve_times.append(float(line[1]))
         self.max_serve_time = max(self.serve_times)
-        self.average_serve_time = sum(self.serve_times) / len(self.serve_times)#
+        self.average_serve_time = sum(self.serve_times) / len(self.serve_times)
         self.print('Max serve time: {}s Average serve time: {}s'.format(self.max_serve_time, self.average_serve_time))
+
+    def get_serve_time_dict(self):
+        return {
+            'serve_time_list': sorted(self.serve_times),
+            'serve_time_average': self.average_serve_time,
+            'serve_time_max': self.max_serve_time,
+            'serve_time_median': sorted(self.serve_times)[len(self.serve_times) // 2]
+        }
 
     def parse_route_popularity(self):
         for line in self.split_rows:
