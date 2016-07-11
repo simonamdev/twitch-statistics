@@ -477,7 +477,7 @@ def main():
     process_streamer_data = False
     process_global_data = False
     process_logs = True
-    process_raw_logs = True
+    process_raw_logs = False
     process_performance_logs = False
     process_downtime_logs = True
     process_page_popularity_logs = True
@@ -602,8 +602,8 @@ def main():
                           ])
         if process_unique_visitor_logs:
             print('Processing unique visitor logs')
-            db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
-                          row_data=[parser.get_unique_ip_count()])
+            db.insert_row(table='unique_visitors', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
+                          row_data=(parser.get_unique_ip_count(),))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
