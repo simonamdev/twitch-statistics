@@ -16,20 +16,23 @@ class ApplicationLogParser:
         self.routes_dict = {}
         self.verbose = verbose
         # Get the data from the log file and parse it
-        self.get_data_rows()
+        self.retrieve_data_rows()
         self.parse_data_rows()
 
     def print(self, print_string=''):
         if self.verbose and not print_string == '':
             print('[LOG] {}'.format(print_string))
 
-    def get_data_rows(self):
+    def retrieve_data_rows(self):
         self.print('Retrieving data for parsing')
         with open(self.file_path, 'r') as log_file:
             # strip the new lines from every row
             for line in log_file:
                 self.split_rows.append(line.strip().split('|'))
         self.print('{} rows recovered'.format(len(self.split_rows)))
+
+    def get_data_rows(self):
+        return self.split_rows
 
     def parse_data_rows(self):
         self.parse_ip_addresses()
