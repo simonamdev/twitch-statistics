@@ -481,7 +481,7 @@ def main():
     process_performance_logs = False
     process_downtime_logs = True
     process_page_popularity_logs = True
-    process_unique_visitor_logs = True
+    process_unique_visitor_logs = False
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # for each game,
@@ -604,6 +604,8 @@ def main():
             print('Processing unique visitor logs')
             db.insert_row(table='unique_visitors', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
                           row_data=(parser.get_unique_ip_count(),))
+        if process_downtime_logs:
+            pass
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
