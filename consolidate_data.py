@@ -623,6 +623,10 @@ def main():
         os.rename(
             src=os.path.join(os.getcwd(), 'logs', 'application.log'),
             dst=os.path.join(os.getcwd(), 'logs', 'old', 'application.log'))
+        # copy in the clean version
+        copy_file(
+            src=os.path.join(os.getcwd(), 'logs', 'application_clean.log'),
+            dst=os.path.join(os.getcwd(), 'logs', 'application.log'))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
