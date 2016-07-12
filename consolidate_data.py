@@ -619,10 +619,12 @@ def main():
                     db.insert_row(table='pages_accessed',
                                   row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
                                   row_data=(route_name, param_string, int(use_count), time_string))
+        # get the count of currently stored logs
+        log_number = len(os.listdir(os.path.join(os.getcwd(), 'logs', 'old')))
         # always move the log to the old folder, regardless of what you do
         os.rename(
             src=os.path.join(os.getcwd(), 'logs', 'application.log'),
-            dst=os.path.join(os.getcwd(), 'logs', 'old', 'application.log'))
+            dst=os.path.join(os.getcwd(), 'logs', 'old', 'application_{}.log'.format(log_number)))
         # copy in the clean version
         copy_file(
             src=os.path.join(os.getcwd(), 'logs', 'application_clean.log'),
