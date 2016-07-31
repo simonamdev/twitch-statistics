@@ -35,6 +35,8 @@ class ApplicationLogParser:
         return self.split_rows
 
     def parse_data_rows(self):
+        if len(self.split_rows) == 0:
+            return []
         self.parse_ip_addresses()
         self.parse_serve_times()
         self.parse_route_popularity()
