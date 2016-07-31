@@ -474,8 +474,8 @@ def get_streamer_db_names(game):
 
 
 def main():
-    process_streamer_data = False
-    process_global_data = False
+    process_streamer_data = True
+    process_global_data = True
     process_logs = True
     process_raw_logs = True
     process_performance_logs = True
@@ -529,6 +529,15 @@ def main():
                             # skip empty rows
                             continue
                         if row[0] == streamer:
+                            # fix the timestamp if it is wrong here, change from DD-MM-YYYY to YYYY-MM-DD
+                            time_string = row[4]
+                            time_split = time_string.split(' ')
+                            date_part = time_split[0].split('-')
+                            year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                            if day == 2016:
+                                day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                            new_string = '{}-{}-{} {}'.format(year, month, day, time_split[1])
+                            row[4] = new_string
                             streamer_data.append(row)
                 stream_dicts = split_by_stream(streamer_data)
                 if len(stream_dicts) == 0:
@@ -589,9 +598,10 @@ def main():
         if process_raw_logs:
             print('Processing raw logs')
             raw_split_rows = parser.get_data_rows()
-            db.insert_rows(table='access_log', row_string='(NULL, ?, ?, ?, ?, ?)',
-                           row_data_list=raw_split_rows)
-        if process_performance_logs:
+            if raw_split_rows:
+                db.insert_rows(table='access_log', row_string='(NULL, ?, ?, ?, ?, ?)',
+                               row_data_list=raw_split_rows)
+        if process_performance_logs and raw_split_rows:
             print('Processing performance logs')
             serve_time_dict = parser.get_serve_time_dict()
             db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?)',
@@ -600,14 +610,14 @@ def main():
                               serve_time_dict['serve_time_max'],
                               serve_time_dict['serve_time_median']
                           ])
-        if process_unique_visitor_logs:
+        if process_unique_visitor_logs and raw_split_rows:
             print('Processing unique visitor logs')
             db.insert_row(table='unique_visitors', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
                           row_data=(parser.get_unique_ip_count(),))
-        if process_downtime_logs:
+        if process_downtime_logs and raw_split_rows:
             print('Processing downtime logs')
             pass
-        if process_page_popularity_logs:
+        if process_page_popularity_logs and raw_split_rows:
             print('Processing page popularity logs')
             routes_dict = parser.get_route_popularity_dict()
             for route_name, params_dict in tqdm(routes_dict.items()):
