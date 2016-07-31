@@ -11,7 +11,7 @@ from logging import FileHandler
 # Global values
 perform_backup = False
 perform_db_consolidation = False
-send_notification_email = False
+send_notification_email = True
 cycle_delay = 30  # seconds
 downtime_log_path = os.path.join(os.getcwd(), 'logs', 'downtime.log')
 
@@ -73,18 +73,19 @@ def consolidate_data(game_dicts, previous_date_string):
             else:
                 print('[!] Not running backup command')
             # move the file to its respective data directory for consolidation
-            data_folder = os.path.join(os.getcwd(), 'data', game['short'], 'csv')
+            data_folder = os.path.join(os.getcwd(), 'data', game['short'], 'csv', file_name)
             move_file(src=file_name, dst=data_folder)
         except Exception as e:
             print('[-] Backing up error: {}'.format(e))
             notification_string += 'NOT FINISHED. '
+        time.sleep(1)
         if not perform_db_consolidation:
             print('[!] Not running db consolidation')
-            print('[!] Moving CSVs to complete folder')
-            move_file(
-                src=os.path.join(os.getcwd(), 'data', game['short'], 'csv', file_name),
-                dst=os.path.join(os.getcwd(), 'completed', file_name)
-            )
+            #print('[!] Moving CSVs to complete folder')
+            #move_file(
+            #    src=os.path.join(os.getcwd(), 'data', game['short'], 'csv', file_name),
+            #    dst=os.path.join(os.getcwd(), 'completed', file_name)
+            #)
     if perform_db_consolidation:
         print('[!] Starting Database consolidation')
         try:
