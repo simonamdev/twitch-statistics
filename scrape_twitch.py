@@ -69,7 +69,7 @@ def main():
                 continue
             returned_data = api.return_required_data()
             # if any returned data is available, then write to to the CSV
-            file_name = game_configuration['shorthand'] + '_' + current_date_string
+            file_name = game_configuration['shorthand'] + '_' + current_date_string + '.csv'
             if returned_data is not None and len(returned_data) > 0:
                 write_to_file(
                     file_name=file_name,
