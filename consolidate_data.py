@@ -6,6 +6,7 @@ from tqdm import tqdm
 from pprint import pprint
 from shutil import copy2 as copy_file
 from neopysqlite.neopysqlite import Pysqlite
+from consolidation import log_parser
 
 # For each game
 games = [
@@ -475,6 +476,12 @@ def get_streamer_db_names(game):
 def main():
     process_streamer_data = True
     process_global_data = True
+    process_logs = True
+    process_raw_logs = True
+    process_performance_logs = True
+    process_downtime_logs = True
+    process_page_popularity_logs = True
+    process_unique_visitor_logs = True
     start_time = time.time()
     print('Starting consolidation script at {}'.format(datetime.datetime.fromtimestamp(start_time)))
     # for each game,
@@ -522,6 +529,15 @@ def main():
                             # skip empty rows
                             continue
                         if row[0] == streamer:
+                            # fix the timestamp if it is wrong here, change from DD-MM-YYYY to YYYY-MM-DD
+                            time_string = row[4]
+                            time_split = time_string.split(' ')
+                            date_part = time_split[0].split('-')
+                            year, month, day = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                            if day == 2016:
+                                day, month, year = int(date_part[0]), int(date_part[1]), int(date_part[2])
+                            new_string = '{}-{}-{} {}'.format(year, month, day, time_split[1])
+                            row[4] = new_string
                             streamer_data.append(row)
                 stream_dicts = split_by_stream(streamer_data)
                 if len(stream_dicts) == 0:
@@ -575,6 +591,54 @@ def main():
             # initialise GameDB
             game_db = GameDB(game=game, streamer_dicts=streamer_dicts)
             game_db.run()
+    if process_logs:
+        db = Pysqlite(database_name='Performance DB', database_file=os.path.join(os.getcwd(), 'meta', 'performance.db'))
+        log_path = os.path.join(os.getcwd(), 'logs', 'application.log')
+        parser = log_parser.ApplicationLogParser(file_path=log_path, verbose=True)
+        if process_raw_logs:
+            print('Processing raw logs')
+            raw_split_rows = parser.get_data_rows()
+            if raw_split_rows:
+                db.insert_rows(table='access_log', row_string='(NULL, ?, ?, ?, ?, ?)',
+                               row_data_list=raw_split_rows)
+        if process_performance_logs and raw_split_rows:
+            print('Processing performance logs')
+            serve_time_dict = parser.get_serve_time_dict()
+            db.insert_row(table='access_time', row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?)',
+                          row_data=[
+                              serve_time_dict['serve_time_average'],
+                              serve_time_dict['serve_time_max'],
+                              serve_time_dict['serve_time_median']
+                          ])
+        if process_unique_visitor_logs and raw_split_rows:
+            print('Processing unique visitor logs')
+            db.insert_row(table='unique_visitors', row_string='(NULL, CURRENT_TIMESTAMP, ?)',
+                          row_data=(parser.get_unique_ip_count(),))
+        if process_downtime_logs and raw_split_rows:
+            print('Processing downtime logs')
+            pass
+        if process_page_popularity_logs and raw_split_rows:
+            print('Processing page popularity logs')
+            routes_dict = parser.get_route_popularity_dict()
+            for route_name, params_dict in tqdm(routes_dict.items()):
+                for param_string, count_and_time_dict in params_dict['params_dict'].items():
+                    use_count = count_and_time_dict['count']
+                    time_string = count_and_time_dict['times'].pop(0)
+                    for epoch_time in count_and_time_dict['times']:
+                        time_string += ',{}'.format(epoch_time)
+                    db.insert_row(table='pages_accessed',
+                                  row_string='(NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?)',
+                                  row_data=(route_name, param_string, int(use_count), time_string))
+        # get the count of currently stored logs
+        log_number = len(os.listdir(os.path.join(os.getcwd(), 'logs', 'old')))
+        # always move the log to the old folder, regardless of what you do
+        os.rename(
+            src=os.path.join(os.getcwd(), 'logs', 'application.log'),
+            dst=os.path.join(os.getcwd(), 'logs', 'old', 'application_{}.log'.format(log_number)))
+        # copy in the clean version
+        copy_file(
+            src=os.path.join(os.getcwd(), 'logs', 'application_clean.log'),
+            dst=os.path.join(os.getcwd(), 'logs', 'application.log'))
     finish_time = time.time()
     delta = (finish_time - start_time) // (60 * 60)
     print('Consolidation complete. Time taken: {} hours'.format(delta))
