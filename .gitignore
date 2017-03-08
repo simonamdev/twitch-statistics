@@ -5,3 +5,4 @@ __pycache__/
 logs/
 meta/
 collection/.cache
+client_id.txt
