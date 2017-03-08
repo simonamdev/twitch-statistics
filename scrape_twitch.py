@@ -8,12 +8,20 @@ from consolidate_data import consolidate_all_data
 from collection import twitchapi
 from logging import FileHandler
 
-# Global values
-perform_backup = False
-perform_db_consolidation = False
-send_notification_email = True
 cycle_delay = 30  # seconds
-downtime_log_path = os.path.join(os.getcwd(), 'logs', 'downtime.log')
+
+config_values = [
+    {
+        'url_name': 'Elite:%20Dangerous',
+        'full_name': ['Elite: Dangerous', 'Elite Dangerous'],
+        'shorthand': 'ED'
+    },
+    {
+        'url_name': 'Planet%20Coaster',
+        'full_name': ['Planet Coaster', 'Planet: Coaster'],
+        'shorthand': 'PC'
+    },
+]
 
 
 def pause(amount=5):
@@ -21,22 +29,6 @@ def pause(amount=5):
         print('[+] Paused for {} seconds   '.format(pause_tick), end='\r')
         time.sleep(1)
     print('                                    ', end='\r')
-
-
-def get_config_values():
-    with open('games.txt', 'r') as file:
-        data = file.readlines()
-    data = [data.strip() for data in data if not data.startswith('#')]
-    dicts_list = []
-    for i in range(0, len(data) // 4):
-        return_dict = {
-            'url': data.pop(0),
-            'full': data.pop(0),
-            'possible_full': data.pop(0).split(','),
-            'short': data.pop(0)
-        }
-        dicts_list.append(return_dict)
-    return dicts_list
 
 
 def insert_data_rows_into_csv(file_name=None, data_rows=None, verbose=False):
