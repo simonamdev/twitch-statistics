@@ -3,8 +3,8 @@ import os
 import time
 from datetime import datetime
 from shutil import move as move_file
-from cfg import SCP_COMMAND, EMAIL_COMMAND
-from collection import twitchapi
+
+import twitchapi
 
 cycle_delay = 30  # seconds
 

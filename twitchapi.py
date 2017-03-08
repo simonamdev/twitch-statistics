@@ -88,12 +88,3 @@ class APIStreamsRequest:
                     timestamp
              ) for stream in self.streams_data if stream['game'] in self.game_full_names
         ]
-
-
-def main():
-    a = APIStreamsRequest(game_url_name='Elite:%20Dangerous', game_proper_name='Elite: Dangerous', verbose=True)
-    a.request_all_game_data()
-    print(a.return_required_data())
-
-if __name__ == '__main__':
-    main()
