@@ -50,8 +50,15 @@ def get_twitch_client_id():
 
 def main():
     client_id = get_twitch_client_id()
+    current_date_string = get_current_date_string()
     while True:
-        current_date_string = get_current_date_string()
+        # if a new day has started, move the completed data to its respective subfolder
+        new_date_string = get_current_date_string()
+        if not current_date_string == new_date_string:
+            data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], 'csv', file_name)
+            print('Moving {} to: {}'.format(file_name, data_folder))
+            move_file(src=file_name, dst=data_folder)
+            current_date_string = new_date_string
         # Scrape the data for each game
         for game_configuration in game_configurations:
             print('Scraping data for: {}'.format(game_configuration['full_name'][0]))
@@ -76,10 +83,7 @@ def main():
                     rows=returned_data)
             else:
                 print('No rows written for: {}'.format(game_configuration['full_name']))
-            # if a new day has started, move the completed data to its respective subfolder
-            if not current_date_string == get_current_date_string():
-                data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], 'csv', file_name)
-                move_file(src=file_name, dst=data_folder)
+
         pause(cycle_delay)
 
 
