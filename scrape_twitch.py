@@ -52,15 +52,15 @@ def main():
     client_id = get_twitch_client_id()
     current_date_string = get_current_date_string()
     while True:
-        # if a new day has started, move the completed data to its respective subfolder
-        new_date_string = get_current_date_string()
-        if not current_date_string == new_date_string:
-            data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], 'csv', file_name)
-            print('Moving {} to: {}'.format(file_name, data_folder))
-            move_file(src=file_name, dst=data_folder)
-            current_date_string = new_date_string
         # Scrape the data for each game
         for game_configuration in game_configurations:
+            # if a new day has started, move the completed data to its respective subfolder
+            new_date_string = get_current_date_string()
+            if not current_date_string == new_date_string:
+                data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], 'csv', file_name)
+                print('Moving {} to: {}'.format(file_name, data_folder))
+                move_file(src=file_name, dst=data_folder)
+                current_date_string = new_date_string
             print('Scraping data for: {}'.format(game_configuration['full_name'][0]))
             # Get the data for the current game by invoking the twitchapi module
             api = twitchapi.APIStreamsRequest(
