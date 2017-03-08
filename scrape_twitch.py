@@ -43,7 +43,13 @@ def get_current_date_string():
     return '{}_{}_{}'.format(previous_day, previous_month, previous_year)
 
 
+def get_twitch_client_id():
+    with open('client_id.txt', 'r') as id_file:
+        return id_file.readline().strip()
+
+
 def main():
+    client_id = get_twitch_client_id()
     while True:
         current_date_string = get_current_date_string()
         # Scrape the data for each game
@@ -52,7 +58,8 @@ def main():
             # Get the data for the current game by invoking the twitchapi module
             api = twitchapi.APIStreamsRequest(
                 game_url_name=game_configuration['url_name'],
-                game_proper_name=game_configuration['full_name'])
+                game_full_names=game_configuration['full_name'],
+                client_id=client_id)
             try:
                 api.request_all_game_data()
             except Exception as e:
