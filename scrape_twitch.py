@@ -57,7 +57,7 @@ def main():
             # if a new day has started, move the completed data to its respective subfolder
             new_date_string = get_current_date_string()
             if not current_date_string == new_date_string:
-                data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], 'csv', file_name)
+                data_folder = os.path.join(os.getcwd(), 'data', game_configuration['shorthand'], file_name)
                 print('Moving {} to: {}'.format(file_name, data_folder))
                 move_file(src=file_name, dst=data_folder)
                 current_date_string = new_date_string
