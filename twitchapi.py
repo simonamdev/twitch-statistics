@@ -25,8 +25,7 @@ class APIStreamsRequest:
                 timeout=self.timeout,
                 headers={'Client-ID': self.client_id})
         except Exception as e:
-            self.print('Encountered an exception:')
-            print(e)
+            # TODO: Don't return None :(
             return None
         self.last_status_code = response.status_code
         self.print('[INFO] Status code returned: {}'.format(self.last_status_code))
@@ -46,7 +45,7 @@ class APIStreamsRequest:
         url = self.json_url + '?game=' + self.game_url_name
         response_data = self.make_request(url=url)
         if response_data is None:
-            raise Exception
+            raise Exception('No data returned in the request')
         streams_data = response_data['streams']
         link_to_next = response_data['_links']['next']
         while not len(streams_data) == 0:
